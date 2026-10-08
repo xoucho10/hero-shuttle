@@ -8,20 +8,20 @@ export default function Page(){
  const devNumber = "256700568634"
 
  const pricing = [
-   { route:"Airport to Stone Town", area:"West", distance:"6 km", time:"12-15 min", price:15, popular:true, note:"Historic UNESCO town, all hotels" },
-   { route:"Airport to Chuwini / Bububu", area:"West", distance:"14 km", time:"20-25 min", price:25, popular:false, note:"West coast lodges, quiet" },
-   { route:"Airport to Nungwi / Kendwa", area:"North", distance:"58 km", time:"65-75 min", price:40, popular:true, note:"Sunset beach, best swimming, resorts" },
-   { route:"Airport to Matemwe", area:"North-East", distance:"52 km", time:"60-70 min", price:40, popular:true, note:"Mnemba snorkeling departure point" },
-   { route:"Airport to Pwani Mchangani", area:"East", distance:"38 km", time:"50-60 min", price:35, popular:false, note:"East coast kite surfing area" },
-   { route:"Airport to Kiwengwa / Pongwe / Pingwe", area:"East", distance:"36 km", time:"50-55 min", price:35, popular:false, note:"The Rock Restaurant, white sand" },
-   { route:"Airport to Uroa / Marumbi / Michamvi", area:"East-South", distance:"32 km", time:"45-50 min", price:35, popular:false, note:"Family beaches, shallow water" },
-   { route:"Airport to Paje / Bwejuu", area:"South-East", distance:"48 km", time:"50-60 min", price:35, popular:true, note:"Kite capital, lively backpacker + boutique" },
-   { route:"Airport to Jambiani / Makunduchi", area:"South", distance:"55 km", time:"55-65 min", price:40, popular:false, note:"Local fishing village, authentic" },
-   { route:"Airport to Kizimkazi", area:"South-West", distance:"56 km", time:"60-70 min", price:40, popular:false, note:"Dolphin tour village + Jozani near" },
+   { route:"Airport to Stone Town", area:"West", distance:"6 km", time:"12-15 min", price:15, market:30, popular:true, note:"Historic UNESCO town, all hotels" },
+   { route:"Airport to Chuwini / Bububu", area:"West", distance:"14 km", time:"20-25 min", price:25, market:45, popular:false, note:"West coast lodges, quiet" },
+   { route:"Airport to Nungwi / Kendwa", area:"North", distance:"58 km", time:"65-75 min", price:40, market:80, popular:true, note:"Sunset beach, best swimming, resorts" },
+   { route:"Airport to Matemwe", area:"North-East", distance:"52 km", time:"60-70 min", price:40, market:80, popular:true, note:"Mnemba snorkeling departure point" },
+   { route:"Airport to Pwani Mchangani", area:"East", distance:"38 km", time:"50-60 min", price:35, market:70, popular:false, note:"East coast kite surfing area" },
+   { route:"Airport to Kiwengwa / Pongwe / Pingwe", area:"East", distance:"36 km", time:"50-55 min", price:35, market:70, popular:false, note:"The Rock Restaurant, white sand" },
+   { route:"Airport to Uroa / Marumbi / Michamvi", area:"East-South", distance:"32 km", time:"45-50 min", price:35, market:70, popular:false, note:"Family beaches, shallow water" },
+   { route:"Airport to Paje / Bwejuu", area:"South-East", distance:"48 km", time:"50-60 min", price:35, market:70, popular:true, note:"Kite capital, lively backpacker + boutique" },
+   { route:"Airport to Jambiani / Makunduchi", area:"South", distance:"55 km", time:"55-65 min", price:40, market:80, popular:false, note:"Local fishing village, authentic" },
+   { route:"Airport to Kizimkazi", area:"South-West", distance:"56 km", time:"60-70 min", price:40, market:80, popular:false, note:"Dolphin tour village + Jozani near" },
  ]
 
  const getWaLink = (route:string, price:number) => {
-   const msg = `Hi HERO! I want to book Airport Transfer: ${route} - $${price} per vehicle up to 4 pax = $${(price/4).toFixed(2)} pp when 4 share. Please confirm pickup with driver name, vehicle plate and meet & greet at Abeid Airport arrivals.`
+   const msg = `Hi HERO! I want to book Airport Transfer: ${route} - $${price} per vehicle up to 4 pax. Please confirm pickup with driver name, vehicle plate and meet & greet at Abeid Airport arrivals.`
    return `https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`
  }
 
@@ -73,7 +73,7 @@ export default function Page(){
       const icon = L.divIcon({ html, className: 'price-pin', iconSize: [150, 32], iconAnchor: [75, 16] })
       const marker = L.marker(p.pos, { icon }).addTo(map)
       const wa = `https://wa.me/${waNumber}?text=${encodeURIComponent(`Hi HERO! I saw map - I want ${p.name} transfer ${p.price} ${p.dist} per vehicle. Please confirm driver.`)}`
-      marker.bindPopup(`<div style="font-family:system-ui; min-width:170px"><b style="font-size:13px">${p.name}</b><br/><span style="font-size:11px; opacity:0.7">${p.dist}</span><br/><span style="font-weight:900; color:${p.color}; font-size:18px">${p.price}</span><span style="font-size:11px; opacity:0.7"> per vehicle</span><br/><span style="font-size:10px; color:#FF8A1A; font-weight:800">$${p.price!== 'FROM'? (parseInt(p.price.replace('$',''))/4).toFixed(2) : '0'} pp when 4 pax</span><br/><a href="${wa}" target="_blank" style="display:inline-block; margin-top:8px; background:#0A2342; color:white; padding:7px 14px; border-radius:20px; text-decoration:none; font-size:11px; font-weight:800">Book on WhatsApp</a></div>`)
+      marker.bindPopup(`<div style="font-family:system-ui; min-width:170px"><b style="font-size:13px">${p.name}</b><br/><span style="font-size:11px; opacity:0.7">${p.dist}</span><br/><span style="font-weight:900; color:${p.color}; font-size:18px">${p.price}</span><span style="font-size:11px; opacity:0.7"> per vehicle</span><br/><a href="${wa}" target="_blank" style="display:inline-block; margin-top:8px; background:#0A2342; color:white; padding:7px 14px; border-radius:20px; text-decoration:none; font-size:11px; font-weight:800">Book on WhatsApp</a></div>`)
     })
   }
   initMap()
@@ -89,7 +89,7 @@ export default function Page(){
    <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#FF8A1A]/10 rounded-full blur-[120px]"></div>
    <div className="relative px-6 md:px-12 py-12 md:py-20 text-center text-white">
      <span className="bg-white/10 border border-white/10 text-[10px] px-4 py-1.5 rounded-full font-black tracking-widest">ABEID AMANI KARUME AIRPORT (ZNZ) • FIXED PER VEHICLE • LICENSED DRIVER • 24/7</span>
-     <h1 className="font-serif font-black text-[32px] md:text-[52px] leading-[0.95] mt-6">Zanzibar Airport Transfers — Fixed Prices<br/><span className="text-[#FF8A1A]">From $15 Per Vehicle = $3.75 pp</span></h1>
+     <h1 className="font-serif font-black text-[32px] md:text-[52px] leading-[0.95] mt-6">Zanzibar Airport Transfers — Fixed Prices<br/><span className="text-[#FF8A1A]">From $15 Per Vehicle</span></h1>
      <p className="text-[14px] opacity-80 mt-5 max-w-2xl mx-auto leading-relaxed">
        Abeid Amani Karume International Airport is 6 km from Stone Town and 48-58 km from beach hotels. Hotel taxis charge $70-$90 per car. Brokers at arrivals charge $50+ after bargaining.
        HERO is local Stone Town team with fixed per vehicle pricing: <b>Stone Town $15, East Coast Paje $35, North Nungwi $40 per vehicle up to 4 pax</b>. Same price day & night, flight tracked, 60 min free wait, meet & greet with name sign, AC Toyota Noah/Alphard, child seat free, pay driver directly after trip in USD/TZS/Euro/M-Pesa. No advance.
@@ -133,7 +133,7 @@ export default function Page(){
          <div className="bg-white border border-gray-200 rounded-[24px] overflow-hidden shadow-[0_12px_40px_rgba(0,0,0,0.08)]">
            <div id="zanzibar-realtime-map" className="w-full h-[440px] md:h-[500px] z-0" style={{ background: '#eef2f7' }}></div>
            <div className="px-4 py-3 flex justify-between items-center bg-[#0A2342] text-white text-[10px]">
-             <span>📍 Click pin → See price per vehicle + per person → Book on WhatsApp</span>
+             <span>📍 Click pin → See price per vehicle → Book on WhatsApp</span>
              <span className="opacity-60 hidden md:inline">Drag • Scroll to zoom • Mobile: pinch</span>
            </div>
          </div>
@@ -153,7 +153,7 @@ export default function Page(){
      <div className="text-center max-w-3xl mx-auto">
        <span className="bg-[#FFFBF5] border border-[#FF8A1A]/20 text-[#FF8A1A] text-[10px] px-4 py-1.5 rounded-full font-black tracking-widest">ALL FIXED PRICES PER VEHICLE UP TO 4 PAX • SAME DAY & NIGHT</span>
        <h2 className="font-serif font-black text-[28px] md:text-[40px] mt-4 leading-[1.05]">Complete Airport Transfer Price List - Per Vehicle</h2>
-       <p className="text-[13px] opacity-60 mt-3">Price is per vehicle Toyota Noah/Alphard up to 4 passengers + luggage. Not per person. Includes driver, fuel, meet & greet at arrivals with name sign, 60 min free waiting, flight tracking, bottled water, child seat on request. Pay driver directly after trip. No advance, free cancellation 24h.</p>
+       <p className="text-[13px] opacity-60 mt-3">Price is per vehicle Toyota Noah/Alphard up to 4 passengers + luggage. Not per person. Market price crossed out so you see real saving. Includes driver, fuel, meet & greet at arrivals with name sign, 60 min free waiting, flight tracking, bottled water, child seat on request. Pay driver directly after trip. No advance, free cancellation 24h.</p>
      </div>
 
      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mt-10">
@@ -164,8 +164,9 @@ export default function Page(){
            <p className="text-[10px] opacity-60 mt-1">{x.area} • {x.distance} • {x.time}</p>
            <p className="text-[10px] opacity-50 mt-1 italic">{x.note}</p>
            <div className="mt-4">
+             <p className="text-[11px] opacity-50 line-through">${x.market} market</p>
              <p className="font-black text-[26px] leading-none text-[#0A2342]">${x.price}<span className="text-[11px] font-medium opacity-60 ml-1">vehicle</span></p>
-             <p className="text-[10px] font-bold text-[#FF8A1A] mt-1">${(x.price/4).toFixed(2)} pp when 4 pax • {(x.price/2).toFixed(2)} pp when 2 pax</p>
+             <p className="text-[10px] font-bold text-[#00AF87] mt-1">Save ${x.market - x.price} • Best Price</p>
            </div>
            <a href={getWaLink(x.route, x.price)} target="_blank" rel="noopener noreferrer" className="mt-4 w-full bg-[#0A2342] group-hover:bg-black text-white text-[11px] font-bold py-2.5 rounded-full flex justify-center transition">Book on WhatsApp</a>
            <p className="text-[9px] opacity-40 mt-2 text-center">Pay driver directly • Free cancellation 24h</p>
@@ -185,7 +186,7 @@ export default function Page(){
          <div className="mt-6 space-y-3 text-[12.5px]">
            <div className="bg-[#F5F7FA] rounded-[12px] p-4">
              <p className="font-black">🚕 Transfers: $15-$40 per vehicle (this page)</p>
-             <p className="opacity-70 mt-1">Airport to any beach is transport only. Price based on distance, fuel (1 liter $1.3), driver time, return empty. Toyota Noah 7-seater but we sell max 4 pax + luggage for comfort. 6 km Stone Town $15, 58 km Nungwi $40. Same day & night. No luggage surcharge for normal 1 bag per person + hand luggage. Extra luggage +$5. Surfboard +$10.</p>
+             <p className="opacity-70 mt-1">Airport to any beach is transport only. Price based on distance, fuel (1 liter $1.3), driver time, return empty. Toyota Noah 7-seater but we sell max 4 pax + luggage for comfort. 6 km Stone Town $15 market $30, 58 km Nungwi $40 market $80. Same day & night. No luggage surcharge for normal 1 bag per person + hand luggage. Extra luggage +$5. Surfboard +$10.</p>
            </div>
            <div className="bg-[#FFFBF5] border border-[#FF8A1A]/20 rounded-[12px] p-4">
              <p className="font-black">🏝️ Tours & Excursions: $22-$85 per tour (separate page)</p>
@@ -210,7 +211,7 @@ export default function Page(){
          <div className="bg-[#0A2342] text-white rounded-[20px] p-7">
            <p className="font-black text-[14px]">How booking works (2 min on WhatsApp)</p>
            <div className="mt-3 space-y-2 text-[12px] opacity-80 leading-relaxed">
-             <p><b className="text-[#FF8A1A]">1. Click Book</b> on route card or map pin → WhatsApp opens with pre-filled message including price per vehicle and per person calculation</p>
+             <p><b className="text-[#FF8A1A]">1. Click Book</b> on route card or map pin → WhatsApp opens with pre-filled message including price per vehicle</p>
              <p><b className="text-[#FF8A1A]">2. Send:</b> Date, flight number (e.g., ET812), hotel name + location pin, number of pax + luggage. We reply in 5-10 min with confirmation, driver name, photo, vehicle plate, exact pickup time</p>
              <p><b className="text-[#FF8A1A]">3. At airport:</b> Driver waits at arrivals hall after customs with your name. If you don't see, call WhatsApp +255773628792. Pay driver after arrival at hotel. Free cancellation 24h before.</p>
            </div>
@@ -227,15 +228,15 @@ export default function Page(){
      <h3 className="font-serif font-black text-[22px] md:text-[30px] text-center leading-tight">Zanzibar Airport Taxi - Real Prices, Real Distances, Real Times</h3>
      <div className="grid md:grid-cols-3 gap-6 mt-8 text-[12.5px] leading-relaxed">
        <div className="bg-[#FFFBF5] border border-[#FF8A1A]/10 rounded-[20px] p-6">
-         <p className="font-black">✈️ Airport to Stone Town $15 per vehicle?</p><p className="mt-2 opacity-70">Yes. Abeid Airport to Stone Town Forodhani 6 km, 12-15 min via Airport Road and Maisara. Tarmac perfect. No traffic except 5-6 PM near Darajani market. Price $15 per vehicle up to 4 pax = $3.75 pp when 4 share.</p>
-         <p className="font-black mt-6">📍 Airport to Nungwi / Kendwa $40?</p><p className="mt-2 opacity-70">Yes 58 km, 65-75 min. Route: Airport - Mwana Kwerekwe - Kiboje - Mahonda - Nungwi. Last 5 km bumpy, we drive slow.</p>
+         <p className="font-black">✈️ Airport to Stone Town $15 per vehicle?</p><p className="mt-2 opacity-70">Yes. Abeid Airport to Stone Town Forodhani 6 km, 12-15 min via Airport Road and Maisara. Tarmac perfect. No traffic except 5-6 PM near Darajani market. Price $15 per vehicle up to 4 pax market $30 save $15.</p>
+         <p className="font-black mt-6">📍 Airport to Nungwi / Kendwa $40?</p><p className="mt-2 opacity-70">Yes 58 km, 65-75 min. Route: Airport - Mwana Kwerekwe - Kiboje - Mahonda - Nungwi. Last 5 km bumpy, we drive slow. Market $80 you save $40.</p>
        </div>
        <div className="bg-[#F5F7FA] border border-black/5 rounded-[20px] p-6">
-         <p className="font-black">🏖️ Paje / Bwejuu / Jambiani?</p><p className="mt-2 opacity-70">Paje 48 km 55 min via Jozani Forest (good tarmac, monkeys crossing). Price $35 per vehicle.</p>
-         <p className="font-black mt-6">🌴 East Coast Kiwengwa / Matemwe?</p><p className="mt-2 opacity-70">Kiwengwa 36 km 55 min, home of The Rock Restaurant. Matemwe 52 km 65 min - departure for Mnemba.</p>
+         <p className="font-black">🏖️ Paje / Bwejuu / Jambiani?</p><p className="mt-2 opacity-70">Paje 48 km 55 min via Jozani Forest (good tarmac, monkeys crossing). Price $35 per vehicle market $70 save $35.</p>
+         <p className="font-black mt-6">🌴 East Coast Kiwengwa / Matemwe?</p><p className="mt-2 opacity-70">Kiwengwa 36 km 55 min, home of The Rock Restaurant. Matemwe 52 km 65 min - departure for Mnemba. $35-$40 market $70-$80 save 50%.</p>
        </div>
        <div className="bg-[#0A2342] text-white rounded-[20px] p-6">
-         <p className="font-black">💎 What makes HERO different?</p><p className="mt-2 opacity-70">We are based in Stone Town, not Arusha. Drivers live here, know every hotel gate. Licensed, insured. Pay driver directly after trip. Free cancellation 24h.</p>
+         <p className="font-black">💎 What makes HERO different?</p><p className="mt-2 opacity-70">We are based in Stone Town, not Arusha. Drivers live here, know every hotel gate. Licensed, insured. Pay driver directly after trip. Free cancellation 24h. Market $30-$80, HERO $15-$40.</p>
          <p className="font-black mt-6">🌙 2 AM same price? Luggage?</p><p className="mt-2 opacity-70">Yes same $15-$40 per vehicle 24/7. Normal luggage included. Extra large bag +$5, surfboard +$10.</p>
          <a href="/" className="mt-5 inline-block bg-white text-[#0A2342] px-5 py-2.5 rounded-full font-bold text-[12px]">🏝️ See Tours & Excursions</a>
        </div>
@@ -245,8 +246,8 @@ export default function Page(){
 
  {/* FINAL CTA */}
  <section className="bg-[#0A2342] px-6 md:px-12 py-14 text-center text-white">
-   <h2 className="font-serif font-black text-[32px] md:text-[44px] leading-[0.95]">Need a HERO From ZNZ Airport?<br/><span className="text-[#FF8A1A]">From $15 Per Vehicle = $3.75 pp</span></h2>
-   <p className="text-[12px] opacity-60 mt-3">Per vehicle up to 4 pax • Pay driver directly • No advance • Free cancellation 24h</p>
+   <h2 className="font-serif font-black text-[32px] md:text-[44px] leading-[0.95]">Need a HERO From ZNZ Airport?<br/><span className="text-[#FF8A1A]">From $15 Per Vehicle</span></h2>
+   <p className="text-[12px] opacity-60 mt-3">Per vehicle up to 4 pax • Pay driver directly • No advance • Free cancellation 24h • Market price crossed out - Best price guaranteed</p>
    <div className="mt-8 flex justify-center gap-3 flex-wrap">
      <a href={getWaLink("Airport Transfer - Any Beach", 40)} target="_blank" rel="noopener noreferrer" className="bg-[#FF8A1A] px-8 py-4 rounded-full font-black">💬 Book on WhatsApp +255 773 628 792</a>
      <a href="/" className="bg-white text-[#0A2342] px-8 py-4 rounded-full font-black">🏝️ Add Tours + Transfer Combo</a>
