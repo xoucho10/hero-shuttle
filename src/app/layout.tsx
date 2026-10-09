@@ -5,6 +5,11 @@ import { GlobalEffects } from "@/components/effects/GlobalEffects";
 export const metadata: Metadata = {
   title: "HERO Shuttle & Tours - Zanzibar Transfers per CAR",
   description: "Zanzibar Airport Transfers and Tours - Price per CAR up to 6 pax same price - Pay after trip",
+  icons: {
+    icon: "/icon.png",
+    shortcut: "/favicon.ico",
+    apple: "/apple-icon.png",
+  },
 };
 
 export default function RootLayout({
@@ -21,3 +26,4 @@ export default function RootLayout({
     </html>
   );
 }
+
