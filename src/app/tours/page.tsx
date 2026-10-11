@@ -1,143 +1,1 @@
-﻿"use client"
-import { useState, useEffect, useMemo } from "react"
-import Header from '@/components/Header'
-import Footer from '@/components/Footer'
-
-const DEFAULT_TOURS = [
-  { id:"prison-nakupenda", name:"Prison Island + Nakupenda", cat:["Popular","Half Day"], price:250, market:350, duration:"5 Hours", pickup:"Stone Town 8:30 AM", desc:"Tortoise sanctuary + sandbank + fruit", includes:"Boat, Guide, Entrance, Fruit, Water", area:"West", active:true, images:["prison-nakupenda.jpg"], imageDatas:[""], image:"prison-nakupenda.jpg", featured:true, imageData:"" },
-  { id:"nakupenda-only", name:"Nakupenda Sandbank Only", cat:["Half Day","Popular"], price:130, market:200, duration:"4 Hours", pickup:"Stone Town 9 AM", desc:"White sandbank in ocean, swimming", includes:"Boat, Fruit, Water", area:"West", active:true, images:["nakupenda-only.jpg"], imageDatas:[""], image:"nakupenda-only.jpg", featured:false, imageData:"" },
-  { id:"prison-only", name:"Prison Island Tortoises", cat:["Half Day"], price:135, market:180, duration:"3 Hours", pickup:"Stone Town 9 AM", desc:"Giant tortoises 100+ years", includes:"Boat, Entrance, Guide", area:"West", active:true, images:["prison-only.jpg"], imageDatas:[""], image:"prison-only.jpg", featured:false, imageData:"" },
-  { id:"spice", name:"Spice Farm Tour", cat:["Cultural"], price:100, market:140, duration:"3 Hours", pickup:"Stone Town 9 AM", desc:"30+ spices + fruits tasting", includes:"Guide, Tasting, Lunch", area:"Central", active:true, images:["spice.jpg"], imageDatas:[""], image:"spice.jpg", featured:false, imageData:"" },
-  { id:"jozani", name:"Jozani Forest Monkeys", cat:["Nature"], price:90, market:120, duration:"3 Hours", pickup:"Stone Town 8 AM", desc:"Red colobus monkeys only in Zanzibar", includes:"Car, Guide, Entrance", area:"South East", active:true, images:["jozani.jpg"], imageDatas:[""], image:"jozani.jpg", featured:false, imageData:"" },
-]
-
-export default function ToursPage(){
-  const [tours, setTours] = useState(DEFAULT_TOURS)
-  const [selected, setSelected] = useState<any[]>([])
-  const [slideIndex, setSlideIndex] = useState<{[k:string]:number}>({})
-
-  useEffect(()=>{
-    fetch('/api/tours').then(r=>r.json()).then(data=>{
-      if(Array.isArray(data) && data.length>0){
-        const mapped = data.map((t:any)=>({
-          id: t.id, name: t.name, cat: t.cat||[t.area], price: t.price, market: t.market,
-          duration: t.duration, pickup: t.pickup, desc: t.description||t.desc, includes: t.includes, area: t.area, active: t.active,
-          images: t.image_urls||[], imageDatas: t.image_urls||[], image: (t.image_urls||[])[0]||"", featured: t.featured, imageData: (t.image_urls||[])[0]||""
-        }))
-        setTours(mapped)
-      }
-    }).catch(()=>{})
-  },[])
-
-  useEffect(()=>{
-    const iv = setInterval(()=>{
-      setSlideIndex(prev=>{
-        const next:any = {...prev}
-        tours.forEach(t=>{
-          const imgs = t.imageDatas?.filter(Boolean) || t.images || []
-          if(imgs.length>1){
-            next[t.id] = ((prev[t.id]||0)+1) % imgs.length
-          }
-        })
-        return next
-      })
-    },5000)
-    return ()=>clearInterval(iv)
-  },[tours])
-
-  const toggleTour = (tour:any)=>{
-    setSelected(prev=>{
-      if(prev.find(p=>p.id===tour.id)) return prev.filter(p=>p.id!==tour.id)
-      return [...prev, {...tour, guests:1}]
-    })
-  }
-
-  const total = useMemo(()=>selected.reduce((s,t)=>s+(t.price*t.guests),0),[selected])
-  const totalMarket = useMemo(()=>selected.reduce((s,t)=>s+((t.market||t.price)*t.guests),0),[selected])
-
-  const bookWhatsApp = ()=>{
-    if(selected.length===0) return
-    const msg = `Jambo HeroShuttle! 🚤%0A%0AI want to book:%0A${selected.map(t=>`• ${t.name} - $${t.price} (${t.duration}, Pickup: ${t.pickup}, ${t.guests} guest)`).join('%0A')}%0A%0ATotal: $${total} (Market: $${totalMarket})%0ASaving: $${totalMarket-total}`
-    window.open(`https://wa.me/255773000000?text=${msg}`, '_blank')
-  }
-
-  return (
-    <div className="min-h-screen bg-gray-100">
-      <Header />
-      <div className="max-w-7xl mx-auto p-4 grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {tours.filter(t=>t.active).map(tour=>{
-            const imgs = tour.imageDatas?.filter(Boolean).length? tour.imageDatas.filter(Boolean) : tour.images
-            const idx = slideIndex[tour.id]||0
-            const currentImg = imgs?.[idx] || ''
-            const isSelected = selected.find(s=>s.id===tour.id)
-            return (
-              <div key={tour.id} className={`rounded-2xl overflow-hidden bg-white border-2 shadow-sm transition ${isSelected?'border-green-500 ring-2 ring-green-200': 'border-gray-800'}`}>
-                <div className="h-48 relative bg-gradient-to-br from-teal-600 to-slate-900 flex items-center justify-center overflow-hidden">
-                  {currentImg? <img src={currentImg} alt={tour.name} className="w-full h-full object-cover" /> : <span className="text-white/50 text-xs">{tour.id}</span>}
-                  {imgs?.length>1 && <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">{imgs.map((_:any,i:number)=><div key={i} className={`w-1.5 h-1.5 rounded-full ${i===idx?'bg-white':'bg-white/40'}`} />)}</div>}
-                  {tour.featured && <div className="absolute top-2 left-2 bg-yellow-400 text-xs font-bold px-2 py-1 rounded">FEATURED</div>}
-                </div>
-                <div className="p-4">
-                  <h3 className="font-bold text-[#0a2540]">{tour.name}</h3>
-                  <p className="text-xs text-gray-500 mt-1 line-clamp-2">{tour.desc} • {tour.duration} • {tour.area}</p>
-                  <div className="flex items-end justify-between mt-3">
-                    <div>
-                      <div className="text-xs text-red-600 font-bold">$</div>
-                      <div className="font-extrabold text-[#0a2540] text-lg">${tour.price}</div>
-                      {tour.market>tour.price && <div className="text-xs line-through text-gray-400">${tour.market}</div>}
-                    </div>
-                    <button onClick={()=>toggleTour(tour)} className={`px-4 py-2 rounded-full text-xs font-bold ${isSelected?'bg-red-500 text-white':'bg-[#0a2540] text-white'}`}>{isSelected?'Remove -':'Add +'}</button>
-                  </div>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-        <div className="lg:sticky top-4 h-fit">
-          <div className="bg-white rounded-2xl border border-gray-800 p-4 shadow-sm">
-            <h3 className="font-bold text-[#0a2540] mb-3">🛒 Total: ${total} ({selected.length} tours)</h3>
-            {selected.length===0? (
-              <p className="text-sm text-gray-500">No tours selected yet. Click Add+ to build your trip.</p>
-            ) : (
-              <div className="space-y-3 max-h-[60vh] overflow-auto pr-1">
-                {selected.map(t=>(
-                  <div key={t.id} className="border rounded-xl p-3 bg-gray-50">
-                    <div className="flex gap-3">
-                      <div className="w-16 h-16 rounded-lg bg-slate-800 flex-shrink-0 overflow-hidden">
-                        {(t.imageDatas?.[0]||t.images?.[0]) && <img src={t.imageDatas?.[0]||t.images?.[0]} className="w-full h-full object-cover" />}
-                      </div>
-                      <div className="flex-1">
-                        <div className="font-bold text-sm text-[#0a2540] leading-tight">{t.name}</div>
-                        <div className="text-[11px] text-gray-600 mt-1">⏱ {t.duration} • 📍 {t.area} • 🕘 {t.pickup}</div>
-                        <div className="text-[11px] text-gray-500 mt-1">{t.includes}</div>
-                      </div>
-                      <button onClick={()=>toggleTour(t)} className="text-red-500 text-xs font-bold">✕</button>
-                    </div>
-                    <div className="flex justify-between items-center mt-2">
-                      <div className="flex items-center gap-2">
-                        <button onClick={()=>setSelected(s=>s.map(x=>x.id===t.id?{...x, guests: Math.max(1, x.guests-1)}:x))} className="w-6 h-6 rounded-full border bg-white">-</button>
-                        <span className="text-xs font-bold">{t.guests} guest</span>
-                        <button onClick={()=>setSelected(s=>s.map(x=>x.id===t.id?{...x, guests: x.guests+1}:x))} className="w-6 h-6 rounded-full border bg-white">+</button>
-                      </div>
-                      <div className="font-bold text-[#0a2540]">${t.price * t.guests}</div>
-                    </div>
-                  </div>
-                ))}
-                <div className="border-t pt-3 text-sm space-y-1">
-                  <div className="flex justify-between"><span>Subtotal</span><span>${total}</span></div>
-                  <div className="flex justify-between text-gray-500"><span>Market price</span><span className="line-through">${totalMarket}</span></div>
-                  <div className="flex justify-between font-bold text-green-600"><span>You save</span><span>${totalMarket-total}</span></div>
-                </div>
-              </div>
-            )}
-            <button disabled={selected.length===0} onClick={bookWhatsApp} className="w-full mt-4 bg-[#25D366] disabled:bg-gray-300 text-white font-bold py-3 rounded-full text-sm">
-              📱 Book WhatsApp
-            </button>
-          </div>
-        </div>
-      </div>
-      <Footer />
-    </div>
-  )
-}
+﻿"use client"import { useState, useEffect, useMemo } from "react"import Header from '@/components/Header'import Footer from '@/components/Footer'const DEFAULT_TOURS = [  { id:"prison-nakupenda", name:"Prison Island + Nakupenda", cat:["Popular","Half Day"], price:55, market:75, duration:"5 Hours", pickup:"Stone Town 8:30 AM", desc:"Tortoise sanctuary + sandbank + fruit", includes:"Boat, Guide, Entrance, Fruit, Water", area:"West", featured:true },  { id:"nakupenda-only", name:"Nakupenda Sandbank Only", cat:["Half Day","Popular"], price:35, market:50, duration:"4 Hours", pickup:"Stone Town 9 AM", desc:"White sandbank in ocean", includes:"Boat, Fruit, Water", area:"West", featured:true },  { id:"prison-only", name:"Prison Island Tortoises", cat:["Half Day"], price:40, market:60, duration:"3 Hours", pickup:"Stone Town", desc:"Giant tortoises 100+ years", includes:"Boat, Entrance, Guide", area:"West", featured:false },  { id:"stone-town", name:"Stone Town Walking Tour", cat:["Popular","Half Day","Cultural"], price:25, market:40, duration:"3 Hours", pickup:"Stone Town", desc:"UNESCO, Slave Market", includes:"Guide, Entrances", area:"West", featured:true },  { id:"stone-food", name:"Stone Town Food Tour", cat:["Cultural","Half Day"], price:30, market:45, duration:"3 Hours", pickup:"Stone Town 5 PM", desc:"Forodhani night market tasting", includes:"Guide, Tasting", area:"West", featured:false },  { id:"spice", name:"Spice Farm Tour", cat:["Half Day","Cultural"], price:22, market:35, duration:"3 Hours", pickup:"Stone Town", desc:"30+ spices + fruits tasting", includes:"Guide, Tasting", area:"Central", featured:false },  { id:"spice-cook", name:"Spice + Cooking Class", cat:["Half Day","Cultural"], price:45, market:65, duration:"5 Hours", pickup:"Stone Town", desc:"Spice tour + Swahili cooking + eat", includes:"Guide, Cooking, Lunch", area:"Central", featured:false },  { id:"jozani", name:"Jozani Forest Monkeys", cat:["Popular","Half Day"], price:30, market:45, duration:"2.5 Hours", pickup:"Paje / Stone Town", desc:"Red colobus monkeys only in Zanzibar", includes:"Entrance, Guide", area:"South-Central", featured:true },  { id:"jozani-salaam", name:"Jozani + Salaam Cave Turtles", cat:["Popular","Half Day"], price:38, market:55, duration:"4 Hours", pickup:"Paje", desc:"Monkeys + turtle cave swimming", includes:"Entrance both, Guide", area:"South", featured:false },  { id:"salaam", name:"Salaam Cave Turtle Swim", cat:["Half Day"], price:25, market:35, duration:"2 Hours", pickup:"Paje / Jambiani", desc:"Swim with turtles in cave", includes:"Entrance, Guide", area:"South-East", featured:false },  { id:"kuza", name:"Kuza Cave Sacred Swim", cat:["Half Day","Cultural"], price:28, market:40, duration:"3 Hours", pickup:"Paje / Jambiani", desc:"Sacred limestone cave + culture", includes:"Entrance, Guide", area:"South-East", featured:false },  { id:"mnemba", name:"Mnemba Atoll Snorkeling", cat:["Popular","Half Day","North"], price:45, market:65, duration:"4 Hours", pickup:"Matemwe 8 AM", desc:"Best coral reef, colorful fish, dolphins", includes:"Boat, Gear, Guide", area:"North-East", featured:true },  { id:"mnemba-dolphin", name:"Mnemba + Dolphin Combo", cat:["Half Day","North"], price:55, market:75, duration:"5 Hours", pickup:"Matemwe / Nungwi 7:30 AM", desc:"Dolphins + Mnemba snorkeling", includes:"Boat, Guide, Gear", area:"North-East", featured:false },  { id:"safari-blue", name:"Safari Blue Full Day BBQ", cat:["Full Day","Popular","South"], price:85, market:120, duration:"8 Hours", pickup:"Fumba 8 AM", desc:"Sandbank + snorkeling + seafood BBQ + dhow", includes:"Dhow, BBQ, Drinks, Gear", area:"South-West", featured:true },  { id:"dhow-stone", name:"Sunset Dhow Stone Town", cat:["Popular","Half Day"], price:35, market:50, duration:"2 Hours", pickup:"Stone Town 4:30 PM", desc:"Traditional dhow sunset cruise", includes:"Dhow, Drinks", area:"West", featured:false },  { id:"dhow-nungwi", name:"Sunset Dhow Nungwi/Kendwa", cat:["Half Day","North"], price:40, market:60, duration:"2.5 Hours", pickup:"Nungwi", desc:"Best sunset north coast", includes:"Dhow, Drinks", area:"North", featured:false },  { id:"dolphin", name:"Kizimkazi Dolphin Tour", cat:["Half Day","South"], price:40, market:60, duration:"4 Hours", pickup:"Kizimkazi 6 AM", desc:"Dolphin watching early morning", includes:"Boat, Guide", area:"South", featured:false },  { id:"dolphin-jozani", name:"Dolphin + Jozani + Cave Full Day", cat:["Full Day","South"], price:75, market:100, duration:"8 Hours", pickup:"Paje 5:30 AM", desc:"Dolphins + monkeys + cave same day", includes:"Boat, Entrances, Guide", area:"South", featured:false },  { id:"rock", name:"The Rock Restaurant Tour", cat:["Half Day","East"], price:30, market:45, duration:"4 Hours", pickup:"East coast", desc:"Iconic Rock photo + Pongwe beach", includes:"Guide", area:"East", featured:false },  { id:"kite-lesson", name:"Paje Kite Surfing Lesson", cat:["Half Day","East","Water"], price:70, market:100, duration:"2 Hours", pickup:"Paje beach", desc:"Beginner kite with instructor + gear", includes:"Instructor, Gear", area:"South-East", featured:false },  { id:"kite-rental", name:"Kite Rental", cat:["Half Day","Water"], price:50, market:70, duration:"2 Hours", pickup:"Paje", desc:"For independent riders", includes:"Gear", area:"South-East", featured:false },  { id:"sup", name:"SUP / Clear Kayak", cat:["Half Day","Water"], price:25, market:35, duration:"2 Hours", pickup:"Paje", desc:"Paddle in lagoon", includes:"Board/Kayak, Guide", area:"South-East", featured:false },  { id:"jet", name:"Jet Ski Nungwi", cat:["Half Day","Water","North"], price:60, market:80, duration:"30 Min", pickup:"Nungwi beach", desc:"Jet ski ride", includes:"Jet ski, Guide", area:"North", featured:false },  { id:"parasail", name:"Parasailing Kendwa", cat:["Half Day","Water","North"], price:70, market:95, duration:"15 Min", pickup:"Kendwa", desc:"Parasailing view", includes:"Gear, Boat", area:"North", featured:false },  { id:"scuba", name:"Scuba Diving Mnemba", cat:["Half Day","Water","North"], price:90, market:130, duration:"4 Hours", pickup:"Nungwi / Matemwe", desc:"2 dives certified", includes:"Gear, Boat, Instructor", area:"North-East", featured:false },  { id:"fishing-deep", name:"Deep Sea Fishing Private", cat:["Full Day","Water"], price:350, market:450, duration:"6 Hours", pickup:"Nungwi 6 AM", desc:"Private boat marlin/barracuda", includes:"Private boat, Gear, Captain", area:"North", featured:false },  { id:"fishing-local", name:"Local Fishing Ngalawa", cat:["Half Day","Cultural","Water"], price:35, market:50, duration:"3 Hours", pickup:"Paje / Jambiani", desc:"Traditional canoe fishing", includes:"Canoe, Guide", area:"South-East", featured:false },  { id:"quad", name:"Quad Bike + Village", cat:["Half Day","Cultural","East"], price:50, market:70, duration:"3 Hours", pickup:"Paje / Bwejuu", desc:"Village + school + beach", includes:"Quad, Guide, Helmet", area:"South-East", featured:false },  { id:"horse", name:"Horse Riding Nungwi", cat:["Half Day","North"], price:60, market:85, duration:"1 Hour", pickup:"Nungwi", desc:"Beach ride sunset/sunrise", includes:"Horse, Guide", area:"North", featured:false },  { id:"mnarani", name:"Mnarani Turtle Aquarium", cat:["Half Day","North"], price:15, market:25, duration:"1.5 Hours", pickup:"Nungwi", desc:"Turtle conservation feed + swim", includes:"Entrance, Guide", area:"North", featured:false },  { id:"chumbe", name:"Chumbe Island Coral Park", cat:["Full Day","South-West"], price:90, market:130, duration:"7 Hours", pickup:"Fumba", desc:"Best coral sanctuary private island", includes:"Boat, Entrance $60, Lunch", area:"South-West", featured:false },  { id:"private-sandbank", name:"Private Sandbank BBQ", cat:["Half Day"], price:120, market:180, duration:"4 Hours", pickup:"Fumba / Stone Town", desc:"Private boat sandbank honeymoon", includes:"Private boat, BBQ, Drinks", area:"South-West", featured:true },  { id:"village", name:"Village Tour Jambiani", cat:["Half Day","Cultural"], price:20, market:30, duration:"2.5 Hours", pickup:"Paje / Jambiani", desc:"Seaweed farming + school + market", includes:"Guide, Donation", area:"South-East", featured:false },  { id:"cooking", name:"Swahili Cooking Class", cat:["Half Day","Cultural"], price:40, market:60, duration:"4 Hours", pickup:"Paje / Stone Town", desc:"Market + cook 3 dishes + eat", includes:"Market, Ingredients, Lunch", area:"South-East", featured:false },  { id:"henna", name:"Henna Painting", cat:["Half Day","Cultural"], price:15, market:25, duration:"1 Hour", pickup:"Paje / Stone Town", desc:"Traditional henna by mama", includes:"Henna", area:"All", featured:false },  { id:"bike", name:"Bike Tour Nungwi", cat:["Half Day","North"], price:35, market:50, duration:"3 Hours", pickup:"Nungwi / Matemwe", desc:"Bike villages + beach", includes:"Bike, Guide", area:"North", featured:false },  { id:"kendwa-sunset", name:"Kendwa Sunset Beach", cat:["Half Day","North"], price:25, market:35, duration:"3 Hours", pickup:"Nungwi / Kendwa", desc:"Best sunset beach + dinner", includes:"Guide", area:"North", featured:false },  { id:"blue-lagoon", name:"Blue Lagoon Michamvi", cat:["Half Day","East"], price:35, market:50, duration:"3 Hours", pickup:"Michamvi / Pongwe", desc:"Hidden lagoon starfish snorkeling", includes:"Boat, Gear, Guide", area:"East", featured:false },]export default function ToursPage(){  const [tours, setTours] = useState(DEFAULT_TOURS.map(t=>({...t, images:[], imageDatas:[], image:"", imageData:""})))  const [filter, setFilter] = useState("All")  const [selected, setSelected] = useState<any[]>([])  // FIXED: MERGE DB with DEFAULT - DB edits price/image, but keep 38 tours filling tabs  useEffect(()=>{    fetch('/api/tours').then(r=>r.json()).then(data=>{      if(!Array.isArray(data) || data.length===0){        // No DB data yet -> keep 38 defaults        return      }      // Merge: if DB has tour, use DB values (so admin edits + pictures are saved), else keep default      const dbMap = new Map(data.map((t:any)=>[t.id, t]))      const merged = DEFAULT_TOURS.map(def=>{        const db:any = dbMap.get(def.id)        if(!db) return {...def, images:[], imageDatas:[], image:"", imageData:"", market: (def as any).market}        return {         ...def,          name: db.name||def.name,          price: db.price??def.price,          market: db.market??(def as any).market,          duration: db.duration||def.duration,          pickup: db.pickup||def.pickup,          desc: db.description||def.desc,          includes: db.includes||def.includes,          area: db.area||def.area,          cat: db.cat||def.cat,          featured: db.featured??def.featured,          images: db.image_urls||[], imageDatas: db.image_urls||[], image: db.image_urls?.[0]||"", imageData: db.image_urls?.[0]||""        }      })      // Add any extra tours that exist only in DB (admin added new)      data.forEach((db:any)=>{        if(!DEFAULT_TOURS.find(d=>d.id===db.id)){          merged.push({            id: db.id, name: db.name, cat: db.cat||[db.area], price: db.price, market: db.market,            duration: db.duration, pickup: db.pickup, desc: db.description||"", includes: db.includes, area: db.area, featured: db.featured,            images: db.image_urls||[], imageDatas: db.image_urls||[], image: db.image_urls?.[0]||"", imageData: db.image_urls?.[0]||""          } as any)        }      })      setTours(merged)    }).catch(()=>{})  },[])  const toggleTour = (tour:any)=>{    setSelected(prev=> prev.find(p=>p.id===tour.id)? prev.filter(p=>p.id!==tour.id) : [...prev, {...tour, guests:1}])  }  const filtered = filter==="All"? tours : tours.filter(t=>t.cat.includes(filter))  const total = selected.reduce((s,t)=>s+(t.price*t.guests),0)  const bookWhatsApp = ()=>{    if(!selected.length) return    const msg = `Jambo HeroShuttle!%0A${selected.map(t=>`• ${t.name} $${t.price}`).join('%0A')}%0ATotal: $${total}`    window.open(`https://wa.me/255773628792?text=${msg}`,'_blank')  }  return (    <div className="min-h-screen bg-[#f6f7f9]">      <Header />      <div className="h-[18px] bg-[#ff8a1a] w-full"></div>      <div className="max-w-7xl mx-auto px-4 py-4">        <div className="flex gap-2 overflow-x-auto mb-4">          {["All","Popular","Half Day","Full Day","North","South","East","West","Cultural","Water"].map(cat=>(            <button key={cat} onClick={()=>setFilter(cat)} className={`px-5 py-2 rounded-full text-[13px] font-bold border whitespace-nowrap ${filter===cat? "bg-[#0a2342] text-white" : "bg-white"}`}>{cat}</button>          ))}          <span className="ml-auto text-[11px] opacity-60 self-center">{filtered.length} tours showing</span>        </div>        <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6 items-start">          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">            {filtered.map(tour=>{              const isSelected = selected.find(s=>s.id===tour.id)              const img = (tour as any).imageData || (tour as any).image || (tour as any).imageDatas?.[0] || ""              return (                <div key={tour.id} className={`rounded-[12px] overflow-hidden bg-white border-[2px] ${isSelected?'border-[#ff8a1a]':'border-[#0a2342]'}`}>                  <div className="h-[180px] relative bg-gradient-to-br from-[#0f766e] to-[#0a2342] flex items-center justify-center overflow-hidden">                    {img? <img src={img} alt={tour.name} className="w-full h-full object-cover" /> : <span className="text-white/40 text-[11px]">{tour.id}</span>}                    {tour.featured && <div className="absolute top-2 left-2 bg-[#facc15] text-[10px] font-black px-2 py-1 rounded">FEATURED</div>}                  </div>                  <div className="p-4">                    <h3 className="font-bold text-[#0a2342] text-[14px]">{tour.name}</h3>                    <p className="text-[11px] text-gray-500 mt-1">{tour.desc} • {tour.duration} • {tour.area}</p>                    <div className="flex items-end justify-between mt-3">                      <div>                        <div className="text-[10px] text-red-600 font-bold">$</div>                        <div className="font-extrabold text-[#0a2342]">${tour.price}</div>                        <div className="text-[11px] line-through text-gray-400">${(tour as any).market}</div>                      </div>                      <button onClick={()=>toggleTour(tour)} className={`px-4 py-1.5 rounded-full text-[11px] font-bold ${isSelected?'bg-[#ff8a1a] text-white':'bg-[#0a2342] text-white'}`}>{isSelected?'Added':'Add +'}</button>                    </div>                  </div>                </div>              )            })}          </div>          <div className="lg:sticky top-4 bg-white rounded-[12px] border-[1.5px] border-[#0a2342]/80 p-4 shadow-sm h-fit">            <h3 className="font-bold text-[13px]">🛒 Total: ${total} ({selected.length} tours)</h3>            {selected.length===0? <p className="text-[12px] text-gray-500 mt-2">No tours selected yet. Click Add+ to build your trip. All {tours.length} tours will stay visible in tabs.</p> :              <div className="mt-3 space-y-2">{selected.map(t=><div key={t.id} className="flex justify-between text-[11px] bg-[#f5f7fa] p-2 rounded"><span>{t.name}</span><button onClick={()=>toggleTour(t)} className="text-red-500 font-bold">✕</button></div>)}</div>            }            <button disabled={!selected.length} onClick={bookWhatsApp} className="w-full mt-4 bg-[#0a2342] disabled:bg-gray-200 text-white font-bold py-2.5 rounded-full text-[12px]">📋 Book WhatsApp</button>            <p className="text-[10px] text-gray-400 mt-2 text-center">Admin edits price/image in dashboard → auto saves to DB → shows here. Your 38 tours always fill tabs.</p>          </div>        </div>      </div>      <Footer />    </div>  )}
