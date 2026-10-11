@@ -16,21 +16,19 @@ export default function ToursPage(){
   const [selected, setSelected] = useState<any[]>([])
   const [slideIndex, setSlideIndex] = useState<{[k:string]:number}>({})
 
-  // Fetch from your heroshuttle schema (Supabase)
   useEffect(()=>{
     fetch('/api/tours').then(r=>r.json()).then(data=>{
       if(Array.isArray(data) && data.length>0){
         const mapped = data.map((t:any)=>({
           id: t.id, name: t.name, cat: t.cat||[t.area], price: t.price, market: t.market,
           duration: t.duration, pickup: t.pickup, desc: t.description||t.desc, includes: t.includes, area: t.area, active: t.active,
-          images: t.image_urls||[], imageDatas: t.image_urls||[], image: (t.image_urls||[])[0]||"", featured: t.featured
+          images: t.image_urls||[], imageDatas: t.image_urls||[], image: (t.image_urls||[])[0]||"", featured: t.featured, imageData: (t.image_urls||[])[0]||""
         }))
         setTours(mapped)
       }
     }).catch(()=>{})
   },[])
 
-  // Auto slider every 5 sec for 3 pics
   useEffect(()=>{
     const iv = setInterval(()=>{
       setSlideIndex(prev=>{
@@ -67,8 +65,6 @@ export default function ToursPage(){
     <div className="min-h-screen bg-gray-100">
       <Header />
       <div className="max-w-7xl mx-auto p-4 grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6">
-
-        {/* LEFT - Tours Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {tours.filter(t=>t.active).map(tour=>{
             const imgs = tour.imageDatas?.filter(Boolean).length? tour.imageDatas.filter(Boolean) : tour.images
@@ -98,12 +94,9 @@ export default function ToursPage(){
             )
           })}
         </div>
-
-        {/* RIGHT - DETAILED SELECTION */}
         <div className="lg:sticky top-4 h-fit">
           <div className="bg-white rounded-2xl border border-gray-800 p-4 shadow-sm">
             <h3 className="font-bold text-[#0a2540] mb-3">🛒 Total: ${total} ({selected.length} tours)</h3>
-
             {selected.length===0? (
               <p className="text-sm text-gray-500">No tours selected yet. Click Add+ to build your trip.</p>
             ) : (
@@ -138,14 +131,11 @@ export default function ToursPage(){
                 </div>
               </div>
             )}
-
             <button disabled={selected.length===0} onClick={bookWhatsApp} className="w-full mt-4 bg-[#25D366] disabled:bg-gray-300 text-white font-bold py-3 rounded-full text-sm">
               📱 Book WhatsApp
             </button>
-            {selected.length>0 && <p className="text-[10px] text-gray-500 mt-2 text-center">Detailed itinerary will be sent via WhatsApp with pickup times & inclusions</p>}
           </div>
         </div>
-
       </div>
       <Footer />
     </div>
