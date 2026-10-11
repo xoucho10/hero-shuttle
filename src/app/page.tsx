@@ -10,25 +10,25 @@ const DEFAULT_ANNOUNCEMENTS = [
 ]
 
 const DEFAULT_TRANSFERS = [
-  { id:"airport-stone", name:"Airport → Stone Town", area:"West", duration:"15 min", price:25, market:40, desc:"Per CAR up to 6 pax - Taxi + driver - Pay after trip", image:"airport-stone.jpg", imageData:"", active:true, cat:["Popular"] },
-  { id:"airport-paje", name:"Airport → Paje / Jambiani", area:"South-East", duration:"1h", price:40, market:60, desc:"Per CAR up to 6 pax - Most booked for kitesurf area", image:"airport-paje.jpg", imageData:"", active:true, cat:["Popular","South"] },
-  { id:"airport-nungwi", name:"Airport → Nungwi / Kendwa", area:"North", duration:"1h 15m", price:40, market:60, desc:"Per CAR up to 6 pax - North beach, sunset best", image:"airport-nungwi.jpg", imageData:"", active:true, cat:["Popular","North"] },
-  { id:"airport-matemwe", name:"Airport → Matemwe / Mnemba", area:"North-East", duration:"1h 20m", price:40, market:60, desc:"Per CAR up to 6 pax - Mnemba area", image:"airport-matemwe.jpg", imageData:"", active:true, cat:["North"] },
-  { id:"stone-paje", name:"Stone Town → Paje", area:"South-East", duration:"1h", price:40, market:60, desc:"Per CAR - Transfer after Stone Town tour", image:"stone-paje.jpg", imageData:"", active:true, cat:["South"] },
-  { id:"paje-nungwi", name:"Paje → Nungwi", area:"North", duration:"1h 30m", price:50, market:70, desc:"Per CAR - East to North crossing", image:"paje-nungwi.jpg", imageData:"", active:true, cat:["Popular"] },
-  { id:"airport-jambiani", name:"Airport → Jambiani / Makunduchi", area:"South", duration:"1h 10m", price:40, market:60, desc:"Per CAR up to 6 pax", image:"airport-jambiani.jpg", imageData:"", active:true, cat:["South"] },
-  { id:"airport-kiwengwa", name:"Airport → Kiwengwa / Pongwe", area:"East", duration:"1h", price:35, market:55, desc:"Per CAR - East coast", image:"airport-kiwengwa.jpg", imageData:"", active:true, cat:["East"] },
+  { id:"airport-stone", name:"Airport → Stone Town", area:"West", duration:"15 min", distance:"7km", price:25, market:40, desc:"Per CAR up to 6 pax - Taxi + driver - Pay after trip", image:"airport-stone.jpg", imageData:"", imageDatas:[""], active:true, cat:["Popular"] },
+  { id:"airport-paje", name:"Airport → Paje / Jambiani", area:"South-East", duration:"1h", distance:"55km", price:40, market:60, desc:"Per CAR up to 6 pax - Most booked for kitesurf area", image:"airport-paje.jpg", imageData:"", imageDatas:[""], active:true, cat:["Popular","South"] },
+  { id:"airport-nungwi", name:"Airport → Nungwi / Kendwa", area:"North", duration:"1h 15m", distance:"60km", price:40, market:60, desc:"Per CAR up to 6 pax - North beach, sunset best", image:"airport-nungwi.jpg", imageData:"", imageDatas:[""], active:true, cat:["Popular","North"] },
+  { id:"airport-matemwe", name:"Airport → Matemwe / Mnemba", area:"North-East", duration:"1h 20m", distance:"65km", price:40, market:60, desc:"Per CAR up to 6 pax - Mnemba area", image:"airport-matemwe.jpg", imageData:"", imageDatas:[""], active:true, cat:["North"] },
+  { id:"stone-paje", name:"Stone Town → Paje", area:"South-East", duration:"1h", distance:"50km", price:40, market:60, desc:"Per CAR - Transfer after Stone Town tour", image:"stone-paje.jpg", imageData:"", imageDatas:[""], active:true, cat:["South"] },
+  { id:"paje-nungwi", name:"Paje → Nungwi", area:"North", duration:"1h 30m", distance:"70km", price:50, market:70, desc:"Per CAR - East to North crossing", image:"paje-nungwi.jpg", imageData:"", imageDatas:[""], active:true, cat:["Popular"] },
+  { id:"airport-jambiani", name:"Airport → Jambiani / Makunduchi", area:"South", duration:"1h 10m", distance:"58km", price:40, market:60, desc:"Per CAR up to 6 pax", image:"airport-jambiani.jpg", imageData:"", imageDatas:[""], active:true, cat:["South"] },
+  { id:"airport-kiwengwa", name:"Airport → Kiwengwa / Pongwe", area:"East", duration:"1h", distance:"45km", price:35, market:55, desc:"Per CAR - East coast", image:"airport-kiwengwa.jpg", imageData:"", imageDatas:[""], active:true, cat:["East"] },
 ]
 
 const DEFAULT_TOURS = [
-  { id:"prison-nakupenda", name:"Prison Island + Nakupenda", cat:["Popular","Half Day"], price:250, market:350, duration:"5 Hours", pickup:"Stone Town 8:30 AM", desc:"Tortoise sanctuary + sandbank + fruit • Boat, Guide, Entrance, Fruit, Water", area:"West", active:true, image:"prison-nakupenda.jpg", featured:true, imageData:"" },
-  { id:"nakupenda-only", name:"Nakupenda Sandbank Only", cat:["Half Day","Popular"], price:130, market:200, duration:"4 Hours", pickup:"Stone Town 9 AM", desc:"White sandbank in ocean, swimming • Boat, Fruit, Water", area:"West", active:true, image:"nakupenda-only.jpg", featured:true, imageData:"" },
-  { id:"stone-town", name:"Stone Town Walking Tour", cat:["Popular","Half Day","Cultural"], price:120, market:180, duration:"3 Hours", pickup:"Stone Town", desc:"UNESCO, Slave Market, House of Wonders • Guide, Entrances", area:"West", active:true, image:"stone-town.jpg", featured:true, imageData:"" },
-  { id:"jozani", name:"Jozani Forest Monkeys", cat:["Popular","Half Day"], price:90, market:140, duration:"2.5 Hours", pickup:"Paje / Stone Town", desc:"Red colobus monkeys only in Zanzibar • Entrance, Guide", area:"South-Central", active:true, image:"jozani.jpg", featured:true, imageData:"" },
-  { id:"mnemba", name:"Mnemba Atoll Snorkeling", cat:["Popular","Half Day","North"], price:180, market:260, duration:"4 Hours", pickup:"Matemwe 8 AM", desc:"Best coral reef, colorful fish, dolphins • Boat, Gear, Guide", area:"North-East", active:true, image:"mnemba.jpg", featured:true, imageData:"" },
-  { id:"safari-blue", name:"Sharing Safari Blue Full Day BBQ", cat:["Full Day","Popular","South"], price:190, market:280, duration:"8 Hours", pickup:"Fumba 8 AM", desc:"Sandbank + snorkeling + seafood BBQ • Dhow, BBQ, Drinks, Gear", area:"South-West", active:true, image:"safari-blue.jpg", featured:true, imageData:"" },
-  { id:"dhow-stone", name:"Sunset Dhow Stone Town", cat:["Popular","Half Day"], price:80, market:130, duration:"2 Hours", pickup:"Stone Town 4:30 PM", desc:"Traditional dhow sunset cruise • Dhow, Drinks", area:"West", active:true, image:"dhow-stone.jpg", featured:false, imageData:"" },
-  { id:"private-safari-blue", name:"Private Safari Blue Full Day BBQ", cat:["Full Day","Popular","South"], price:220, market:320, duration:"8 Hours", pickup:"8:30 AM", desc:"Sandbank + snorkeling + seafood BBQ • Private dhow", area:"West", active:true, image:"private-safari-blue.jpg", featured:true, imageData:"" },
+  { id:"prison-nakupenda", name:"Prison Island + Nakupenda", cat:["Popular","Half Day"], price:250, market:350, duration:"5 Hours", pickup:"Stone Town 8:30 AM", desc:"Tortoise sanctuary + sandbank + fruit • Boat, Guide, Entrance, Fruit, Water", area:"West", active:true, image:"prison-nakupenda.jpg", imageDatas:[""], featured:true, imageData:"" },
+  { id:"nakupenda-only", name:"Nakupenda Sandbank Only", cat:["Half Day","Popular"], price:130, market:200, duration:"4 Hours", pickup:"Stone Town 9 AM", desc:"White sandbank in ocean, swimming • Boat, Fruit, Water", area:"West", active:true, image:"nakupenda-only.jpg", imageDatas:[""], featured:true, imageData:"" },
+  { id:"stone-town", name:"Stone Town Walking Tour", cat:["Popular","Half Day","Cultural"], price:120, market:180, duration:"3 Hours", pickup:"Stone Town", desc:"UNESCO, Slave Market, House of Wonders • Guide, Entrances", area:"West", active:true, image:"stone-town.jpg", imageDatas:[""], featured:true, imageData:"" },
+  { id:"jozani", name:"Jozani Forest Monkeys", cat:["Popular","Half Day"], price:90, market:140, duration:"2.5 Hours", pickup:"Paje / Stone Town", desc:"Red colobus monkeys only in Zanzibar • Entrance, Guide", area:"South-Central", active:true, image:"jozani.jpg", imageDatas:[""], featured:true, imageData:"" },
+  { id:"mnemba", name:"Mnemba Atoll Snorkeling", cat:["Popular","Half Day","North"], price:180, market:260, duration:"4 Hours", pickup:"Matemwe 8 AM", desc:"Best coral reef, colorful fish, dolphins • Boat, Gear, Guide", area:"North-East", active:true, image:"mnemba.jpg", imageDatas:[""], featured:true, imageData:"" },
+  { id:"safari-blue", name:"Sharing Safari Blue Full Day BBQ", cat:["Full Day","Popular","South"], price:190, market:280, duration:"8 Hours", pickup:"Fumba 8 AM", desc:"Sandbank + snorkeling + seafood BBQ • Dhow, BBQ, Drinks, Gear", area:"South-West", active:true, image:"safari-blue.jpg", imageDatas:[""], featured:true, imageData:"" },
+  { id:"dhow-stone", name:"Sunset Dhow Stone Town", cat:["Popular","Half Day"], price:80, market:130, duration:"2 Hours", pickup:"Stone Town 4:30 PM", desc:"Traditional dhow sunset cruise • Dhow, Drinks", area:"West", active:true, image:"dhow-stone.jpg", imageDatas:[""], featured:false, imageData:"" },
+  { id:"private-safari-blue", name:"Private Safari Blue Full Day BBQ", cat:["Full Day","Popular","South"], price:220, market:320, duration:"8 Hours", pickup:"8:30 AM", desc:"Sandbank + snorkeling + seafood BBQ • Private dhow", area:"West", active:true, image:"private-safari-blue.jpg", imageDatas:[""], featured:true, imageData:"" },
 ]
 
 const DEFAULT_BLOGS = [
@@ -43,31 +43,73 @@ export default function HomePage(){
   const [tours, setTours] = useState(DEFAULT_TOURS)
   const [transfers, setTransfers] = useState(DEFAULT_TRANSFERS)
   const [filter, setFilter] = useState("All")
-  const [selectedTours, setSelectedTours] = useState<string[]>([])
-  const [selectedTransfers, setSelectedTransfers] = useState<string[]>([])
+  const [selectedTours, setSelectedTours] = useState<any[]>([])
+  const [selectedTransfers, setSelectedTransfers] = useState<any[]>([])
   const [waNumber, setWaNumber] = useState("255773628792")
   const [from, setFrom] = useState("Abeid Airport (ZNZ)")
   const [to, setTo] = useState("Stone Town")
   const [date, setDate] = useState("")
   const [guests, setGuests] = useState("2 Guests")
   const [reviewTab, setReviewTab] = useState("google")
+  const [slideIndex, setSlideIndex] = useState<{[k:string]:number}>({})
 
   useEffect(()=>{
     try{
       const a = localStorage.getItem("hero_announcements"); if(a) setAnnouncements(JSON.parse(a))
-      const t = localStorage.getItem("hero_tours"); if(t){ const p=JSON.parse(t); if(p.length>0) setTours(p) }
+      const t = localStorage.getItem("hero_tours"); if(t){ const p=JSON.parse(t); if(p.length>0) setTours(p.map((x:any)=>({...x, imageDatas: x.imageDatas||[x.imageData||x.image]}))) }
       const tr = localStorage.getItem("hero_transfers"); if(tr){ const p=JSON.parse(tr); if(p.length>0) setTransfers(p) }
       const w = localStorage.getItem("hero_wa"); if(w) setWaNumber(w)
     }catch{}
+    // Load from heroshuttle schema (Supabase)
+    fetch('/api/tours').then(r=>r.json()).then(data=>{
+      if(Array.isArray(data)&&data.length>0){
+        setTours(data.map((t:any)=>({
+          id:t.id, name:t.name, cat:t.cat||[t.area], price:t.price, market:t.market, duration:t.duration, pickup:t.pickup, desc:t.description||t.desc, includes:t.includes||'', area:t.area, active:t.active, featured:t.featured,
+          image:t.image_urls?.[0]||'', imageData:t.image_urls?.[0]||'', imageDatas:t.image_urls||[], images:t.image_urls||[]
+        })))
+      }
+    }).catch(()=>{})
+    fetch('/api/transfers').then(r=>r.json()).then(data=>{
+      if(Array.isArray(data)&&data.length>0){
+        setTransfers(data.map((t:any)=>({
+          id:t.id, name:t.route||t.name, area:t.area, duration:t.time||t.duration, distance:t.distance, price:t.price, market:t.market, desc:t.note||t.desc, image:t.image_urls?.[0]||'', imageData:t.image_urls?.[0]||'', imageDatas:t.image_urls||[], active:t.active, cat:t.popular?["Popular"]:[t.area]
+        })))
+      }
+    }).catch(()=>{})
     const iv = setInterval(()=> setActiveSlide(s=> (s+1)%announcements.length), 6000)
     return ()=> clearInterval(iv)
-  },[])
+  },[announcements.length])
+
+  // 3 pics slider every 5 sec
+  useEffect(()=>{
+    const iv = setInterval(()=>{
+      setSlideIndex(prev=>{
+        const next:any = {...prev}
+        ;[...tours,...transfers].forEach((it:any)=>{
+          const imgs = (it.imageDatas?.filter(Boolean)||[]).length>0? it.imageDatas.filter(Boolean) : [it.imageData].filter(Boolean)
+          if(imgs.length>1) next[it.id] = ((prev[it.id]||0)+1)%imgs.length
+        })
+        return next
+      })
+    },5000)
+    return ()=>clearInterval(iv)
+  },[tours, transfers])
 
   const filteredTours = filter==="All"? tours.filter(t=>t.active) : tours.filter(t=>t.active && t.cat.includes(filter))
   const filteredTransfers = filter==="All"? transfers.filter(t=>t.active) : transfers.filter(t=>t.active && (t.cat?.includes(filter) || t.area===filter))
-  const toursTotal = useMemo(()=> selectedTours.reduce((s,id)=> s + (tours.find(t=>t.id===id)?.price||0),0),[selectedTours, tours])
-  const transfersTotal = useMemo(()=> selectedTransfers.reduce((s,id)=> s + (transfers.find(t=>t.id===id)?.price||0),0),[selectedTransfers, transfers])
+
+  const toursTotal = useMemo(()=> selectedTours.reduce((s,t)=> s + (t.price*(t.guests||1)),0),[selectedTours])
+  const transfersTotal = useMemo(()=> selectedTransfers.reduce((s,t)=> s + (t.price*(t.guests||1)),0),[selectedTransfers])
+  const marketTotal = useMemo(()=> [...selectedTours,...selectedTransfers].reduce((s,t:any)=> s + ((t.market||t.price)*(t.guests||1)),0),[selectedTours, selectedTransfers])
+  const grandTotal = toursTotal + transfersTotal
   const activeAnn = announcements[activeSlide] || announcements[0]
+
+  const toggleTour = (tour:any)=>{
+    setSelectedTours(prev=> prev.find(p=>p.id===tour.id)? prev.filter(p=>p.id!==tour.id) : [...prev, {...tour, guests:1}])
+  }
+  const toggleTransfer = (tr:any)=>{
+    setSelectedTransfers(prev=> prev.find(p=>p.id===tr.id)? prev.filter(p=>p.id!==tr.id) : [...prev, {...tr, guests:1}])
+  }
 
   return (
     <main className="min-h-screen bg-[#F8FAFF]">
@@ -123,13 +165,17 @@ export default function HomePage(){
           </div>
 
           <div className="mt-8 grid md:grid-cols-2 lg:grid-cols-4 gap-5">
-            {filteredTransfers.slice(0,8).map((tr:any)=>(
-              <div key={tr.id} className="bg-white rounded-[16px] overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col border border-[#0A2342]/5">
-                <div className="h-[160px] bg-[#EAF2FF] relative">
-                  {tr.imageData? <img src={tr.imageData} alt={tr.name} className="w-full h-full object-cover"/> : <div className="w-full h-full bg-gradient-to-br from-[#0A2342] to-[#2a5a8a] flex items-center justify-center text-white/40 text-[10px]">{tr.image}</div>}
+            {filteredTransfers.slice(0,8).map((tr:any)=>{
+              const imgs = tr.imageDatas?.filter(Boolean) || [tr.imageData].filter(Boolean)
+              const idx = slideIndex[tr.id]||0
+              const isSelected = selectedTransfers.find(s=>s.id===tr.id)
+              return (
+              <div key={tr.id} className={`bg-white rounded-[16px] overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col border-2 ${isSelected?'border-green-500':'border-[#0A2342]/5'}`}>
+                <div className="h-[160px] bg-[#EAF2FF] relative overflow-hidden">
+                  {imgs[idx]? <img src={imgs[idx]} alt={tr.name} className="w-full h-full object-cover"/> : <div className="w-full h-full bg-gradient-to-br from-[#0A2342] to-[#2a5a8a] flex items-center justify-center text-white/40 text-[10px]">{tr.image}</div>}
                   <span className="absolute top-2 left-2 bg-[#0A2342] text-white text-[8px] px-2 py-1 rounded-full font-black">🚕 {tr.area}</span>
-                  <span className="absolute bottom-2 left-2 bg-white text-[#0A2342] text-[9px] px-2 py-1 rounded-full font-bold shadow">{tr.duration}</span>
-                  <span className="absolute bottom-2 right-2 bg-[#FF8A1A] text-white w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-black">$</span>
+                  <span className="absolute bottom-2 left-2 bg-white text-[#0A2342] text-[9px] px-2 py-1 rounded-full font-bold shadow">{tr.duration} {tr.distance?`• ${tr.distance}`:''}</span>
+                  {imgs.length>1 && <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">{imgs.map((_:any,i:number)=><div key={i} className={`w-1 h-1 rounded-full ${i===idx?'bg-white':'bg-white/50'}`} />)}</div>}
                 </div>
                 <div className="p-3 flex flex-col flex-1">
                   <p className="font-black text-[12px] leading-tight text-[#0A2342]">{tr.name}</p>
@@ -140,11 +186,11 @@ export default function HomePage(){
                       <p className="font-black text-[14px] text-[#0A2342]">${tr.price} <span className="text-[9px] font-medium opacity-60">per car</span></p>
                       <p className="text-[8px] font-bold text-green-600">Save ${tr.market - tr.price} per CAR</p>
                     </div>
-                    <button onClick={()=> setSelectedTransfers(p=> p.includes(tr.id)? p.filter(x=>x!==tr.id) : [...p, tr.id])} className={`px-4 py-2 rounded-full text-[10px] font-black transition ${selectedTransfers.includes(tr.id)? "bg-green-600 text-white" : "bg-[#0A2342] text-white hover:bg-black"}`}>{selectedTransfers.includes(tr.id)? "✓ Added" : "Add +"}</button>
+                    <button onClick={()=>toggleTransfer(tr)} className={`px-4 py-2 rounded-full text-[10px] font-black transition ${isSelected? "bg-green-600 text-white" : "bg-[#0A2342] text-white hover:bg-black"}`}>{isSelected? "✓ Added" : "Add +"}</button>
                   </div>
                 </div>
               </div>
-            ))}
+            )})}
           </div>
         </div>
       </section>
@@ -164,14 +210,18 @@ export default function HomePage(){
           </div>
 
           <div className="mt-10 grid md:grid-cols-2 lg:grid-cols-4 gap-5">
-            {filteredTours.slice(0,8).map((t:any)=>(
-              <div key={t.id} className="bg-white rounded-[16px] overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col border border-[#0A2342]/5">
-                <div className="h-[180px] bg-[#E6F5F3] relative">
-                  {t.imageData? <img src={t.imageData} alt={t.name} className="w-full h-full object-cover"/> : <div className="w-full h-full bg-gradient-to-br from-[#1eb3a5] to-[#0A2342] flex items-center justify-center text-white/60 text-[10px]">{t.image}</div>}
+            {filteredTours.slice(0,8).map((t:any)=>{
+              const imgs = t.imageDatas?.filter(Boolean) || [t.imageData].filter(Boolean)
+              const idx = slideIndex[t.id]||0
+              const isSelected = selectedTours.find(s=>s.id===t.id)
+              return (
+              <div key={t.id} className={`bg-white rounded-[16px] overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col border-2 ${isSelected?'border-green-500':'border-[#0A2342]/5'}`}>
+                <div className="h-[180px] bg-[#E6F5F3] relative overflow-hidden">
+                  {imgs[idx]? <img src={imgs[idx]} alt={t.name} className="w-full h-full object-cover"/> : <div className="w-full h-full bg-gradient-to-br from-[#1eb3a5] to-[#0A2342] flex items-center justify-center text-white/60 text-[10px]">{t.image}</div>}
                   <span className="absolute top-2 left-2 bg-[#0A2342] text-white text-[8px] px-2 py-1 rounded-full font-black">{t.cat[0]}</span>
                   <span className="absolute top-2 right-2 bg-white text-[#0A2342] text-[8px] px-2 py-1 rounded-full font-black shadow">{t.area}</span>
                   <span className="absolute bottom-2 left-2 bg-white text-[#0A2342] text-[9px] px-2 py-1 rounded-full font-bold shadow">{t.duration}</span>
-                  <span className="absolute bottom-2 right-2 bg-[#FF8A1A] text-white w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-black">$</span>
+                  {imgs.length>1 && <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">{imgs.map((_:any,i:number)=><div key={i} className={`w-1 h-1 rounded-full ${i===idx?'bg-white':'bg-white/50'}`} />)}</div>}
                 </div>
                 <div className="p-3 flex flex-col flex-1">
                   <p className="font-black text-[12px] leading-tight text-[#0A2342]">{t.name}</p>
@@ -182,29 +232,87 @@ export default function HomePage(){
                       <p className="font-black text-[14px] text-[#0A2342]">${t.price} <span className="text-[9px] font-medium opacity-60">per car</span></p>
                       <p className="text-[8px] font-bold text-green-600">Save ${t.market - t.price} - per CAR</p>
                     </div>
-                    <button onClick={()=> setSelectedTours(p=> p.includes(t.id)? p.filter(x=>x!==t.id) : [...p, t.id])} className={`px-4 py-2 rounded-full text-[10px] font-black ${selectedTours.includes(t.id)? "bg-green-600 text-white" : "bg-[#0A2342] text-white hover:bg-black"}`}>{selectedTours.includes(t.id)? "✓ Added" : "Add +"}</button>
+                    <button onClick={()=>toggleTour(t)} className={`px-4 py-2 rounded-full text-[10px] font-black ${isSelected? "bg-green-600 text-white" : "bg-[#0A2342] text-white hover:bg-black"}`}>{isSelected? "✓ Added" : "Add +"}</button>
                   </div>
                 </div>
               </div>
-            ))}
+            )})}
           </div>
 
+          {/* DETAILED COMBO SELECTION - NEW DESIGN */}
           {(selectedTours.length>0 || selectedTransfers.length>0) && (
-            <div className="mt-8 bg-white rounded-[16px] p-5 max-w-[900px] mx-auto border shadow-xl sticky bottom-4 z-20">
-              <div className="flex justify-between items-center">
-                <p className="font-black text-[13px] text-[#0A2342]">🛒 {selectedTransfers.length} Transfers + {selectedTours.length} Tours - Price PER CAR</p>
-                <p className="font-black text-[18px] text-[#0A2342]">${transfersTotal + toursTotal} per car</p>
+            <div className="mt-8 bg-white rounded-[20px] p-5 max-w-[1100px] mx-auto border-2 border-[#0A2342] shadow-2xl sticky bottom-4 z-30">
+              <div className="flex flex-col md:flex-row gap-5">
+                {/* LEFT DETAILED LIST */}
+                <div className="flex-1">
+                  <div className="flex justify-between items-center mb-3">
+                    <p className="font-black text-[14px] text-[#0A2342]">🛒 Your Selection - Detailed</p>
+                    <p className="font-black text-[14px] text-[#0A2342]">${grandTotal} <span className="text-[10px] font-medium">per CAR</span></p>
+                  </div>
+
+                  <div className="space-y-2.5 max-h-[320px] overflow-auto pr-1">
+                    {selectedTransfers.map((tr:any)=>(
+                      <div key={tr.id} className="flex gap-3 border rounded-xl p-2.5 bg-[#F0F6FF]">
+                        <div className="w-14 h-14 rounded-lg overflow-hidden bg-[#0A2342] flex-shrink-0">
+                          {(tr.imageDatas?.[0]||tr.imageData) && <img src={tr.imageDatas?.[0]||tr.imageData} className="w-full h-full object-cover"/>}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-black text-[11px] text-[#0A2342] truncate">🚕 {tr.name}</p>
+                          <p className="text-[10px] text-[#0A2342]/60">⏱ {tr.duration} {tr.distance?`• ${tr.distance}`:''} • 📍 {tr.area}</p>
+                          <p className="text-[10px] text-[#0A2342]/50 truncate">{tr.desc}</p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <button onClick={()=>setSelectedTransfers(s=>s.map(x=>x.id===tr.id?{...x, guests: Math.max(1,(x.guests||1)-1)}:x))} className="w-5 h-5 rounded-full border bg-white text-[12px]">-</button>
+                            <span className="text-[11px] font-bold">{tr.guests||1} car</span>
+                            <button onClick={()=>setSelectedTransfers(s=>s.map(x=>x.id===tr.id?{...x, guests: (x.guests||1)+1}:x))} className="w-5 h-5 rounded-full border bg-white text-[12px]">+</button>
+                            <span className="ml-auto font-black text-[12px] text-[#0A2342]">${tr.price*(tr.guests||1)}</span>
+                          </div>
+                        </div>
+                        <button onClick={()=>setSelectedTransfers(p=>p.filter(x=>x.id!==tr.id))} className="text-red-500 font-black text-[12px] px-1">✕</button>
+                      </div>
+                    ))}
+
+                    {selectedTours.map((t:any)=>(
+                      <div key={t.id} className="flex gap-3 border rounded-xl p-2.5 bg-[#FFF8ED]">
+                        <div className="w-14 h-14 rounded-lg overflow-hidden bg-[#0A2342] flex-shrink-0">
+                          {(t.imageDatas?.[0]||t.imageData) && <img src={t.imageDatas?.[0]||t.imageData} className="w-full h-full object-cover"/>}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-black text-[11px] text-[#0A2342] truncate">🏝️ {t.name}</p>
+                          <p className="text-[10px] text-[#0A2342]/60">⏱ {t.duration} • 🕘 {t.pickup} • 📍 {t.area}</p>
+                          <p className="text-[10px] text-[#0A2342]/50 truncate">{t.includes||t.desc}</p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <button onClick={()=>setSelectedTours(s=>s.map(x=>x.id===t.id?{...x, guests: Math.max(1,(x.guests||1)-1)}:x))} className="w-5 h-5 rounded-full border bg-white text-[12px]">-</button>
+                            <span className="text-[11px] font-bold">{t.guests||1} car</span>
+                            <button onClick={()=>setSelectedTours(s=>s.map(x=>x.id===t.id?{...x, guests: (x.guests||1)+1}:x))} className="w-5 h-5 rounded-full border bg-white text-[12px]">+</button>
+                            <span className="ml-auto font-black text-[12px] text-[#0A2342]">${t.price*(t.guests||1)}</span>
+                          </div>
+                        </div>
+                        <button onClick={()=>setSelectedTours(p=>p.filter(x=>x.id!==t.id))} className="text-red-500 font-black text-[12px] px-1">✕</button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* RIGHT SUMMARY */}
+                <div className="md:w-[260px] bg-[#F8FAFF] rounded-[14px] p-4 border h-fit">
+                  <p className="font-black text-[12px] text-[#0A2342]">Price Breakdown (per CAR)</p>
+                  <div className="mt-3 space-y-1.5 text-[11px]">
+                    <div className="flex justify-between"><span className="text-[#0A2342]/60">Transfers ({selectedTransfers.length})</span><span className="font-bold">${transfersTotal}</span></div>
+                    <div className="flex justify-between"><span className="text-[#0A2342]/60">Tours ({selectedTours.length})</span><span className="font-bold">${toursTotal}</span></div>
+                    <div className="flex justify-between text-gray-400"><span>Market price</span><span className="line-through">${marketTotal}</span></div>
+                    <div className="flex justify-between font-black text-green-600 border-t pt-1.5 mt-1.5"><span>You save</span><span>${marketTotal-grandTotal}</span></div>
+                    <div className="flex justify-between font-black text-[14px] text-[#0A2342] border-t pt-1.5"><span>Total per CAR</span><span>${grandTotal}</span></div>
+                    <p className="text-[9px] text-[#0A2342]/50">Same CAR up to 6 pax same price. Pay driver after each trip.</p>
+                  </div>
+                  <button onClick={()=>{
+                    const trList=selectedTransfers.map((tt:any)=>`• 🚕 ${tt.name} - $${tt.price} x ${tt.guests||1} CAR = $${tt.price*(tt.guests||1)} - ${tt.duration} - ${tt.area}`).join("%0A")
+                    const tList=selectedTours.map((tt:any)=>`• 🏝️ ${tt.name} - $${tt.price} x ${tt.guests||1} CAR = $${tt.price*(tt.guests||1)} - ${tt.duration} - Pickup ${tt.pickup}`).join("%0A")
+                    const msg=`Jambo HERO! 🚤 Combo Booking - DETAILED PER CAR:%0A%0A🚕 TRANSFERS:%0A${trList||'None'}%0A%0A🏝️ TOURS:%0A${tList||'None'}%0A%0A💰 Transfers: $${transfersTotal} per CAR%0A💰 Tours: $${toursTotal} per CAR%0A💰 GRAND TOTAL: $${grandTotal} per CAR (up to 6 pax same car)%0A💚 You Save: $${marketTotal-grandTotal} vs market%0A%0APay driver after each trip. Free cancellation 24h.`
+                    window.open(`https://wa.me/${waNumber}?text=${msg}`,"_blank")
+                  }} className="mt-4 w-full bg-[#0A2342] text-white py-3 rounded-full font-black text-[11px] hover:bg-black transition">Book Combo ${grandTotal} per CAR - WhatsApp</button>
+                  <button onClick={()=>{setSelectedTours([]); setSelectedTransfers([])}} className="mt-2 w-full text-[10px] text-[#0A2342]/50 underline">Clear all</button>
+                </div>
               </div>
-              <div className="mt-3 flex flex-wrap gap-2 text-[11px]">
-                {selectedTransfers.map(id=>{ const tr=transfers.find(x=>x.id===id); return <span key={id} className="bg-[#EAF2FF] px-3 py-1 rounded-full font-bold text-[#0A2342]">🚕 {tr?.name} ${tr?.price} <button onClick={()=>setSelectedTransfers(p=>p.filter(x=>x!==id))} className="ml-1 text-red-500">×</button></span>})}
-                {selectedTours.map(id=>{ const t=tours.find(x=>x.id===id); return <span key={id} className="bg-[#FFF3E0] px-3 py-1 rounded-full font-bold text-[#0A2342]">🏝️ {t?.name} ${t?.price} <button onClick={()=>setSelectedTours(p=>p.filter(x=>x!==id))} className="ml-1 text-red-500">×</button></span>})}
-              </div>
-              <button onClick={()=>{
-                const trList=selectedTransfers.map(id=>{ const tt=transfers.find(x=>x.id===id); return `${tt?.name} $${tt?.price} per CAR`}).join("%0A")
-                const tList=selectedTours.map(id=>{ const tt=tours.find(x=>x.id===id); return `${tt?.name} $${tt?.price} per CAR`}).join("%0A")
-                const msg=`Hi HERO! Combo Booking PER CAR:%0A%0ATransfers:%0A${trList}%0A%0ATours:%0A${tList}%0A%0ATransfer Total: $${transfersTotal} per CAR%0ATours Total: $${toursTotal} per CAR%0AGrand Total: $${transfersTotal+toursTotal} per CAR (up to 6 pax same car)%0A%0APay driver after each trip`
-                window.open(`https://wa.me/${waNumber}?text=${msg}`,"_blank")
-              }} className="mt-4 w-full bg-[#0A2342] text-white py-3 rounded-full font-black text-[12px]">Book Combo ({selectedTransfers.length} Transfers + {selectedTours.length} Tours) - ${transfersTotal+toursTotal} per CAR on WhatsApp</button>
             </div>
           )}
         </div>
