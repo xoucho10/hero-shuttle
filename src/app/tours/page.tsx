@@ -23,49 +23,42 @@ const DEFAULT_TOURS = [
   { id:"private-safari-blue", name:"Private Safari Blue Full Day BBQ", cat:["Full Day","Popular","South"], price:220, market:320, duration:"8 Hours", pickup:"8:30 AM", desc:"Sandbank + snorkeling + seafood BBQ + Private dhow", includes:"Dhow, BBQ, Drinks, Gear", area:"West", active:true, images:["private-safari-blue.jpg"], imageDatas:[""], image:"private-safari-blue.jpg", featured:true, imageData:"" },
 ]
 
-// --- NEW: 5 SECONDS SLIDER FOR 3 PICS ---
 function TourImageSlider({ tour }: { tour: any }) {
   const images = useMemo(() => {
-    const datas = (tour.imageDatas || []).filter((b: string) => b && b.length > 10)
-    if (datas.length > 0) return datas
-    if (tour.imageData) return [tour.imageData]
+    const datas = (tour.imageDatas || []).filter((b: string) => b && b.length > 20)
+    if (datas.length > 0) return datas.slice(0,3)
+    if (tour.imageData && tour.imageData.length > 20) return [tour.imageData]
     return []
-  }, [tour])
+  }, [tour.imageDatas, tour.imageData])
 
   const [index, setIndex] = useState(0)
 
   useEffect(() => {
     if (images.length <= 1) return
-    const timer = setInterval(() => {
-      setIndex((i) => (i + 1) % images.length)
-    }, 5000) // 5 seconds
+    const timer = setInterval(() => setIndex(i => (i + 1) % images.length), 5000)
     return () => clearInterval(timer)
   }, [images.length])
 
   if (images.length === 0) {
-    return <div className="w-full h-full bg-gradient-to-br from-[#1eb3a5] to-[#0A2342] flex items-center justify-center text-white/50 text-[10px]">{tour.image || tour.id}</div>
+    return <div className="w-full h-full bg-gradient-to-br from-[#1eb3a5] to-[#0A2342] flex items-center justify-center text-white/50 text-[10px]">{tour.id}</div>
   }
 
   return (
-    <div className="w-full h-full relative">
+    <div className="w-full h-full relative bg-black">
       {images.map((img: string, i: number) => (
-        <img
-          key={i}
-          src={img}
-          alt={`${tour.name} ${i+1}`}
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${i === index? "opacity-100" : "opacity-0"}`}
-        />
+        <img key={i} src={img} alt={`${tour.name} ${i+1}`} className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${i === index? "opacity-100" : "opacity-0"}`} />
       ))}
-      {/* dots */}
       {images.length > 1 && (
-        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
-          {images.map((_: any, i: number) => (
-            <div key={i} className={`w-1.5 h-1.5 rounded-full transition-all ${i === index? "bg-white w-4" : "bg-white/50"}`} />
-          ))}
-        </div>
+        <>
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
+            {images.map((_: any, i: number) => (
+              <div key={i} className={`h-1.5 rounded-full transition-all ${i === index? "bg-white w-4" : "bg-white/60 w-1.5"}`} />
+            ))}
+          </div>
+          <div className="absolute top-3 right-3 bg-black/60 text-white text-[8px] px-2 py-1 rounded-full">{index+1}/{images.length}</div>
+        </>
       )}
       <div className="absolute top-3 left-3 bg-[#0A2342] text-white text-[9px] px-2.5 py-1 rounded-full font-black">{tour.cat[0]}</div>
-      <div className="absolute top-3 right-3 bg-black/60 text-white text-[8px] px-2 py-1 rounded-full">{index+1}/{images.length}</div>
     </div>
   )
 }
@@ -95,7 +88,7 @@ export default function ToursPage(){
         const p=JSON.parse(t);
         if(Array.isArray(p) && p.length>0) {
           const migrated = p.map((x:any)=> ({
-           ...x,
+          ...x,
             imageDatas: x.imageDatas || (x.imageData? [x.imageData] : []),
             images: x.images || (x.image? [x.image] : [])
           }))
@@ -114,13 +107,7 @@ export default function ToursPage(){
   },[])
 
   const filtered = filter==="All"? allTours.filter(t=>t.active) : allTours.filter(t=>t.active && t.cat.includes(filter))
-
-  const calcPrice = (base:number, pax:number) => {
-    if(pax<=paxRules.basePax) return base
-    const extra = pax - paxRules.basePax
-    return base + (base * paxRules.extraPaxPercent/100 * extra)
-  }
-
+  const calcPrice = (base:number, pax:number) => pax<=paxRules.basePax? base : base + (base * paxRules.extraPaxPercent/100 * (pax-paxRules.basePax))
   const transportCost = useMemo(()=>{
     if(!selected.length) return 0
     const tourAreas = selected.map(id=> allTours.find(t=>t.id===id)?.area).filter(Boolean)
@@ -131,123 +118,48 @@ export default function ToursPage(){
     })
     return max
   },[selected, hotelArea, transportMatrix, allTours])
-
-  const toursTotal = selected.reduce((s,id)=>{
-    const t=allTours.find(x=>x.id===id)
-    return s + calcPrice(t?.price||0, paxCount)
-  },0)
-
+  const toursTotal = selected.reduce((s,id)=> s + calcPrice(allTours.find(x=>x.id===id)?.price||0, paxCount),0)
   const grandTotal = toursTotal + transportCost
 
   return (
     <main className="min-h-screen bg-[#F5F7FA]">
       <Header/>
       <section className="bg-[#0A2342] text-white px-6 md:px-12 py-8 text-center">
-        <h1 className="font-black text-[28px] md:text-[30px]">Tours & Excursions - Price for 2 Pax</h1>
-        <p className="text-[11px] opacity-60 mt-2">{allTours.filter(t=>t.active).length} Tours • {paxRules.basePax} pax base • 3 pics auto-slide every 5 sec</p>
+        <h1 className="font-black text-[28px]">Tours - {allTours.filter(t=>t.active).length} Tours • 3 Pics Auto-Slide 5s</h1>
+        <p className="text-[11px] opacity-60 mt-2">Data from admin localStorage {allTours[0]?.imageDatas?.filter(Boolean).length||0} pics loaded</p>
         <div className="mt-5 flex justify-center gap-2 flex-wrap max-w-[800px] mx-auto">
           {["All","Popular","Half Day","Full Day","North","South","East","West","Cultural"].map(c=>(
-            <button key={c} onClick={()=>setFilter(c)} className={`px-4 py-2 rounded-full text-[11px] font-black border transition ${filter===c? "bg-white text-[#0A2342] border-white" : "bg-white/10 text-white border-white/20 hover:bg-white/20"}`}>{c}</button>
+            <button key={c} onClick={()=>setFilter(c)} className={`px-4 py-2 rounded-full text-[11px] font-black border ${filter===c? "bg-white text-[#0A2342]" : "bg-white/10 text-white border-white/20"}`}>{c}</button>
           ))}
         </div>
         <div className="mt-4 inline-flex bg-white/10 rounded-full p-1 gap-1">
-          {[2,3,4,5,6].map(n=>(
-            <button key={n} onClick={()=>setPaxCount(n)} className={`px-4 py-2 rounded-full text-[11px] font-black transition ${paxCount===n? "bg-white text-[#0A2342]" : "text-white/70 hover:text-white"}`}>{n} pax {n>2?`+${(n-2)*paxRules.extraPaxPercent}%`: ""}</button>
-          ))}
+          {[2,3,4,5,6].map(n=><button key={n} onClick={()=>setPaxCount(n)} className={`px-4 py-2 rounded-full text-[11px] font-black ${paxCount===n? "bg-white text-[#0A2342]" : "text-white/70"}`}>{n} pax</button>)}
         </div>
       </section>
-
       <section className="px-4 md:px-8 lg:px-12 py-6">
         <div className="max-w-[1600px] mx-auto flex flex-col lg:flex-row gap-6">
-          <div className="flex-1 grid md:grid-cols-2 xl:grid-cols-3 gap-5 content-start">
+          <div className="flex-1 grid md:grid-cols-2 xl:grid-cols-3 gap-5">
             {filtered.map((t:any)=>(
-              <div key={t.id} className="bg-white rounded-[16px] overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition flex flex-col">
-                <div className="h-[200px] bg-[#F5F7FA] relative overflow-hidden">
-                  <TourImageSlider tour={t} />
-                </div>
+              <div key={t.id} className="bg-white rounded-[16px] overflow-hidden border shadow-sm flex flex-col">
+                <div className="h-[200px] relative overflow-hidden"><TourImageSlider tour={t} /></div>
                 <div className="p-4 flex flex-col flex-1">
-                  <p className="font-black text-[13px] leading-tight">{t.name}</p>
-                  <p className="text-[10px] opacity-50 mt-1 line-clamp-1">{t.desc}</p>
+                  <p className="font-black text-[13px]">{t.name}</p>
+                  <p className="text-[10px] opacity-50 mt-1">{t.desc}</p>
                   <div className="mt-4 flex justify-between items-end mt-auto">
-                    <div>
-                      <p className="text-[10px] text-red-600 font-black line-through">${t.market}</p>
-                      <p className="font-black text-[15px]">${t.price} <span className="text-[10px] font-medium opacity-60">for 2 pax</span></p>
-                      <p className="text-[9px] font-bold text-green-600 mt-0.5">Save ${t.market - t.price}</p>
-                    </div>
-                    <button onClick={()=> setSelected(prev=> prev.includes(t.id)? prev.filter(x=>x!==t.id) : [...prev, t.id])} className={`px-4 py-2 rounded-full text-[10px] font-black transition ${selected.includes(t.id)? "bg-green-600 text-white" : "bg-[#0A2342] text-white hover:bg-black"}`}>{selected.includes(t.id)? "✓ Added" : "Add +"}</button>
+                    <div><p className="text-[10px] text-red-600 font-black line-through">${t.market}</p><p className="font-black text-[15px]">${t.price}</p></div>
+                    <button onClick={()=> setSelected(prev=> prev.includes(t.id)? prev.filter(x=>x!==t.id) : [...prev, t.id])} className={`px-4 py-2 rounded-full text-[10px] font-black ${selected.includes(t.id)? "bg-green-600 text-white" : "bg-[#0A2342] text-white"}`}>{selected.includes(t.id)? "✓ Added" : "Add +"}</button>
                   </div>
                 </div>
               </div>
             ))}
           </div>
-
-          <div className="w-full lg:w-[380px] flex flex-col gap-4 lg:sticky lg:top-6 h-fit">
-            <div className="bg-white rounded-[16px] border overflow-hidden">
-              <div className="p-4 flex justify-between items-center border-b">
-                <h3 className="font-black text-[12px]">🗺️ Zanzibar Map - Your Hotel</h3>
-                <span className="text-[9px] bg-[#0A2342] text-white px-2 py-1 rounded-full">{hotelArea}</span>
-              </div>
-              <div className="h-[200px] bg-[#E8F4F8] relative">
-                <iframe title="Zanzibar Map" width="100%" height="100%" style={{border:0}} loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=39.0%2C-6.5%2C39.8%2C-5.6&layer=mapnik&marker=-6.1659%2C39.2026" />
-                <div className="absolute bottom-2 left-2 right-2 bg-white/90 backdrop-blur rounded-full px-3 py-2 flex gap-2">
-                  <select value={hotelArea} onChange={e=>setHotelArea(e.target.value)} className="flex-1 bg-[#F5F7FA] rounded-full px-3 py-1.5 text-[10px] font-bold border">
-                    {hotelOptions.map((h:any,i:number)=><option key={i} value={h.area}>{h.label}</option>)}
-                  </select>
-                </div>
-              </div>
-            </div>
-
+          <div className="w-full lg:w-[380px] lg:sticky lg:top-6 h-fit space-y-4">
             <div className="bg-white rounded-[16px] border p-5">
-              <h3 className="font-black text-[13px]">🛒 Your Selection</h3>
-              <div className="mt-4 space-y-2">
-                <div className="flex gap-2">
-                  <input type="date" value={date} onChange={e=>setDate(e.target.value)} className="flex-1 bg-[#F5F7FA] rounded-full px-3 py-2.5 text-[11px] font-bold border"/>
-                  <select value={paxCount} onChange={e=>setPaxCount(parseInt(e.target.value))} className="w-[110px] bg-[#F5F7FA] rounded-full px-3 py-2.5 text-[11px] font-bold border">
-                    {[2,3,4,5,6].map(n=> <option key={n} value={n}>{n} pax</option>)}
-                  </select>
-                </div>
-                <input value={name} onChange={e=>setName(e.target.value)} placeholder="Your Name" className="w-full bg-[#F5F7FA] rounded-full px-4 py-2.5 text-[11px] font-bold border"/>
-              </div>
-
-              <div className="mt-5">
-                {selected.length===0? (
-                  <div className="bg-[#F5F7FA] rounded-[12px] p-4 text-center"><p className="text-[11px] opacity-60">No tours selected yet</p></div>
-                ) : (
-                  <div className="space-y-2 max-h-[180px] overflow-y-auto pr-1">
-                    {selected.map(id=>{
-                      const t = allTours.find(x=>x.id===id)
-                      return (
-                        <div key={id} className="flex justify-between items-center bg-[#F5F7FA] rounded-full px-3 py-2">
-                          <span className="text-[11px] font-bold truncate flex-1">{t?.name}</span>
-                          <span className="text-[11px] font-black ml-2">${calcPrice(t?.price||0, paxCount)}</span>
-                          <button onClick={()=>setSelected(prev=>prev.filter(x=>x!==id))} className="ml-2 text-red-500 font-black text-[12px]">×</button>
-                        </div>
-                      )
-                    })}
-                  </div>
-                )}
-              </div>
-
-              <div className="mt-5 border-t pt-4 space-y-2 text-[11px]">
-                <div className="flex justify-between"><span className="opacity-60">Tours ({selected.length})</span><span className="font-black">${toursTotal}</span></div>
-                <div className="flex justify-between"><span className="opacity-60">Transport per vehicle</span><span className="font-black">${transportCost}</span></div>
-                <div className="flex justify-between text-[13px] font-black border-t pt-2 mt-2"><span>Grand Total</span><span>${grandTotal}</span></div>
-              </div>
-
-              <button
-                disabled={selected.length===0}
-                onClick={()=>{
-                  const list = selected.map(id=>{
-                    const t=allTours.find(x=>x.id===id)
-                    return `• ${t?.name} - $${calcPrice(t?.price||0, paxCount)}`
-                  }).join("%0A")
-                  const msg=`Hi HERO!%0AName: ${name}%0ADate: ${date}%0AHotel: ${hotelArea}%0APax: ${paxCount}%0A%0ATours:%0A${list}%0A%0ATotal: $${grandTotal}`
-                  window.open(`https://wa.me/${waNumber}?text=${msg}`, "_blank")
-                }}
-                className={`mt-5 w-full py-3.5 rounded-full font-black text-[12px] ${selected.length===0? "bg-gray-200 text-gray-400" : "bg-[#25D366] text-white"}`}
-              >
-                📲 Book - ${grandTotal}
-              </button>
+              <h3 className="font-black text-[13px]">🛒 Total: ${grandTotal} ({selected.length} tours)</h3>
+              <button onClick={()=>{
+                const list = selected.map(id=> allTours.find(x=>x.id===id)?.name).join("%0A")
+                window.open(`https://wa.me/${waNumber}?text=Hi HERO!%0A${list}%0ATotal $${grandTotal}`, "_blank")
+              }} className="mt-4 w-full py-3.5 rounded-full font-black bg-[#25D366] text-white text-[12px]">📲 Book WhatsApp</button>
             </div>
           </div>
         </div>
