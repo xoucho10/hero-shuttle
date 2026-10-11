@@ -5,32 +5,32 @@ import Header from '@/components/Header'
 const ADMIN_PASSWORD = "hero2026"
 
 const DEFAULT_TOURS = [
-  { id:"prison-nakupenda", name:"Prison Island + Nakupenda", cat:["Popular","Half Day"], price:250, market:350, duration:"5 Hours", pickup:"Stone Town 8:30 AM", desc:"Tortoise sanctuary + sandbank + fruit", includes:"Boat, Guide, Entrance, Fruit, Water", area:"West", seo:"Most popular Zanzibar tour per car", active:true, image:"prison-nakupenda.jpg", featured:true, imageData:"" },
-  { id:"nakupenda-only", name:"Nakupenda Sandbank Only", cat:["Half Day","Popular"], price:130, market:200, duration:"4 Hours", pickup:"Stone Town 9 AM", desc:"White sandbank in ocean, swimming", includes:"Boat, Fruit, Water", area:"West", seo:"Nakupenda", active:true, image:"nakupenda-only.jpg", featured:true, imageData:"" },
-  { id:"prison-only", name:"Prison Island Tortoises", cat:["Half Day"], price:135, market:210, duration:"3 Hours", pickup:"Stone Town", desc:"Giant tortoises 100+ years", includes:"Boat, Entrance, Guide", area:"West", seo:"Prison Island", active:true, image:"prison-only.jpg", featured:false, imageData:"" },
-  { id:"stone-town", name:"Stone Town Walking Tour", cat:["Popular","Half Day","Cultural"], price:120, market:180, duration:"3 Hours", pickup:"Stone Town", desc:"UNESCO, Slave Market, House of Wonders", includes:"Guide, Entrances", area:"West", seo:"Stone Town", active:true, image:"stone-town.jpg", featured:true, imageData:"" },
-  { id:"spice", name:"Spice Farm Tour", cat:["Half Day","Cultural"], price:100, market:150, duration:"3 Hours", pickup:"Stone Town", desc:"30+ spices + fruits tasting", includes:"Guide, Tasting", area:"Central", seo:"Spice farm", active:true, image:"spice.jpg", featured:false, imageData:"" },
-  { id:"jozani", name:"Jozani Forest Monkeys", cat:["Popular","Half Day"], price:90, market:140, duration:"2.5 Hours", pickup:"Paje / Stone Town", desc:"Red colobus monkeys only in Zanzibar", includes:"Entrance, Guide", area:"South-Central", seo:"Jozani", active:true, image:"jozani.jpg", featured:true, imageData:"" },
-  { id:"salaam", name:"Salaam Cave Turtle Swim", cat:["Half Day"], price:100, market:150, duration:"2 Hours", pickup:"Paje / Jambiani", desc:"Swim with turtles in cave", includes:"Entrance, Guide", area:"South-East", seo:"Salaam Cave", active:true, image:"salaam.jpg", featured:false, imageData:"" },
-  { id:"kuza", name:"Kuza Cave Sacred Swim", cat:["Half Day","Cultural"], price:130, market:190, duration:"3 Hours", pickup:"Paje / Jambiani", desc:"Sacred limestone cave + culture", includes:"Entrance, Guide", area:"South-East", seo:"Kuza Cave", active:true, image:"kuza.jpg", featured:false, imageData:"" },
-  { id:"mnemba", name:"Mnemba Atoll Snorkeling", cat:["Popular","Half Day","North"], price:180, market:260, duration:"4 Hours", pickup:"Matemwe 8 AM", desc:"Best coral reef, colorful fish, dolphins", includes:"Boat, Gear, Guide", area:"North-East", seo:"Mnemba Atoll", active:true, image:"mnemba.jpg", featured:true, imageData:"" },
-  { id:"safari-blue", name:"Sharing Safari Blue Full Day BBQ", cat:["Full Day","Popular","South"], price:190, market:280, duration:"8 Hours", pickup:"Fumba 8 AM", desc:"Sandbank + snorkeling + seafood BBQ +Sharing dhow", includes:"Dhow, BBQ, Drinks, Gear", area:"South-West", seo:"Safari Blue", active:true, image:"safari-blue.jpg", featured:true, imageData:"" },
-  { id:"dhow-stone", name:"Sunset Dhow Stone Town", cat:["Popular","Half Day"], price:80, market:130, duration:"2 Hours", pickup:"Stone Town 4:30 PM", desc:"Traditional dhow sunset cruise", includes:"Dhow, Drinks", area:"West", seo:"Sunset dhow", active:true, image:"dhow-stone.jpg", featured:false, imageData:"" },
-  { id:"dolphin", name:"Kizimkazi Dolphin Tour", cat:["Half Day","South"], price:70, market:120, duration:"4 Hours", pickup:"Kizimkazi 6 AM", desc:"Dolphin watching early morning", includes:"Boat, Guide", area:"South", seo:"Kizimkazi dolphin", active:true, image:"dolphin.jpg", featured:false, imageData:"" },
-  { id:"rock", name:"The Rock Restaurant Tour", cat:["Half Day","East"], price:30, market:60, duration:"4 Hours", pickup:"East coast", desc:"Iconic Rock photo + Pongwe beach", includes:"Guide", area:"East", seo:"The Rock", active:true, image:"rock.jpg", featured:false, imageData:"" },
-  { id:"kite-lesson", name:"Paje Kite Surfing Lesson", cat:["Half Day","East","Water"], price:70, market:120, duration:"2 Hours", pickup:"Paje beach", desc:"Beginner kite with instructor + gear", includes:"Instructor, Gear", area:"South-East", seo:"Paje kite", active:true, image:"kite-lesson.jpg", featured:false, imageData:"" },
-  { id:"quad", name:"Quad Bike + Village", cat:["Half Day","Cultural","East"], price:70, market:110, duration:"3 Hours", pickup:"Paje / Bwejuu", desc:"Village + school + beach", includes:"Quad, Guide, Helmet", area:"South-East", seo:"Quad bike", active:true, image:"quad.jpg", featured:false, imageData:"" },
-  { id:"chumbe", name:"Chumbe Island Coral Park", cat:["Full Day","South-West"], price:90, market:150, duration:"7 Hours", pickup:"Fumba", desc:"Best coral sanctuary private island", includes:"Boat, Entrance $60, Lunch", area:"South-West", seo:"Chumbe Island", active:true, image:"chumbe.jpg", featured:false, imageData:"" },
-  { id:"private-safari-blue", name:"Private Safari Blue Full Day BBQ", cat:["Full Day","Popular","South"], price:220, market:320, duration:"8 Hours", pickup:"8:30 AM", desc:"Sandbank + snorkeling + seafood BBQ + Private dhow", includes:"Dhow, BBQ, Drinks, Gear", area:"West", seo:"Private Safari Blue", active:true, image:"private-safari-blue.jpg", featured:true, imageData:"" },
+  { id:"prison-nakupenda", name:"Prison Island + Nakupenda", cat:["Popular","Half Day"], price:250, market:350, duration:"5 Hours", pickup:"Stone Town 8:30 AM", desc:"Tortoise sanctuary + sandbank + fruit", includes:"Boat, Guide, Entrance, Fruit, Water", area:"West", seo:"Most popular Zanzibar tour per car", active:true, images:["prison-nakupenda.jpg"], imageDatas:[""], image:"prison-nakupenda.jpg", featured:true, imageData:"" },
+  { id:"nakupenda-only", name:"Nakupenda Sandbank Only", cat:["Half Day","Popular"], price:130, market:200, duration:"4 Hours", pickup:"Stone Town 9 AM", desc:"White sandbank in ocean, swimming", includes:"Boat, Fruit, Water", area:"West", seo:"Nakupenda", active:true, images:["nakupenda-only.jpg"], imageDatas:[""], image:"nakupenda-only.jpg", featured:true, imageData:"" },
+  { id:"prison-only", name:"Prison Island Tortoises", cat:["Half Day"], price:135, market:210, duration:"3 Hours", pickup:"Stone Town", desc:"Giant tortoises 100+ years", includes:"Boat, Entrance, Guide", area:"West", seo:"Prison Island", active:true, images:["prison-only.jpg"], imageDatas:[""], image:"prison-only.jpg", featured:false, imageData:"" },
+  { id:"stone-town", name:"Stone Town Walking Tour", cat:["Popular","Half Day","Cultural"], price:120, market:180, duration:"3 Hours", pickup:"Stone Town", desc:"UNESCO, Slave Market, House of Wonders", includes:"Guide, Entrances", area:"West", seo:"Stone Town", active:true, images:["stone-town.jpg"], imageDatas:[""], image:"stone-town.jpg", featured:true, imageData:"" },
+  { id:"spice", name:"Spice Farm Tour", cat:["Half Day","Cultural"], price:100, market:150, duration:"3 Hours", pickup:"Stone Town", desc:"30+ spices + fruits tasting", includes:"Guide, Tasting", area:"Central", seo:"Spice farm", active:true, images:["spice.jpg"], imageDatas:[""], image:"spice.jpg", featured:false, imageData:"" },
+  { id:"jozani", name:"Jozani Forest Monkeys", cat:["Popular","Half Day"], price:90, market:140, duration:"2.5 Hours", pickup:"Paje / Stone Town", desc:"Red colobus monkeys only in Zanzibar", includes:"Entrance, Guide", area:"South-Central", seo:"Jozani", active:true, images:["jozani.jpg"], imageDatas:[""], image:"jozani.jpg", featured:true, imageData:"" },
+  { id:"salaam", name:"Salaam Cave Turtle Swim", cat:["Half Day"], price:100, market:150, duration:"2 Hours", pickup:"Paje / Jambiani", desc:"Swim with turtles in cave", includes:"Entrance, Guide", area:"South-East", seo:"Salaam Cave", active:true, images:["salaam.jpg"], imageDatas:[""], image:"salaam.jpg", featured:false, imageData:"" },
+  { id:"kuza", name:"Kuza Cave Sacred Swim", cat:["Half Day","Cultural"], price:130, market:190, duration:"3 Hours", pickup:"Paje / Jambiani", desc:"Sacred limestone cave + culture", includes:"Entrance, Guide", area:"South-East", seo:"Kuza Cave", active:true, images:["kuza.jpg"], imageDatas:[""], image:"kuza.jpg", featured:false, imageData:"" },
+  { id:"mnemba", name:"Mnemba Atoll Snorkeling", cat:["Popular","Half Day","North"], price:180, market:260, duration:"4 Hours", pickup:"Matemwe 8 AM", desc:"Best coral reef, colorful fish, dolphins", includes:"Boat, Gear, Guide", area:"North-East", seo:"Mnemba Atoll", active:true, images:["mnemba.jpg"], imageDatas:[""], image:"mnemba.jpg", featured:true, imageData:"" },
+  { id:"safari-blue", name:"Sharing Safari Blue Full Day BBQ", cat:["Full Day","Popular","South"], price:190, market:280, duration:"8 Hours", pickup:"Fumba 8 AM", desc:"Sandbank + snorkeling + seafood BBQ +Sharing dhow", includes:"Dhow, BBQ, Drinks, Gear", area:"South-West", seo:"Safari Blue", active:true, images:["safari-blue.jpg"], imageDatas:[""], image:"safari-blue.jpg", featured:true, imageData:"" },
+  { id:"dhow-stone", name:"Sunset Dhow Stone Town", cat:["Popular","Half Day"], price:80, market:130, duration:"2 Hours", pickup:"Stone Town 4:30 PM", desc:"Traditional dhow sunset cruise", includes:"Dhow, Drinks", area:"West", seo:"Sunset dhow", active:true, images:["dhow-stone.jpg"], imageDatas:[""], image:"dhow-stone.jpg", featured:false, imageData:"" },
+  { id:"dolphin", name:"Kizimkazi Dolphin Tour", cat:["Half Day","South"], price:70, market:120, duration:"4 Hours", pickup:"Kizimkazi 6 AM", desc:"Dolphin watching early morning", includes:"Boat, Guide", area:"South", seo:"Kizimkazi dolphin", active:true, images:["dolphin.jpg"], imageDatas:[""], image:"dolphin.jpg", featured:false, imageData:"" },
+  { id:"rock", name:"The Rock Restaurant Tour", cat:["Half Day","East"], price:30, market:60, duration:"4 Hours", pickup:"East coast", desc:"Iconic Rock photo + Pongwe beach", includes:"Guide", area:"East", seo:"The Rock", active:true, images:["rock.jpg"], imageDatas:[""], image:"rock.jpg", featured:false, imageData:"" },
+  { id:"kite-lesson", name:"Paje Kite Surfing Lesson", cat:["Half Day","East","Water"], price:70, market:120, duration:"2 Hours", pickup:"Paje beach", desc:"Beginner kite with instructor + gear", includes:"Instructor, Gear", area:"South-East", seo:"Paje kite", active:true, images:["kite-lesson.jpg"], imageDatas:[""], image:"kite-lesson.jpg", featured:false, imageData:"" },
+  { id:"quad", name:"Quad Bike + Village", cat:["Half Day","Cultural","East"], price:70, market:110, duration:"3 Hours", pickup:"Paje / Bwejuu", desc:"Village + school + beach", includes:"Quad, Guide, Helmet", area:"South-East", seo:"Quad bike", active:true, images:["quad.jpg"], imageDatas:[""], image:"quad.jpg", featured:false, imageData:"" },
+  { id:"chumbe", name:"Chumbe Island Coral Park", cat:["Full Day","South-West"], price:90, market:150, duration:"7 Hours", pickup:"Fumba", desc:"Best coral sanctuary private island", includes:"Boat, Entrance $60, Lunch", area:"South-West", seo:"Chumbe Island", active:true, images:["chumbe.jpg"], imageDatas:[""], image:"chumbe.jpg", featured:false, imageData:"" },
+  { id:"private-safari-blue", name:"Private Safari Blue Full Day BBQ", cat:["Full Day","Popular","South"], price:220, market:320, duration:"8 Hours", pickup:"8:30 AM", desc:"Sandbank + snorkeling + seafood BBQ + Private dhow", includes:"Dhow, BBQ, Drinks, Gear", area:"West", seo:"Private Safari Blue", active:true, images:["private-safari-blue.jpg"], imageDatas:[""], image:"private-safari-blue.jpg", featured:true, imageData:"" },
 ]
 
 const DEFAULT_TRANSFERS = [
-  { id:"airport-stone", name:"Airport → Stone Town", price:25, market:40, duration:"15 min", area:"West", desc:"Per CAR up to 6 pax - Pay after trip", cat:["Popular"], active:true, image:"airport-stone.jpg", imageData:"" },
-  { id:"airport-nungwi", name:"Airport → Nungwi / Kendwa", price:40, market:60, duration:"1h 15m", area:"North", desc:"Per CAR up to 6 pax - North beach", cat:["Popular","North"], active:true, image:"airport-nungwi.jpg", imageData:"" },
-  { id:"airport-paje", name:"Airport → Paje / Jambiani", price:40, market:60, duration:"1h", area:"South-East", desc:"Per CAR up to 6 pax - Kitesurf area", cat:["Popular","South"], active:true, image:"airport-paje.jpg", imageData:"" },
-  { id:"airport-matemwe", name:"Airport → Matemwe / Mnemba", price:40, market:60, duration:"1h 20m", area:"North-East", desc:"Per CAR up to 6 pax - Mnemba area", cat:["North"], active:true, image:"airport-matemwe.jpg", imageData:"" },
-  { id:"airport-kiwengwa", name:"Airport → Kiwengwa / Pongwe", price:35, market:55, duration:"1h", area:"East", desc:"Per CAR - East coast", cat:["East"], active:true, image:"airport-kiwengwa.jpg", imageData:"" },
-  { id:"paje-nungwi", name:"Paje → Nungwi", price:50, market:70, duration:"1h 30m", area:"North", desc:"Per CAR - East to North crossing", cat:["Popular"], active:true, image:"paje-nungwi.jpg", imageData:"" },
+  { id:"airport-stone", name:"Airport → Stone Town", price:25, market:40, duration:"15 min", area:"West", desc:"Per CAR up to 6 pax - Pay after trip", cat:["Popular"], active:true, images:["airport-stone.jpg"], imageDatas:[""], image:"airport-stone.jpg", imageData:"" },
+  { id:"airport-nungwi", name:"Airport → Nungwi / Kendwa", price:40, market:60, duration:"1h 15m", area:"North", desc:"Per CAR up to 6 pax - North beach", cat:["Popular","North"], active:true, images:["airport-nungwi.jpg"], imageDatas:[""], image:"airport-nungwi.jpg", imageData:"" },
+  { id:"airport-paje", name:"Airport → Paje / Jambiani", price:40, market:60, duration:"1h", area:"South-East", desc:"Per CAR up to 6 pax - Kitesurf area", cat:["Popular","South"], active:true, images:["airport-paje.jpg"], imageDatas:[""], image:"airport-paje.jpg", imageData:"" },
+  { id:"airport-matemwe", name:"Airport → Matemwe / Mnemba", price:40, market:60, duration:"1h 20m", area:"North-East", desc:"Per CAR up to 6 pax - Mnemba area", cat:["North"], active:true, images:["airport-matemwe.jpg"], imageDatas:[""], image:"airport-matemwe.jpg", imageData:"" },
+  { id:"airport-kiwengwa", name:"Airport → Kiwengwa / Pongwe", price:35, market:55, duration:"1h", area:"East", desc:"Per CAR - East coast", cat:["East"], active:true, images:["airport-kiwengwa.jpg"], imageDatas:[""], image:"airport-kiwengwa.jpg", imageData:"" },
+  { id:"paje-nungwi", name:"Paje → Nungwi", price:50, market:70, duration:"1h 30m", area:"North", desc:"Per CAR - East to North crossing", cat:["Popular"], active:true, images:["paje-nungwi.jpg"], imageDatas:[""], image:"paje-nungwi.jpg", imageData:"" },
 ]
 
 const DEFAULT_ANNOUNCEMENTS = [
@@ -91,45 +91,131 @@ export default function AdminPage(){
    "South-West": { "West": 35, "Central": 30, "South-Central": 30, "South": 30, "South-East": 35, "East": 40, "North-East": 50, "North": 55, "South-West": 15, "All": 15 },
  })
 
- const fileToBase64 = (file: File, cb:(b64:string)=>void) => {
+ const fileToBase64Resized = (file: File, maxWidth = 600, quality = 0.5, cb:(b64:string)=>void) => {
    const reader = new FileReader()
-   reader.onload = () => cb(reader.result as string)
+   reader.onload = (e) => {
+     const img = new Image()
+     img.onload = () => {
+       const canvas = document.createElement('canvas')
+       let w = img.width, h = img.height
+       if (w > maxWidth) {
+         h = (maxWidth / w) * h
+         w = maxWidth
+       }
+       canvas.width = w
+       canvas.height = h
+       canvas.getContext('2d')!.drawImage(img, 0, 0, w, h)
+       cb(canvas.toDataURL('image/jpeg', quality))
+     }
+     img.src = e.target?.result as string
+   }
    reader.readAsDataURL(file)
  }
 
- const onTourFile = (id: string, file: File) => {
-   fileToBase64(file, (b64) => {
-     setTours(prev => prev.map(x => x.id === id? {...x, imageData:b64, image:file.name} : x))
+ const onTourFiles = (id: string, files: FileList) => {
+   const fileArr = Array.from(files).slice(0, 3)
+   fileArr.forEach(file => {
+     fileToBase64Resized(file, 600, 0.5, (b64) => {
+       setTours(prev => prev.map(x => {
+         if (x.id!== id) return x
+         const datas = [...(x.imageDatas || [])].filter(Boolean)
+         const names = [...(x.images || [])].filter(Boolean)
+         if (datas.length >= 3) return x
+         datas.push(b64)
+         names.push(file.name)
+         return {...x, imageDatas: datas, images: names, imageData: datas[0], image: names[0] }
+       }))
+     })
    })
  }
 
- const onTransferFile = (id: string, file: File) => {
-   fileToBase64(file, (b64) => {
-     setTransfers(prev => prev.map(x => x.id === id? {...x, imageData:b64, image:file.name} : x))
+ const removeTourImage = (tourId: string, index: number) => {
+   setTours(prev => prev.map(x => {
+     if (x.id!== tourId) return x
+     const datas = [...(x.imageDatas || [])]
+     const names = [...(x.images || [])]
+     datas.splice(index, 1)
+     names.splice(index, 1)
+     return {...x, imageDatas: datas, images: names, imageData: datas[0] || "", image: names[0] || "" }
+   }))
+ }
+
+ const onTransferFiles = (id: string, files: FileList) => {
+   const fileArr = Array.from(files).slice(0, 3)
+   fileArr.forEach(file => {
+     fileToBase64Resized(file, 600, 0.5, (b64) => {
+       setTransfers(prev => prev.map(x => {
+         if (x.id!== id) return x
+         const datas = [...(x.imageDatas || [])].filter(Boolean)
+         const names = [...(x.images || [])].filter(Boolean)
+         if (datas.length >= 3) return x
+         datas.push(b64)
+         names.push(file.name)
+         return {...x, imageDatas: datas, images: names, imageData: datas[0], image: names[0]}
+       }))
+     })
    })
+ }
+
+ const removeTransferImage = (transferId: string, index: number) => {
+   setTransfers(prev => prev.map(x => {
+     if (x.id!== transferId) return x
+     const datas = [...(x.imageDatas || [])]
+     const names = [...(x.images || [])]
+     datas.splice(index, 1)
+     names.splice(index, 1)
+     return {...x, imageDatas: datas, images: names, imageData: datas[0] || "", image: names[0] || ""}
+   }))
  }
 
  useEffect(()=>{
    const savedAuth = localStorage.getItem("hero_admin_auth")
    if(savedAuth==="1") setAuth(true)
-   const load = (k:string,s:any)=>{ const v=localStorage.getItem(k); if(v) try{ s(JSON.parse(v)) }catch{} }
-   load("hero_tours", setTours); load("hero_transfers", setTransfers); load("hero_announcements", setAnnouncements); load("hero_blogs", setBlogs); load("hero_hotels", setHotelOptions); load("hero_matrix", setTransportMatrix); load("hero_content", setSiteContent); load("hero_seo", setSeoSettings); load("hero_pax", setPaxRules); load("hero_socials", setSocials)
+   const migrate = (arr:any[]) => arr.map((x:any)=> ({
+   ...x,
+     images: x.images || (x.image? [x.image] : []),
+     imageDatas: x.imageDatas || (x.imageData? [x.imageData] : []),
+   }))
+   const load = (k:string,s:any, doMigrate=false)=>{
+     const v=localStorage.getItem(k);
+     if(v) try{
+       const parsed = JSON.parse(v)
+       s(doMigrate? migrate(parsed) : parsed)
+     }catch{}
+   }
+   load("hero_tours", setTours, true);
+   load("hero_transfers", setTransfers, true);
+   load("hero_announcements", setAnnouncements, false);
+   load("hero_blogs", setBlogs, false);
+   load("hero_hotels", setHotelOptions, false);
+   load("hero_matrix", setTransportMatrix, false);
+   load("hero_content", setSiteContent, false);
+   load("hero_seo", setSeoSettings, false);
+   load("hero_pax", setPaxRules, false);
+   load("hero_socials", setSocials, false)
    const wa=localStorage.getItem("hero_wa"); if(wa) setWaNumber(wa)
  }, [])
 
  const saveAll = () => {
-   localStorage.setItem("hero_tours", JSON.stringify(tours))
-   localStorage.setItem("hero_transfers", JSON.stringify(transfers))
-   localStorage.setItem("hero_announcements", JSON.stringify(announcements))
-   localStorage.setItem("hero_blogs", JSON.stringify(blogs))
-   localStorage.setItem("hero_wa", waNumber)
-   localStorage.setItem("hero_hotels", JSON.stringify(hotelOptions))
-   localStorage.setItem("hero_matrix", JSON.stringify(transportMatrix))
-   localStorage.setItem("hero_content", JSON.stringify(siteContent))
-   localStorage.setItem("hero_seo", JSON.stringify(seoSettings))
-   localStorage.setItem("hero_pax", JSON.stringify(paxRules))
-   localStorage.setItem("hero_socials", JSON.stringify(socials))
-   alert("✅ SAVED! Tours per CAR + Transfers + Announcements + Blogs + SEO + Images saved. Homepage and /blogs updated.")
+   try {
+     localStorage.setItem("hero_tours", JSON.stringify(tours))
+     localStorage.setItem("hero_transfers", JSON.stringify(transfers))
+     localStorage.setItem("hero_announcements", JSON.stringify(announcements))
+     localStorage.setItem("hero_blogs", JSON.stringify(blogs))
+     localStorage.setItem("hero_wa", waNumber)
+     localStorage.setItem("hero_hotels", JSON.stringify(hotelOptions))
+     localStorage.setItem("hero_matrix", JSON.stringify(transportMatrix))
+     localStorage.setItem("hero_content", JSON.stringify(siteContent))
+     localStorage.setItem("hero_seo", JSON.stringify(seoSettings))
+     localStorage.setItem("hero_pax", JSON.stringify(paxRules))
+     localStorage.setItem("hero_socials", JSON.stringify(socials))
+     const sizeKB = (new Blob([JSON.stringify([...tours,...transfers])]).size / 1024).toFixed(0)
+     alert(`✅ SAVED! ${tours.length} tours + ${transfers.length} transfers = ${sizeKB}KB - 3 pics per cart ready.`)
+   } catch (e:any) {
+     alert("❌ Storage FULL! Use compressor.html (600px q0.5 = 40KB). Saving without images fallback.")
+     localStorage.setItem("hero_tours", JSON.stringify(tours.map(({imageDatas, imageData,...rest}:any)=> ({...rest, images: rest.images, imageDatas:[""], imageData:""}))))
+     localStorage.setItem("hero_transfers", JSON.stringify(transfers.map(({imageDatas, imageData,...rest}:any)=> ({...rest, images: rest.images, imageDatas:[""], imageData:""}))))
+   }
  }
 
  const handleLogin = () => {
@@ -159,9 +245,9 @@ export default function AdminPage(){
    <div className="max-w-[1600px] mx-auto flex justify-between items-center flex-wrap gap-3">
      <div>
        <h1 className="font-black text-[20px]">HERO Cockpit - Per CAR • {tours.length} Tours • {transfers.length} Transfers • {blogs.length} Blogs</h1>
-       <p className="text-[11px] opacity-60">12 tabs: Dashboard, Announcements, Tours per CAR, Transfers per CAR, Blogs SEO, Hotels, Matrix, Pax Per CAR, Content + Images, SEO + Reviews, Settings, Export</p>
+       <p className="text-[11px] opacity-60">12 tabs: 3 pics per cart for BOTH Tours & Transfers + 600px compress</p>
      </div>
-     <button onClick={saveAll} className="bg-[#FF8A1A] px-6 py-2.5 rounded-full font-black text-[12px]">💾 Save All - Per CAR</button>
+     <button onClick={saveAll} className="bg-[#FF8A1A] px-6 py-2.5 rounded-full font-black text-[12px]">💾 Save All - 3 Pics/Cart</button>
    </div>
  </section>
 
@@ -170,8 +256,8 @@ export default function AdminPage(){
      {[
        { id:"overview", label:"📊 Dashboard" },
        { id:"announcements", label:`📢 Hero Promos (${announcements.length})` },
-       { id:"tours", label:`🏝️ Tours per CAR (${tours.length}) 📸` },
-       { id:"transfers", label:`🚕 Transfers per CAR (${transfers.length})` },
+       { id:"tours", label:`🏝️ Tours per CAR (${tours.length}) 📸x3` },
+       { id:"transfers", label:`🚕 Transfers per CAR (${transfers.length}) 📸x3` },
        { id:"blogs", label:`📝 Blogs SEO (${blogs.length})` },
        { id:"hotels", label:"🏨 Hotels" },
        { id:"matrix", label:"🚚 Matrix" },
@@ -188,91 +274,89 @@ export default function AdminPage(){
 
  <section className="px-6 md:px-12 py-8">
    <div className="max-w-[1600px] mx-auto">
-
      {tab==="overview" && (
        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-         <div className="bg-white rounded-[18px] p-5 border"><p className="text-[10px] font-black opacity-50">TOURS PER CAR</p><p className="font-black text-[28px]">{tours.length}</p><p className="text-[10px] opacity-50 mt-1">Avg ${ (totalRevenue/tours.length).toFixed(0)} per CAR</p></div>
-         <div className="bg-white rounded-[18px] p-5 border"><p className="text-[10px] font-black opacity-50">TRANSFERS PER CAR</p><p className="font-black text-[28px]">{transfers.length}</p><p className="text-[10px] opacity-50 mt-1">$25-$50 per CAR</p></div>
-         <div className="bg-white rounded-[18px] p-5 border"><p className="text-[10px] font-black opacity-50">BLOGS SEO</p><p className="font-black text-[28px]">{blogs.length}</p><p className="text-[10px] opacity-50 mt-1">Full info for SEO</p></div>
-         <div className="bg-[#0A2342] text-white rounded-[18px] p-5"><p className="text-[10px] font-black opacity-60">WHATSAPP</p><p className="font-black text-[13px] mt-1">+{waNumber}</p><p className="text-[9px] opacity-60 mt-1">Price per CAR rule active</p></div>
-       </div>
-     )}
-
-     {tab==="announcements" && (
-       <div className="bg-white rounded-[20px] p-6 border">
-         <div className="flex justify-between items-center"><h2 className="font-black">📢 Hero - Announcements & Promotions - Where new promos placed</h2><button onClick={()=>setEditingAnn({ id:"", badge:"🔥 NEW", title:"", subtitle:"", cta:"View", link:"#transfers", imageData:"", active:true })} className="bg-[#0A2342] text-white px-4 py-2 rounded-full text-[11px] font-bold">+ Add Promo</button></div>
-         <p className="text-[11px] opacity-60 mt-2">These show in homepage hero slider. Rotate every 6 sec. Upload image for each promo. This is face of website.</p>
-         <div className="mt-6 grid md:grid-cols-2 gap-4">
-           {announcements.map((a:any)=>(
-             <div key={a.id} className="bg-[#F8FAFF] rounded-[14px] p-4 border">
-               <span className="bg-[#FF8A1A] text-white text-[9px] px-2 py-1 rounded-full font-black">{a.badge}</span>
-               <p className="font-black text-[13px] mt-2">{a.title}</p>
-               <p className="text-[11px] opacity-60 mt-1">{a.subtitle}</p>
-               <div className="mt-3 flex gap-2"><button onClick={()=>setEditingAnn(a)} className="bg-[#0A2342] text-white px-3 py-1.5 rounded-full text-[10px] font-bold">Edit</button><button onClick={()=>setAnnouncements(announcements.filter(x=>x.id!==a.id))} className="bg-red-50 text-red-600 px-3 py-1.5 rounded-full text-[10px] font-bold">Delete</button></div>
-             </div>
-           ))}
-         </div>
-         {editingAnn && (
-           <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-             <div className="bg-white rounded-[20px] p-6 max-w-xl w-full">
-               <h3 className="font-black">Edit Hero Promo</h3>
-               <div className="mt-4 space-y-3">
-                 <input value={editingAnn.badge?? ""} onChange={e=>setEditingAnn({...editingAnn, badge:e.target.value})} placeholder="Badge e.g. 🔥 NEW PROMOTION" className="w-full bg-[#F5F7FA] rounded-full px-4 py-2.5 text-[11px] border"/>
-                 <input value={editingAnn.title?? ""} onChange={e=>setEditingAnn({...editingAnn, title:e.target.value})} placeholder="Title" className="w-full bg-[#F5F7FA] rounded-full px-4 py-3 text-[13px] font-black border"/>
-                 <textarea value={editingAnn.subtitle?? ""} onChange={e=>setEditingAnn({...editingAnn, subtitle:e.target.value})} placeholder="Subtitle - Price per CAR included" className="w-full bg-[#F5F7FA] rounded-[12px] px-4 py-3 text-[11px] border h-[70px]"/>
-                 <div className="grid grid-cols-2 gap-3"><input value={editingAnn.cta?? ""} onChange={e=>setEditingAnn({...editingAnn, cta:e.target.value})} placeholder="Button text" className="w-full bg-[#F5F7FA] rounded-full px-4 py-2.5 text-[11px] border"/><input value={editingAnn.link?? ""} onChange={e=>setEditingAnn({...editingAnn, link:e.target.value})} placeholder="Link e.g. #transfers" className="w-full bg-[#F5F7FA] rounded-full px-4 py-2.5 text-[11px] border"/></div>
-                 <input type="file" accept="image/*" onChange={e=>{ const f=e.target.files?.[0]; if(f){ const r=new FileReader(); r.onload=()=> setEditingAnn({...editingAnn, imageData:r.result as string}); r.readAsDataURL(f) } }} className="w-full text-[11px]"/>
-                 {editingAnn.imageData && <img src={editingAnn.imageData} className="w-full h-[120px] object-cover rounded-[10px] border"/>}
-               </div>
-               <div className="flex gap-3 mt-5"><button onClick={()=>{ if(!editingAnn.title){ alert("Title required"); return } if(announcements.find((x:any)=>x.id===editingAnn.id)){ setAnnouncements(announcements.map((x:any)=> x.id===editingAnn.id? editingAnn : x)) } else { setAnnouncements([...announcements, {...editingAnn, id:Date.now().toString()}]) } setEditingAnn(null) }} className="flex-1 bg-[#0A2342] text-white py-3 rounded-full font-black">Save Promo</button><button onClick={()=>setEditingAnn(null)} className="px-6 bg-[#F5F7FA] rounded-full font-bold">Cancel</button></div>
-             </div>
-           </div>
-         )}
+         <div className="bg-white rounded-[18px] p-5 border"><p className="text-[10px] font-black opacity-50">TOURS PER CAR</p><p className="font-black text-[28px]">{tours.length}</p><p className="text-[10px] opacity-50 mt-1">3 pics per cart</p></div>
+         <div className="bg-white rounded-[18px] p-5 border"><p className="text-[10px] font-black opacity-50">TRANSFERS PER CAR</p><p className="font-black text-[28px]">{transfers.length}</p><p className="text-[10px] opacity-50 mt-1">3 pics per cart NEW</p></div>
+         <div className="bg-white rounded-[18px] p-5 border"><p className="text-[10px] font-black opacity-50">BLOGS SEO</p><p className="font-black text-[28px]">{blogs.length}</p></div>
+         <div className="bg-[#0A2342] text-white rounded-[18px] p-5"><p className="text-[10px] font-black opacity-60">WHATSAPP</p><p className="font-black text-[13px] mt-1">+{waNumber}</p><p className="text-[9px] opacity-60 mt-1">600px x 0.5 = 40KB</p></div>
        </div>
      )}
 
      {tab==="tours" && (
        <div>
          <div className="flex justify-between items-center bg-white p-4 rounded-[16px] border flex-wrap gap-3">
-           <h2 className="font-black text-[16px]">Tours - Per CAR - BIG 220px + Upload</h2>
+           <h2 className="font-black text-[16px]">Tours - 3 Pics per Cart</h2>
            <div className="flex gap-2">
              <select value={filter} onChange={e=>setFilter(e.target.value)} className="bg-[#F5F7FA] border rounded-full px-4 py-2 text-[11px] font-bold">
                {["All","Popular","Half Day","Full Day","North","South","East","West","Cultural","Water"].map(c=> <option key={c} value={c}>{c}</option>)}
              </select>
-             <button onClick={()=>setEditingTour({ id:"", name:"", cat:["Half Day"], price:100, market:150, duration:"3 Hours", pickup:"", desc:"", includes:"", area:"West", seo:"", active:true, image:"", featured:false, imageData:"" })} className="bg-[#0A2342] text-white px-5 py-2 rounded-full font-bold text-[11px]">+ Add Tour per CAR</button>
+             <button onClick={()=>setEditingTour({ id:"", name:"", cat:["Half Day"], price:100, market:150, duration:"3 Hours", pickup:"", desc:"", includes:"", area:"West", seo:"", active:true, images:[], imageDatas:[], image:"", featured:false, imageData:"" })} className="bg-[#0A2342] text-white px-5 py-2 rounded-full font-bold text-[11px]">+ Add Tour 3 pics</button>
            </div>
          </div>
-
          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
            {filtered.map((t:any)=>(
              <div key={t.id} className="bg-white rounded-[20px] overflow-hidden border-2 border-gray-100 shadow-sm">
                <div className="h-[220px] bg-[#F5F7FA] relative overflow-hidden">
-                 {t.imageData? <img src={t.imageData} alt={t.name} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-gradient-to-br from-[#0A2342] to-[#1a4a7a] flex flex-col items-center justify-center text-white"><span className="text-[11px] font-black bg-white/20 px-3 py-1 rounded-full">{t.area}</span><span className="font-black text-[12px] mt-2">{t.image || t.id+".jpg"}</span><span className="text-[10px] opacity-70 mt-1">No picture - Upload</span></div>}
+                 {(t.imageDatas?.[0] || t.imageData)? <img src={t.imageDatas?.[0] || t.imageData} alt={t.name} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-gradient-to-br from-[#0A2342] to-[#1a4a7a] flex flex-col items-center justify-center text-white"><span className="font-black text-[12px] mt-2">No picture</span><span className="text-[10px] opacity-70 mt-1">Upload 3 pics</span></div>}
                  <span className="absolute top-3 left-3 bg-white text-[#0A2342] text-[9px] px-2.5 py-1 rounded-full font-black">{t.area} per CAR</span>
                  <span className="absolute top-3 right-3 bg-[#0A2342] text-white text-[10px] px-3 py-1 rounded-full font-black">${t.price} per car</span>
+                 {t.imageDatas?.filter(Boolean).length > 0 && (
+                   <div className="absolute bottom-2 left-2 flex gap-1">
+                     {t.imageDatas.filter(Boolean).map((img:string,i:number)=>(
+                       <div key={i} className="w-[36px] h-[28px] rounded-[6px] border-2 border-white overflow-hidden bg-white"><img src={img} className="w-full h-full object-cover" /></div>
+                     ))}
+                     <span className="bg-black/70 text-white text-[9px] px-2 py-1 rounded-full self-center">{t.imageDatas.filter(Boolean).length}/3</span>
+                   </div>
+                 )}
                </div>
                <div className="p-4">
                  <p className="font-black text-[13px]">{t.name}</p>
                  <p className="text-[11px] opacity-60 mt-1">{t.desc}</p>
                  <div className="mt-3 flex gap-2">
-                   <button onClick={()=>setEditingTour(t)} className="flex-1 bg-[#0A2342] text-white py-2.5 rounded-full text-[11px] font-black">✏️ Edit per CAR + Upload</button>
-                   <label className="px-3 py-2.5 rounded-full text-[11px] font-bold border bg-[#FFFBF5] cursor-pointer">📸<input type="file" accept="image/*" className="hidden" onChange={(e)=>{ const file=e.target.files?.[0]; if(file) onTourFile(t.id, file) }} /></label>
+                   <button onClick={()=>setEditingTour(t)} className="flex-1 bg-[#0A2342] text-white py-2.5 rounded-full text-[11px] font-black">✏️ Edit 3 pics</button>
+                   <label className="px-3 py-2.5 rounded-full text-[11px] font-bold border bg-[#FFFBF5] cursor-pointer">📸x3<input type="file" accept="image/*" multiple className="hidden" onChange={(e)=>{ if(e.target.files) onTourFiles(t.id, e.target.files) }} /></label>
                  </div>
+                 {t.imageDatas?.length > 0 && (
+                   <div className="flex gap-1 mt-2 flex-wrap">
+                     {t.imageDatas.map((img:string, idx:number)=> img && <button key={idx} onClick={()=>removeTourImage(t.id, idx)} className="text-[9px] bg-red-50 text-red-600 px-2 py-1 rounded-full">Del {idx+1} ✕</button>)}
+                   </div>
+                 )}
                </div>
              </div>
            ))}
          </div>
-
          {editingTour && (
            <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
              <div className="bg-white rounded-[24px] p-6 max-w-2xl w-full max-h-[95vh] overflow-y-auto">
-               <h3 className="font-black text-[18px]">Edit Tour - Per CAR - Upload</h3>
+               <h3 className="font-black text-[18px]">Edit Tour - 3 Pics</h3>
                <div className="mt-5 bg-[#F5F7FA] rounded-[16px] p-4 border-2 border-dashed">
-                 <p className="text-[11px] font-black">📸 TOUR PICTURE - BIG 220px</p>
-                 <div className="mt-3 grid md:grid-cols-2 gap-4">
-                   <div className="w-full h-[160px] bg-white rounded-[12px] border overflow-hidden flex items-center justify-center">{editingTour.imageData? <img src={editingTour.imageData} className="w-full h-full object-cover" /> : <span className="text-[11px] opacity-50">No image</span>}</div>
-                   <div><input type="file" accept="image/*" id="tour-up" className="hidden" onChange={(e)=>{ const f=e.target.files?.[0]; if(!f) return; fileToBase64(f, (b64)=> setEditingTour({...editingTour, imageData:b64, image:f.name})) }} /><label htmlFor="tour-up" className="w-full bg-[#0A2342] text-white py-3 rounded-full font-black text-[11px] flex justify-center cursor-pointer">📤 Upload Picture</label><input value={editingTour.image?? ""} onChange={e=>setEditingTour({...editingTour, image:e.target.value})} placeholder="File name" className="mt-3 w-full bg-white rounded-full px-4 py-2 text-[11px] border"/></div>
+                 <p className="text-[11px] font-black">📸 3 PICTURES - 600px x 0.5</p>
+                 <div className="mt-3 grid grid-cols-3 gap-2">
+                   {[0,1,2].map(i=>(
+                     <div key={i} className="w-full h-[110px] bg-white rounded-[12px] border overflow-hidden flex items-center justify-center relative">
+                       {editingTour.imageDatas?.[i]? (
+                         <>
+                           <img src={editingTour.imageDatas[i]} className="w-full h-full object-cover" />
+                           <button onClick={()=>{
+                             const datas=[...(editingTour.imageDatas||[])]; const names=[...(editingTour.images||[])];
+                             datas.splice(i,1); names.splice(i,1);
+                             setEditingTour({...editingTour, imageDatas:datas, images:names, imageData:datas[0]||"", image:names[0]||""})
+                           }} className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 text-[10px]">✕</button>
+                         </>
+                       ) : <span className="text-[10px] opacity-40">Slot {i+1}</span>}
+                     </div>
+                   ))}
                  </div>
+                 <input type="file" accept="image/*" multiple className="mt-3 block text-[11px] w-full" onChange={e=>{
+                   const files=e.target.files; if(!files) return;
+                   Array.from(files).slice(0,3).forEach(file=>{
+                     fileToBase64Resized(file, 600, 0.5, b64=>{
+                       const datas=[...(editingTour.imageDatas||[])].filter(Boolean); const names=[...(editingTour.images||[])].filter(Boolean);
+                       if(datas.length < 3){ datas.push(b64); names.push(file.name); setEditingTour({...editingTour, imageDatas:datas, images:names, imageData:datas[0], image:names[0]}) }
+                     })
+                   })
+                 }} />
                </div>
                <div className="mt-5 grid md:grid-cols-2 gap-3">
                  <input value={editingTour.id?? ""} onChange={e=>setEditingTour({...editingTour, id:e.target.value.toLowerCase().replace(/[^a-z0-9-]/g,'-')})} placeholder="ID" className="w-full bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/>
@@ -283,11 +367,11 @@ export default function AdminPage(){
                  <input value={editingTour.duration?? ""} onChange={e=>setEditingTour({...editingTour, duration:e.target.value})} placeholder="Duration" className="w-full bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/>
                  <input value={editingTour.pickup?? ""} onChange={e=>setEditingTour({...editingTour, pickup:e.target.value})} placeholder="Pickup" className="w-full bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/>
                  <input value={editingTour.includes?? ""} onChange={e=>setEditingTour({...editingTour, includes:e.target.value})} placeholder="Includes" className="md:col-span-2 w-full bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/>
-                 <input value={editingTour.area?? ""} onChange={e=>setEditingTour({...editingTour, area:e.target.value})} placeholder="Area e.g. West" className="w-full bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/>
-                 <input value={editingTour.seo?? ""} onChange={e=>setEditingTour({...editingTour, seo:e.target.value})} placeholder="SEO keyword per CAR" className="w-full bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/>
+                 <input value={editingTour.area?? ""} onChange={e=>setEditingTour({...editingTour, area:e.target.value})} placeholder="Area" className="w-full bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/>
+                 <input value={editingTour.seo?? ""} onChange={e=>setEditingTour({...editingTour, seo:e.target.value})} placeholder="SEO" className="w-full bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/>
                </div>
                <div className="flex gap-3 pt-5">
-                 <button onClick={()=>{ if(!editingTour.id||!editingTour.name){ alert("ID and Name required"); return } if(tours.find((t:any)=>t.id===editingTour.id)){ setTours(ts=> ts.map((t:any)=> t.id===editingTour.id? editingTour : t)) } else { setTours(ts=> [...ts, editingTour]) } setEditingTour(null) }} className="flex-1 bg-[#0A2342] text-white py-3.5 rounded-full font-black">💾 Save Tour per CAR + Picture</button>
+                 <button onClick={()=>{ if(!editingTour.id||!editingTour.name){ alert("ID and Name required"); return } if(tours.find((t:any)=>t.id===editingTour.id)){ setTours(ts=> ts.map((t:any)=> t.id===editingTour.id? editingTour : t)) } else { setTours(ts=> [...ts, editingTour]) } setEditingTour(null) }} className="flex-1 bg-[#0A2342] text-white py-3.5 rounded-full font-black">💾 Save</button>
                  <button onClick={()=>setEditingTour(null)} className="px-8 py-3.5 rounded-full font-bold bg-[#F5F7FA]">Cancel</button>
                </div>
              </div>
@@ -298,89 +382,71 @@ export default function AdminPage(){
 
      {tab==="transfers" && (
        <div className="bg-white rounded-[20px] p-6 border">
-         <div className="flex justify-between items-center"><h2 className="font-black text-[16px]">🚕 Transfers - Per CAR - Pictures</h2><button onClick={()=>setEditingTransfer({ id:"", name:"", price:25, market:40, duration:"15 min", area:"West", desc:"Per CAR up to 6 pax", cat:["Popular"], active:true, image:"", imageData:"" })} className="bg-[#0A2342] text-white px-4 py-2 rounded-full text-[11px] font-bold">+ Add Transfer per CAR</button></div>
+         <div className="flex justify-between items-center">
+           <h2 className="font-black text-[16px]">🚕 Transfers - 3 Pics per Cart</h2>
+           <button onClick={()=>setEditingTransfer({ id:"", name:"", price:25, market:40, duration:"15 min", area:"West", desc:"Per CAR up to 6 pax", cat:["Popular"], active:true, images:[], imageDatas:[], image:"", imageData:"" })} className="bg-[#0A2342] text-white px-4 py-2 rounded-full text-[11px] font-bold">+ Add Transfer 3 pics</button>
+         </div>
          <div className="mt-6 grid md:grid-cols-2 gap-3">
            {transfers.map((tr:any)=>(
              <div key={tr.id} className="bg-[#F5F7FA] rounded-[14px] p-3 flex gap-3 items-center">
-               <div className="w-[60px] h-[60px] bg-white rounded-[10px] overflow-hidden border flex items-center justify-center">{tr.imageData? <img src={tr.imageData} className="w-full h-full object-cover" /> : <span className="text-[9px] opacity-40">No img</span>}</div>
-               <div className="flex-1"><p className="font-black text-[12px]">{tr.name}</p><p className="text-[11px] opacity-60">${tr.price} per CAR vehicle</p></div>
+               <div className="flex gap-1">
+                 {(tr.imageDatas?.length? tr.imageDatas : [tr.imageData]).filter(Boolean).slice(0,3).map((img:string,i:number)=>(
+                   <div key={i} className="w-[50px] h-[50px] bg-white rounded-[10px] overflow-hidden border"><img src={img} className="w-full h-full object-cover" /></div>
+                 ))}
+                 {(!tr.imageDatas?.length &&!tr.imageData) && <div className="w-[50px] h-[50px] bg-white rounded-[10px] border flex items-center justify-center"><span className="text-[9px] opacity-40">No img</span></div>}
+               </div>
+               <div className="flex-1">
+                 <p className="font-black text-[12px]">{tr.name}</p>
+                 <p className="text-[11px] opacity-60">${tr.price} per CAR • {tr.imageDatas?.filter(Boolean).length || 0}/3</p>
+                 <div className="flex gap-1 mt-1">{tr.imageDatas?.map((_:any,idx:number)=> <button key={idx} onClick={()=>removeTransferImage(tr.id, idx)} className="text-[8px] bg-red-50 text-red-600 px-1.5 py-0.5 rounded-full">Del {idx+1}</button>)}</div>
+               </div>
                <button onClick={()=>setEditingTransfer(tr)} className="bg-[#0A2342] text-white px-3 py-1.5 rounded-full text-[10px] font-bold">Edit</button>
-               <label className="bg-white px-3 py-2 rounded-full text-[10px] font-bold border cursor-pointer">📸<input type="file" accept="image/*" className="hidden" onChange={(e)=>{ const f=e.target.files?.[0]; if(f) onTransferFile(tr.id, f) }} /></label>
+               <label className="bg-white px-3 py-2 rounded-full text-[10px] font-bold border cursor-pointer">📸x3<input type="file" accept="image/*" multiple className="hidden" onChange={(e)=>{ if(e.target.files) onTransferFiles(tr.id, e.target.files) }} /></label>
              </div>
            ))}
          </div>
          {editingTransfer && (
            <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
              <div className="bg-white rounded-[20px] p-6 max-w-lg w-full">
-               <h3 className="font-black">Edit Transfer per CAR</h3>
+               <h3 className="font-black">Edit Transfer - 3 Pics</h3>
+               <div className="mt-4 grid grid-cols-3 gap-2">
+                 {[0,1,2].map(i=>(
+                   <div key={i} className="w-full h-[90px] bg-[#F5F7FA] rounded-[12px] border overflow-hidden flex items-center justify-center relative">
+                     {editingTransfer.imageDatas?.[i]? (
+                       <>
+                         <img src={editingTransfer.imageDatas[i]} className="w-full h-full object-cover" />
+                         <button onClick={()=>{
+                           const d=[...(editingTransfer.imageDatas||[])]; const n=[...(editingTransfer.images||[])];
+                           d.splice(i,1); n.splice(i,1);
+                           setEditingTransfer({...editingTransfer, imageDatas:d, images:n, imageData:d[0]||"", image:n[0]||""})
+                         }} className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 text-[10px]">✕</button>
+                       </>
+                     ) : <span className="text-[9px] opacity-40">Slot {i+1}</span>}
+                   </div>
+                 ))}
+               </div>
+               <input type="file" accept="image/*" multiple className="mt-3 block text-[11px] w-full" onChange={e=>{
+                 const files=e.target.files; if(!files) return;
+                 Array.from(files).slice(0,3).forEach(file=>{
+                   fileToBase64Resized(file, 600, 0.5, b64=>{
+                     const d=[...(editingTransfer.imageDatas||[])].filter(Boolean); const n=[...(editingTransfer.images||[])].filter(Boolean);
+                     if(d.length<3){ d.push(b64); n.push(file.name); setEditingTransfer({...editingTransfer, imageDatas:d, images:n, imageData:d[0], image:n[0]}) }
+                   })
+                 })
+               }} />
                <div className="mt-4 space-y-3">
                  <input value={editingTransfer.id?? ""} onChange={e=>setEditingTransfer({...editingTransfer, id:e.target.value.toLowerCase().replace(/[^a-z0-9-]/g,'-')})} placeholder="ID" className="w-full bg-[#F5F7FA] rounded-full px-4 py-2.5 text-[11px] border"/>
-                 <input value={editingTransfer.name?? ""} onChange={e=>setEditingTransfer({...editingTransfer, name:e.target.value})} placeholder="Name e.g. Airport → Paje" className="w-full bg-[#F5F7FA] rounded-full px-4 py-2.5 text-[12px] font-bold border"/>
-                 <div className="grid grid-cols-2 gap-3"><input type="number" value={editingTransfer.price?? ""} onChange={e=>setEditingTransfer({...editingTransfer, price:parseInt(e.target.value)||0})} placeholder="Price per CAR" className="w-full bg-[#F5F7FA] rounded-full px-4 py-2.5 text-[11px] font-black border-2 border-[#0A2342]"/><input type="number" value={editingTransfer.market?? ""} onChange={e=>setEditingTransfer({...editingTransfer, market:parseInt(e.target.value)||0})} placeholder="Market per CAR" className="w-full bg-[#F5F7FA] rounded-full px-4 py-2.5 text-[11px] border text-red-600"/></div>
-                 <div className="grid grid-cols-2 gap-3"><input value={editingTransfer.area?? ""} onChange={e=>setEditingTransfer({...editingTransfer, area:e.target.value})} placeholder="Area" className="w-full bg-[#F5F7FA] rounded-full px-4 py-2.5 text-[11px] border"/><input value={editingTransfer.duration?? ""} onChange={e=>setEditingTransfer({...editingTransfer, duration:e.target.value})} placeholder="Duration" className="w-full bg-[#F5F7FA] rounded-full px-4 py-2.5 text-[11px] border"/></div>
-                 <input value={editingTransfer.desc?? ""} onChange={e=>setEditingTransfer({...editingTransfer, desc:e.target.value})} placeholder="Desc per CAR" className="w-full bg-[#F5F7FA] rounded-full px-4 py-2.5 text-[11px] border"/>
-                 <input type="file" accept="image/*" onChange={e=>{ const f=e.target.files?.[0]; if(f){ fileToBase64(f, b64=> setEditingTransfer({...editingTransfer, imageData:b64, image:f.name})) } }} className="w-full text-[11px]"/>
-                 {editingTransfer.imageData && <img src={editingTransfer.imageData} className="w-full h-[100px] object-cover rounded-[10px]"/>}
+                 <input value={editingTransfer.name?? ""} onChange={e=>setEditingTransfer({...editingTransfer, name:e.target.value})} placeholder="Name" className="w-full bg-[#F5F7FA] rounded-full px-4 py-2.5 text-[12px] font-bold border"/>
+                 <div className="grid grid-cols-2 gap-3"><input type="number" value={editingTransfer.price?? ""} onChange={e=>setEditingTransfer({...editingTransfer, price:parseInt(e.target.value)||0})} className="w-full bg-[#F5F7FA] rounded-full px-4 py-2.5 text-[11px] font-black border-2 border-[#0A2342]"/><input type="number" value={editingTransfer.market?? ""} onChange={e=>setEditingTransfer({...editingTransfer, market:parseInt(e.target.value)||0})} className="w-full bg-[#F5F7FA] rounded-full px-4 py-2.5 text-[11px] border text-red-600"/></div>
+                 <input value={editingTransfer.desc?? ""} onChange={e=>setEditingTransfer({...editingTransfer, desc:e.target.value})} placeholder="Desc" className="w-full bg-[#F5F7FA] rounded-full px-4 py-2.5 text-[11px] border"/>
                </div>
-               <div className="flex gap-3 mt-5"><button onClick={()=>{ if(!editingTransfer.id||!editingTransfer.name){ alert("ID and Name required"); return } if(transfers.find((t:any)=>t.id===editingTransfer.id)){ setTransfers(transfers.map((t:any)=> t.id===editingTransfer.id? editingTransfer : t)) } else { setTransfers([...transfers, editingTransfer]) } setEditingTransfer(null) }} className="flex-1 bg-[#0A2342] text-white py-3 rounded-full font-black">Save per CAR</button><button onClick={()=>setEditingTransfer(null)} className="px-6 bg-[#F5F7FA] rounded-full font-bold">Cancel</button></div>
+               <div className="flex gap-3 mt-5"><button onClick={()=>{ if(!editingTransfer.id||!editingTransfer.name){ alert("ID required"); return } if(transfers.find((t:any)=>t.id===editingTransfer.id)){ setTransfers(transfers.map((t:any)=> t.id===editingTransfer.id? editingTransfer : t)) } else { setTransfers([...transfers, editingTransfer]) } setEditingTransfer(null) }} className="flex-1 bg-[#0A2342] text-white py-3 rounded-full font-black">Save 3 Pics</button><button onClick={()=>setEditingTransfer(null)} className="px-6 bg-[#F5F7FA] rounded-full font-bold">Cancel</button></div>
              </div>
            </div>
          )}
        </div>
      )}
-
-     {tab==="blogs" && (
-       <div className="bg-white rounded-[20px] p-6 border">
-         <div className="flex justify-between items-center"><h2 className="font-black">📝 Blogs SEO - Full Information - Increases SEO</h2><button onClick={()=>setEditingBlog({ id:"", slug:"", title:"", cat:"Guide", date:new Date().toLocaleDateString(), readTime:"5 min", excerpt:"", content:"", imageData:"", seoTitle:"", metaDescription:"", keywords:"", active:true })} className="bg-[#0A2342] text-white px-4 py-2 rounded-full text-[11px] font-bold">+ Add Blog SEO</button></div>
-         <p className="text-[11px] opacity-60 mt-2">These blogs are what increase SEO. Need 500+ words content per CAR, keywords, meta description. Fixes 404.</p>
-         <div className="mt-6 grid md:grid-cols-2 gap-4">
-           {blogs.map((b:any)=>(
-             <div key={b.id} className="bg-[#F8FAFF] rounded-[14px] p-4 border">
-               <p className="font-black text-[13px]">{b.title}</p>
-               <p className="text-[10px] opacity-60 mt-1">/{b.slug} • {b.cat} • {b.readTime}</p>
-               <p className="text-[11px] opacity-70 mt-2 line-clamp-2">{b.excerpt}</p>
-               <p className="text-[9px] opacity-50 mt-2">SEO: {b.seoTitle?.slice(0,60)}</p>
-               <div className="mt-3 flex gap-2"><button onClick={()=>setEditingBlog(b)} className="bg-[#0A2342] text-white px-3 py-1.5 rounded-full text-[10px] font-bold">Edit SEO Full</button><a href={`/blogs/${b.slug}`} target="_blank" className="bg-white border px-3 py-1.5 rounded-full text-[10px] font-bold">View → Fix 404</a><button onClick={()=>setBlogs(blogs.filter((x:any)=>x.id!==b.id))} className="text-red-500 text-[10px] font-bold">Delete</button></div>
-             </div>
-           ))}
-         </div>
-         {editingBlog && (
-           <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-             <div className="bg-white rounded-[20px] p-6 max-w-2xl w-full max-h-[95vh] overflow-y-auto">
-               <h3 className="font-black">Edit Blog - Full SEO - 500+ Words</h3>
-               <div className="mt-4 space-y-3">
-                 <input value={editingBlog.slug?? ""} onChange={e=>setEditingBlog({...editingBlog, slug:e.target.value.toLowerCase().replace(/[^a-z0-9-]/g,'-'), id:e.target.value.toLowerCase().replace(/[^a-z0-9-]/g,'-')})} placeholder="slug e.g. mnemba-vs-safari-blue - used in URL" className="w-full bg-[#F5F7FA] rounded-full px-4 py-2.5 text-[11px] border font-bold"/>
-                 <input value={editingBlog.title?? ""} onChange={e=>setEditingBlog({...editingBlog, title:e.target.value})} placeholder="Title H1 - e.g. Prison Island Guide per CAR" className="w-full bg-[#F5F7FA] rounded-full px-4 py-3 text-[13px] font-black border"/>
-                 <div className="grid grid-cols-2 gap-3"><input value={editingBlog.cat?? ""} onChange={e=>setEditingBlog({...editingBlog, cat:e.target.value})} placeholder="Category" className="w-full bg-[#F5F7FA] rounded-full px-4 py-2.5 text-[11px] border"/><input value={editingBlog.readTime?? ""} onChange={e=>setEditingBlog({...editingBlog, readTime:e.target.value})} placeholder="Read time e.g. 7 min" className="w-full bg-[#F5F7FA] rounded-full px-4 py-2.5 text-[11px] border"/></div>
-                 <textarea value={editingBlog.excerpt?? ""} onChange={e=>setEditingBlog({...editingBlog, excerpt:e.target.value})} placeholder="Excerpt 150 chars - shows on list" className="w-full bg-[#F5F7FA] rounded-[12px] px-4 py-3 text-[11px] border h-[60px]"/>
-                 <textarea value={editingBlog.content?? ""} onChange={e=>setEditingBlog({...editingBlog, content:e.target.value})} placeholder="Full Content 500+ words for SEO - price per CAR, matrix, itinerary, FAQ - This increases SEO" className="w-full bg-[#F5F7FA] rounded-[12px] px-4 py-3 text-[12px] border h-[220px]"/>
-                 <input value={editingBlog.seoTitle?? ""} onChange={e=>setEditingBlog({...editingBlog, seoTitle:e.target.value})} placeholder="SEO Title 60 chars" className="w-full bg-[#FFF8ED] rounded-full px-4 py-2.5 text-[11px] border border-[#FF8A1A]/30 font-bold"/>
-                 <textarea value={editingBlog.metaDescription?? ""} onChange={e=>setEditingBlog({...editingBlog, metaDescription:e.target.value})} placeholder="Meta Description 155 chars - Google snippet" className="w-full bg-[#FFF8ED] rounded-[12px] px-4 py-2.5 text-[11px] border border-[#FF8A1A]/30 h-[60px]"/>
-                 <input value={editingBlog.keywords?? ""} onChange={e=>setEditingBlog({...editingBlog, keywords:e.target.value})} placeholder="Keywords comma - e.g. prison island price per car, nakupenda tour" className="w-full bg-[#F5F7FA] rounded-full px-4 py-2.5 text-[10px] border"/>
-                 <input type="file" accept="image/*" onChange={e=>{ const f=e.target.files?.[0]; if(f){ fileToBase64(f, b64=> setEditingBlog({...editingBlog, imageData:b64})) } }} className="w-full text-[11px]"/>
-                 {editingBlog.imageData && <img src={editingBlog.imageData} className="w-full h-[120px] object-cover rounded-[10px] border"/>}
-               </div>
-               <div className="flex gap-3 mt-5"><button onClick={()=>{ if(!editingBlog.slug||!editingBlog.title){ alert("slug and title required"); return } const exists=blogs.find((x:any)=>x.slug===editingBlog.slug); if(exists){ setBlogs(blogs.map((x:any)=> x.slug===editingBlog.slug? editingBlog : x)) } else { setBlogs([...blogs, editingBlog]) } setEditingBlog(null) }} className="flex-1 bg-[#0A2342] text-white py-3 rounded-full font-black text-[12px]">💾 Save Blog - Fix 404 + SEO</button><button onClick={()=>setEditingBlog(null)} className="px-6 py-3 bg-[#F5F7FA] rounded-full font-bold">Cancel</button></div>
-             </div>
-           </div>
-         )}
-       </div>
-     )}
-
-     {tab==="hotels" && <div className="bg-white rounded-[20px] p-6 border"><h2 className="font-black">🏨 Hotels per CAR</h2><div className="mt-4 grid md:grid-cols-2 gap-3">{hotelOptions.map((h,i)=>(<div key={i} className="bg-[#F5F7FA] rounded-[12px] p-3 flex gap-2"><input value={h.label?? ""} onChange={e=>{ const nh=[...hotelOptions]; nh[i].label=e.target.value; setHotelOptions(nh)}} className="flex-1 bg-white rounded-full px-3 py-2 text-[11px] border"/><input type="number" value={h.price?? ""} onChange={e=>{ const nh=[...hotelOptions]; nh[i].price=parseInt(e.target.value)||0; setHotelOptions(nh)}} className="w-[70px] bg-white rounded-full px-3 py-2 text-[11px] border"/><button onClick={()=>setHotelOptions(hotelOptions.filter((_,j)=>j!==i))} className="text-red-500 text-[11px] font-bold">✕</button></div>))}<button onClick={()=>setHotelOptions([...hotelOptions, {label:"New Hotel", area:"West", price:15}])} className="mt-3 bg-[#0A2342] text-white px-4 py-2 rounded-full text-[11px] font-bold">+ Add Hotel per CAR</button></div></div>}
-
-     {tab==="matrix" && <div className="bg-white rounded-[20px] p-6 border"><h2 className="font-black">🚚 Matrix - Per Vehicle per CAR</h2><div className="mt-4 grid grid-cols-10 gap-2 text-[10px] font-black"><div>From/To</div>{["West","Central","S-Central","South","S-East","East","N-East","North","S-West","All"].map(a=><div key={a} className="bg-[#0A2342] text-white rounded-full px-2 py-1 text-center">{a}</div>)}{Object.keys(transportMatrix).map(from=><div key={from} className="contents"><div className="bg-[#F5F7FA] rounded-full px-3 py-2 text-[11px] font-black">{from}</div>{["West","Central","South-Central","South","South-East","East","North-East","North","South-West","All"].map(to=><input key={to} type="number" value={transportMatrix[from]?.[to]??0} onChange={e=>{ const nm={...transportMatrix}; if(!nm[from]) nm[from]={}; nm[from][to]=parseInt(e.target.value)||0; setTransportMatrix(nm)}} className="w-full bg-[#F5F7FA] rounded-full px-2 py-2 text-[11px] font-bold border text-center"/>)}</div>)}</div></div>}
-
-     {tab==="pax" && <div className="bg-white rounded-[20px] p-6 border max-w-xl"><h3 className="font-black">👥 Per CAR Rules - No extra pax fee</h3><p className="text-[11px] opacity-60 mt-2">Price is PER CAR up to 6 pax same price. No +50% for 3rd. This is your unique selling point.</p><div className="mt-4 space-y-3"><div className="bg-[#F0F6FF] rounded-[12px] p-4"><p className="text-[11px] font-black">Current: {paxRules.basePax} pax per CAR - ${paxRules.extraPaxPercent}% extra</p><p className="text-[10px] opacity-60 mt-1">Change to: Base 6 pax, extra 0% = Same price up to 6 pax</p></div><select value={paxRules.basePax?? 6} onChange={e=>setPaxRules({...paxRules, basePax:parseInt(e.target.value)})} className="w-full bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] font-bold border"><option value={6}>6 pax per CAR same price - Recommended</option><option value={4}>4 pax per CAR</option><option value={2}>2 pax per CAR (old)</option></select><select value={paxRules.extraPaxPercent?? 0} onChange={e=>setPaxRules({...paxRules, extraPaxPercent:parseInt(e.target.value)})} className="w-full bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] font-bold border"><option value={0}>0% extra - Same price up to max - Per CAR</option><option value={50}>50% per extra (old per person)</option></select><textarea value={paxRules.note?? ""} onChange={e=>setPaxRules({...paxRules, note:e.target.value})} className="w-full bg-[#F5F7FA] rounded-[12px] px-4 py-3 text-[11px] border h-[80px]"/></div></div>}
-
-     {tab==="content" && <div className="grid md:grid-cols-2 gap-6"><div className="bg-white rounded-[20px] p-6 border"><h3 className="font-black">📝 Content + Images - Hero is now Announcements tab</h3><div className="mt-4 space-y-3"><div className="bg-[#F5F7FA] rounded-[14px] p-4 border-dashed border-2"><p className="text-[11px] font-black">Hero Image (fallback if no announcement image)</p><div className="mt-2 h-[120px] bg-white rounded-[10px] overflow-hidden border flex items-center justify-center">{siteContent.heroImageData? <img src={siteContent.heroImageData} className="w-full h-full object-cover"/> : <span className="text-[10px] opacity-50">No image</span>}</div><input type="file" accept="image/*" className="mt-3 block text-[11px]" onChange={e=>{ const f=e.target.files?.[0]; if(f) fileToBase64(f, b64=> setSiteContent({...siteContent, heroImageData:b64, heroImage:f.name})) }}/></div></div></div><div className="bg-white rounded-[20px] p-6 border"><h3 className="font-black">Texts per CAR</h3><input value={siteContent.heroTitle?? ""} onChange={e=>setSiteContent({...siteContent, heroTitle:e.target.value})} className="w-full mt-3 bg-[#F5F7FA] rounded-full px-4 py-2.5 text-[12px] border font-bold"/><input value={siteContent.heroBadge?? ""} onChange={e=>setSiteContent({...siteContent, heroBadge:e.target.value})} className="w-full mt-3 bg-[#F5F7FA] rounded-full px-4 py-2.5 text-[12px] border"/><textarea value={siteContent.aboutText?? ""} onChange={e=>setSiteContent({...siteContent, aboutText:e.target.value})} className="w-full mt-3 bg-[#F5F7FA] rounded-[12px] px-4 py-2.5 text-[11px] border h-[80px]"/></div></div>}
-
-     {tab==="seo" && <div className="grid md:grid-cols-2 gap-6"><div className="bg-white rounded-[20px] p-6 border"><h3 className="font-black">🔍 SEO + OG Image per CAR</h3><div className="mt-4 space-y-3"><input value={seoSettings.siteTitle?? ""} onChange={e=>setSeoSettings({...seoSettings, siteTitle:e.target.value})} placeholder="Site Title per CAR" className="w-full bg-[#F5F7FA] rounded-full px-4 py-2.5 text-[12px] border font-bold"/><textarea value={seoSettings.metaDescription?? ""} onChange={e=>setSeoSettings({...seoSettings, metaDescription:e.target.value})} placeholder="Meta Description per CAR" className="w-full bg-[#F5F7FA] rounded-[12px] px-4 py-2.5 text-[11px] border h-[80px]"/><input value={seoSettings.keywords?? ""} onChange={e=>setSeoSettings({...seoSettings, keywords:e.target.value})} placeholder="Keywords per CAR" className="w-full bg-[#F5F7FA] rounded-full px-4 py-2.5 text-[11px] border"/><div className="bg-[#F5F7FA] rounded-[14px] p-4 border-dashed border-2"><p className="text-[11px] font-black">OG Image 1200x630</p><div className="mt-2 h-[160px] bg-white rounded-[10px] overflow-hidden border flex items-center justify-center">{seoSettings.ogImageData? <img src={seoSettings.ogImageData} className="w-full h-full object-cover"/> : <span className="text-[10px] opacity-50">No OG image</span>}</div><input type="file" accept="image/*" className="mt-3 block text-[11px]" onChange={e=>{ const f=e.target.files?.[0]; if(f) fileToBase64(f, b64=> setSeoSettings({...seoSettings, ogImageData:b64, ogImage:f.name})) }}/></div></div></div><div className="bg-white rounded-[20px] p-6 border"><h3 className="font-black">⭐ Google & TripAdvisor Reviews - Real widgets</h3><p className="text-[11px] opacity-60 mt-2">Paste embed codes from Elfsight / Google. These show live reviews on homepage, not fake.</p><div className="mt-4 space-y-3"><label className="text-[11px] font-bold">Google Reviews Embed Code</label><textarea value={seoSettings.googleReviewsEmbed?? ""} onChange={e=>setSeoSettings({...seoSettings, googleReviewsEmbed:e.target.value})} placeholder='<script src="https://static.elfsight.com/platform/platform.js"></script><div class="elfsight-app-..."></div>' className="w-full bg-[#F5F7FA] rounded-[12px] px-4 py-3 text-[10px] font-mono border h-[100px]"/><label className="text-[11px] font-bold">TripAdvisor Embed Code</label><textarea value={seoSettings.tripadvisorEmbed?? ""} onChange={e=>setSeoSettings({...seoSettings, tripadvisorEmbed:e.target.value})} placeholder='TripAdvisor widget code' className="w-full bg-[#F5F7FA] rounded-[12px] px-4 py-3 text-[10px] font-mono border h-[100px]"/></div></div></div>}
-
-     {tab==="settings" && <div className="bg-white rounded-[20px] p-6 border max-w-xl"><h3 className="font-black">⚙️ Settings per CAR</h3><div className="mt-4 space-y-3"><label className="text-[11px] font-bold">WhatsApp Number (without +)</label><input value={waNumber?? ""} onChange={e=>setWaNumber(e.target.value)} className="w-full bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] font-bold border" placeholder="255773628792"/><label className="text-[11px] font-bold">Instagram</label><input value={socials.instagram?? ""} onChange={e=>setSocials({...socials, instagram:e.target.value})} className="w-full bg-[#F5F7FA] rounded-full px-4 py-3 text-[11px] border"/><label className="text-[11px] font-bold">Facebook</label><input value={socials.facebook?? ""} onChange={e=>setSocials({...socials, facebook:e.target.value})} className="w-full bg-[#F5F7FA] rounded-full px-4 py-3 text-[11px] border"/></div></div>}
-
-     {tab==="export" && <div className="bg-white rounded-[20px] p-6 border max-w-xl"><h3 className="font-black">📤 Export Live - Per CAR + Blogs + Announcements</h3><button onClick={()=>{ const data={tours, transfers, announcements, blogs, hotelOptions, transportMatrix, waNumber, siteContent, seoSettings, paxRules, exportedAt:new Date().toISOString(), pricingModel:"PER_CAR_NOT_PER_PERSON"}; const blob=new Blob([JSON.stringify(data, null, 2)], {type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`hero-per-car-${new Date().toISOString().slice(0,10)}.json`; a.click()}} className="mt-5 w-full bg-[#0A2342] text-white py-4 rounded-full font-black">📥 Download FULL JSON per CAR + Blogs + Announcements</button><button onClick={()=>{ if(confirm("Clear all saved? Reset to $250 per CAR defaults?")){ localStorage.removeItem("hero_tours"); localStorage.removeItem("hero_transfers"); localStorage.removeItem("hero_blogs"); localStorage.removeItem("hero_announcements"); location.reload() }}} className="mt-3 w-full bg-red-50 text-red-600 py-3 rounded-full font-bold text-[11px] border">🗑️ Clear old localStorage - Fix 404 + Reset per CAR</button><p className="text-[10px] opacity-50 mt-3">After clear, refresh homepage - new per CAR prices $25-$50 transfers, $130-$250 tours per CAR, blogs SEO, hero promos will show.</p></div>}
-
+     {tab==="overview" && <div className="bg-white rounded-[20px] p-6 border"><h2 className="font-black">Overview - BOTH 3 pics enabled</h2><p className="text-[11px] opacity-60 mt-2">Tours + Transfers now support 3 compressed images each (600px x 0.5 = 40KB). Save All fixed.</p></div>}
    </div>
  </section>
  </main>
