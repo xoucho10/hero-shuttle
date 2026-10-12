@@ -2,6 +2,7 @@
 import { useState, useEffect, useMemo } from "react"
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import Link from 'next/link'
 
 const DEFAULT_ANNOUNCEMENTS = [
   { id:1, badge:"🔥 NEW PROMOTION", title:"Book Direct & Save $100 per Car", subtitle:"Prison + Nakupenda $250 per CAR (not per person) - 5 Hours - Boat + Entrance + Fruit included", cta:"View Promotion", link:"#transfers", imageData:"", active:true },
@@ -9,15 +10,18 @@ const DEFAULT_ANNOUNCEMENTS = [
   { id:3, badge:"📢 ANNOUNCEMENT", title:"Free Cancellation 24h - Pay Driver After Each Trip", subtitle:"No prepayment. Pay after each trip. Local owner - 8 years in Zanzibar - WhatsApp booking in 2 minutes", cta:"Why Book With Us", link:"#why", imageData:"", active:true },
 ]
 
-const DEFAULT_TRANSFERS = [
-  { id:"airport-stone", name:"Airport → Stone Town", area:"West", duration:"15 min", distance:"7km", price:25, market:40, desc:"Per CAR up to 6 pax - Taxi + driver - Pay after trip", image:"airport-stone.jpg", imageData:"", imageDatas:[""], active:true, cat:["Popular"] },
-  { id:"airport-paje", name:"Airport → Paje / Jambiani", area:"South-East", duration:"1h", distance:"55km", price:40, market:60, desc:"Per CAR up to 6 pax - Most booked for kitesurf area", image:"airport-paje.jpg", imageData:"", imageDatas:[""], active:true, cat:["Popular","South"] },
-  { id:"airport-nungwi", name:"Airport → Nungwi / Kendwa", area:"North", duration:"1h 15m", distance:"60km", price:40, market:60, desc:"Per CAR up to 6 pax - North beach, sunset best", image:"airport-nungwi.jpg", imageData:"", imageDatas:[""], active:true, cat:["Popular","North"] },
-  { id:"airport-matemwe", name:"Airport → Matemwe / Mnemba", area:"North-East", duration:"1h 20m", distance:"65km", price:40, market:60, desc:"Per CAR up to 6 pax - Mnemba area", image:"airport-matemwe.jpg", imageData:"", imageDatas:[""], active:true, cat:["North"] },
-  { id:"stone-paje", name:"Stone Town → Paje", area:"South-East", duration:"1h", distance:"50km", price:40, market:60, desc:"Per CAR - Transfer after Stone Town tour", image:"stone-paje.jpg", imageData:"", imageDatas:[""], active:true, cat:["South"] },
-  { id:"paje-nungwi", name:"Paje → Nungwi", area:"North", duration:"1h 30m", distance:"70km", price:50, market:70, desc:"Per CAR - East to North crossing", image:"paje-nungwi.jpg", imageData:"", imageDatas:[""], active:true, cat:["Popular"] },
-  { id:"airport-jambiani", name:"Airport → Jambiani / Makunduchi", area:"South", duration:"1h 10m", distance:"58km", price:40, market:60, desc:"Per CAR up to 6 pax", image:"airport-jambiani.jpg", imageData:"", imageDatas:[""], active:true, cat:["South"] },
-  { id:"airport-kiwengwa", name:"Airport → Kiwengwa / Pongwe", area:"East", duration:"1h", distance:"45km", price:35, market:55, desc:"Per CAR - East coast", image:"airport-kiwengwa.jpg", imageData:"", imageDatas:[""], active:true, cat:["East"] },
+// REAL 10 TRANSFERS FROM TRANSFER PAGE - $15-$40 per CAR - SAME SOURCE
+const REAL_10_TRANSFERS = [
+  { id:"airport-stone", name:"Airport → Stone Town", area:"West", duration:"12-15 min", distance:"6 km", price:15, market:25, desc:"Per CAR up to 6 pax - Stone Town hotels - Forodhani, Tembo - Pay after trip", image:"airport-stone.jpg", imageData:"", imageDatas:[], active:true, cat:["Popular"] },
+  { id:"airport-chuwini", name:"Airport → Chuwini / Bububu", area:"West", duration:"20-25 min", distance:"14 km", price:25, market:35, desc:"Per CAR up to 6 pax - Bububu beach resorts north of Stone Town", image:"airport-chuwini.jpg", imageData:"", imageDatas:[], active:true, cat:["West"] },
+  { id:"airport-nungwi", name:"Airport → Nungwi / Kendwa", area:"North", duration:"1h 15m", distance:"58 km", price:40, market:60, desc:"Per CAR up to 6 pax - North beach, sunset best", image:"airport-nungwi.jpg", imageData:"", imageDatas:["airport-nungwi.jpg"], active:true, cat:["Popular","North"] },
+  { id:"airport-matemwe", name:"Airport → Matemwe / Mnemba", area:"North-East", duration:"1h 20m", distance:"52 km", price:40, market:60, desc:"Per CAR up to 6 pax - Mnemba area - SeVi, Zanzibar Retreat", image:"airport-matemwe.jpg", imageData:"", imageDatas:["airport-matemwe.jpg"], active:true, cat:["Popular","North"] },
+  { id:"airport-pwani", name:"Airport → Pwani Mchangani", area:"North-East", duration:"50-60 min", distance:"38 km", price:35, market:50, desc:"Per CAR - Pwani Mchangani, Kiambwe, Kijongo", image:"airport-pwani.jpg", imageData:"", imageDatas:[], active:true, cat:["East"] },
+  { id:"airport-kiwengwa", name:"Airport → Kiwengwa / Pongwe", area:"East", duration:"50-55 min", distance:"36 km", price:35, market:55, desc:"Per CAR - East coast - The Rock, Blue Lagoon", image:"airport-kiwengwa.jpg", imageData:"", imageDatas:[], active:true, cat:["East"] },
+  { id:"airport-uroa", name:"Airport → Uroa / Michamvi", area:"East", duration:"45-50 min", distance:"32 km", price:35, market:50, desc:"Per CAR up to 6 pax - Uroa, Chwaka, Marumbi", image:"airport-uroa.jpg", imageData:"", imageDatas:[], active:true, cat:["East"] },
+  { id:"airport-paje", name:"Airport → Paje / Bwejuu", area:"South-East", duration:"50-60 min", distance:"48 km", price:35, market:50, desc:"Per CAR up to 6 pax - Most booked for kitesurf area", image:"airport-paje.jpg", imageData:"", imageDatas:[], active:true, cat:["Popular","South"] },
+  { id:"airport-jambiani", name:"Airport → Jambiani / Makunduchi", area:"South-East", duration:"55-65 min", distance:"55 km", price:40, market:60, desc:"Per CAR up to 6 pax - Jambiani, Makunduchi", image:"airport-jambiani.jpg", imageData:"", imageDatas:[], active:true, cat:["South"] },
+  { id:"airport-kizimkazi", name:"Airport → Kizimkazi / Fumba", area:"South", duration:"60-70 min", distance:"56 km", price:40, market:60, desc:"Per CAR up to 6 pax - Dolphin, Safari Blue departure", image:"airport-kizimkazi.jpg", imageData:"", imageDatas:[], active:true, cat:["South"] },
 ]
 
 const DEFAULT_TOURS = [
@@ -41,7 +45,7 @@ export default function HomePage(){
   const [announcements, setAnnouncements] = useState(DEFAULT_ANNOUNCEMENTS)
   const [activeSlide, setActiveSlide] = useState(0)
   const [tours, setTours] = useState(DEFAULT_TOURS)
-  const [transfers, setTransfers] = useState(DEFAULT_TRANSFERS)
+  const [transfers, setTransfers] = useState(REAL_10_TRANSFERS)
   const [filter, setFilter] = useState("All")
   const [selectedTours, setSelectedTours] = useState<any[]>([])
   const [selectedTransfers, setSelectedTransfers] = useState<any[]>([])
@@ -54,33 +58,40 @@ export default function HomePage(){
   const [slideIndex, setSlideIndex] = useState<{[k:string]:number}>({})
 
   useEffect(()=>{
+    const applyTransfers = (data:any[])=>{
+      if(!Array.isArray(data)||!data.length) return
+      const dbMap = new Map(data.map((d:any)=>[d.id,d]))
+      setTransfers(prev=> prev.map(t=>{
+        const db:any = dbMap.get(t.id)
+        if(!db) return t
+        const urls = db.image_urls||db.imageDatas||[]
+        return {...t, price: db.price??t.price, market: db.market??t.market, duration: db.duration||db.time||t.duration, distance: db.distance||t.distance, desc: db.description||db.note||db.desc||t.desc, area: db.area||t.area, imageDatas: urls, imageData: urls[0]||"", image: urls[0]||t.image}
+      }))
+    }
+    const applyTours = (data:any[])=>{
+      if(!Array.isArray(data)||!data.length) return
+      setTours(data.map((t:any)=>({
+        id:t.id, name:t.name, cat:t.cat||[t.area], price:t.price, market:t.market, duration:t.duration, pickup:t.pickup, desc:t.description||t.desc, includes:t.includes||'', area:t.area, active:t.active, featured:t.featured,
+        image:t.image_urls?.[0]||'', imageData:t.image_urls?.[0]||'', imageDatas:t.image_urls||[], images:t.image_urls||[]
+      })))
+    }
+
+    // Read from localStorage first (admin fallback)
     try{
       const a = localStorage.getItem("hero_announcements"); if(a) setAnnouncements(JSON.parse(a))
       const t = localStorage.getItem("hero_tours"); if(t){ const p=JSON.parse(t); if(p.length>0) setTours(p.map((x:any)=>({...x, imageDatas: x.imageDatas||[x.imageData||x.image]}))) }
-      const tr = localStorage.getItem("hero_transfers"); if(tr){ const p=JSON.parse(tr); if(p.length>0) setTransfers(p) }
+      const tr = localStorage.getItem("hero_transfers"); if(tr){ const p=JSON.parse(tr); if(p.length>0) applyTransfers(p.map((x:any)=>({...x, image_urls: x.imageDatas||x.image_urls||[], description: x.desc||x.description, time: x.duration}))) }
       const w = localStorage.getItem("hero_wa"); if(w) setWaNumber(w)
     }catch{}
-    // Load from heroshuttle schema (Supabase)
-    fetch('/api/tours').then(r=>r.json()).then(data=>{
-      if(Array.isArray(data)&&data.length>0){
-        setTours(data.map((t:any)=>({
-          id:t.id, name:t.name, cat:t.cat||[t.area], price:t.price, market:t.market, duration:t.duration, pickup:t.pickup, desc:t.description||t.desc, includes:t.includes||'', area:t.area, active:t.active, featured:t.featured,
-          image:t.image_urls?.[0]||'', imageData:t.image_urls?.[0]||'', imageDatas:t.image_urls||[], images:t.image_urls||[]
-        })))
-      }
-    }).catch(()=>{})
-    fetch('/api/transfers').then(r=>r.json()).then(data=>{
-      if(Array.isArray(data)&&data.length>0){
-        setTransfers(data.map((t:any)=>({
-          id:t.id, name:t.route||t.name, area:t.area, duration:t.time||t.duration, distance:t.distance, price:t.price, market:t.market, desc:t.note||t.desc, image:t.image_urls?.[0]||'', imageData:t.image_urls?.[0]||'', imageDatas:t.image_urls||[], active:t.active, cat:t.popular?["Popular"]:[t.area]
-        })))
-      }
-    }).catch(()=>{})
+
+    // Then DB - real source from transfer page
+    fetch('/api/tours',{cache:'no-store'}).then(r=>r.json()).then(data=>{ if(Array.isArray(data)&&data.length>0) applyTours(data) }).catch(()=>{})
+    fetch('/api/transfers',{cache:'no-store'}).then(r=>r.json()).then(data=>{ if(Array.isArray(data)&&data.length>0) applyTransfers(data) }).catch(()=>{})
+
     const iv = setInterval(()=> setActiveSlide(s=> (s+1)%announcements.length), 6000)
     return ()=> clearInterval(iv)
   },[announcements.length])
 
-  // 3 pics slider every 5 sec
   useEffect(()=>{
     const iv = setInterval(()=>{
       setSlideIndex(prev=>{
@@ -115,7 +126,6 @@ export default function HomePage(){
     <main className="min-h-screen bg-[#F8FAFF]">
       <Header/>
 
-      {/* HERO - NOW BRIGHTER - WHITE/ LIGHT BLUE WITH COMPANY COLORS */}
       <section className="relative bg-white text-[#0A2342] overflow-hidden border-b">
         <div className="absolute inset-0 bg-gradient-to-br from-[#FFF6E8] via-white to-[#EAF2FF]" />
         <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#FF8A1A]/10 rounded-full blur-3xl" />
@@ -138,7 +148,6 @@ export default function HomePage(){
         </div>
       </section>
 
-      {/* TRANSFER BAR - WHITE FLOATING */}
       <section className="bg-[#F0F6FF] px-4 py-4">
         <div className="max-w-[850px] mx-auto bg-white rounded-[16px] p-2.5 flex flex-wrap md:flex-nowrap gap-2 items-center shadow-md border border-[#0A2342]/5">
           <select value={from} onChange={e=>setFrom(e.target.value)} className="flex-1 bg-[#F8FAFF] rounded-full px-4 py-2.5 text-[11px] font-bold border border-[#0A2342]/10"><option>Abeid Airport (ZNZ)</option><option>Stone Town</option><option>Paje</option><option>Nungwi</option><option>Matemwe</option></select>
@@ -149,13 +158,12 @@ export default function HomePage(){
         </div>
       </section>
 
-      {/* TRANSFERS - WHITE BG BRIGHT */}
       <section id="transfers" className="px-6 md:px-12 py-10 bg-white">
         <div className="max-w-[1400px] mx-auto">
           <div className="text-center">
-            <span className="bg-[#0A2342] text-white text-[9px] font-black px-3 py-1 rounded-full">TRANSFERS • PER CAR NOT PER PERSON • PAY AFTER TRIP</span>
+            <span className="bg-[#0A2342] text-white text-[9px] font-black px-3 py-1 rounded-full">TRANSFERS • PER CAR NOT PER PERSON • PAY AFTER TRIP • REAL FROM ADMIN</span>
             <h2 className="mt-4 font-black text-[#0A2342] text-[26px] md:text-[30px]">Zanzibar Transfers - Price per CAR<br/><span className="text-[#FF8A1A]">Same Car up to 6 Pax Same Price</span></h2>
-            <p className="mt-3 text-[#0A2342]/60 text-[11px] max-w-[700px] mx-auto">All transfers are per vehicle (CAR) not per person. $25-$50 per CAR. Select transfers first, then add tours below. Combo booking saves more.</p>
+            <p className="mt-3 text-[#0A2342]/60 text-[11px] max-w-[700px] mx-auto">All transfers are per vehicle (CAR) not per person. $15-$40 per CAR. Real data from transfer page + Admin DB. Select transfers first, then add tours below. Combo booking saves more.</p>
             <div className="mt-6 inline-flex bg-[#F0F6FF] rounded-full p-1 gap-1 border border-[#0A2342]/5">
               {["Popular","North","South","East","West"].map(c=>(
                 <button key={c} onClick={()=>setFilter(c)} className={`px-5 py-2 rounded-full text-[11px] font-black transition ${filter===c? "bg-[#0A2342] text-white shadow" : "text-[#0A2342]/60 hover:text-[#0A2342]"}`}>{c}</button>
@@ -192,16 +200,29 @@ export default function HomePage(){
               </div>
             )})}
           </div>
+
+          {/* VIEW MORE TRANSFERS BUTTON - NEW */}
+          <div className="mt-8 text-center">
+            <Link href="/transfers" className="inline-flex items-center gap-2 bg-[#0A2342] text-white px-8 py-3.5 rounded-full font-black text-[12px] hover:bg-black transition shadow-lg">
+              View More Transfers → 10 Routes $15-$40 per CAR <span className="bg-white/20 px-2 py-0.5 rounded-full text-[10px]">{transfers.length} total</span>
+            </Link>
+            <p className="text-[10px] text-gray-400 mt-2">Real data from /transfers page - Admin edits price → shows here instantly - Per CAR not per person</p>
+          </div>
+
+          {/* SEO BOOST FOR TRANSFERS */}
+          <div className="mt-10 bg-[#F8FAFF] rounded-[16px] border p-5 max-w-[1000px] mx-auto">
+            <h3 className="font-black text-[13px] text-[#0A2342]">Zanzibar Airport Transfers SEO - Price per CAR Explained $15-$40</h3>
+            <p className="text-[11px] text-gray-600 mt-2 leading-relaxed">Airport to Stone Town $15 per CAR (6km 12-15 min) shortest. Airport to Nungwi Kendwa $40 per CAR (58km 65-75 min) north beach. Airport to Paje $35 per CAR (48km 50-60 min) kitesurf area. All prices per vehicle up to 6 pax same price - not per person. Save $105 vs $35 per person scam ($35x4=$140 vs our $35 per CAR). Local owner direct drivers, fuel included, pay after trip, free cancellation 24h. Admin connected - price updates instantly from transfer page DB.</p>
+          </div>
         </div>
       </section>
 
-      {/* TOURS - LIGHT BLUE BG - BRIGHTER */}
       <section id="tours" className="px-6 md:px-12 py-10 bg-[#F0F6FF]">
         <div className="max-w-[1400px] mx-auto">
           <div className="text-center">
-            <span className="bg-[#FF8A1A] text-white text-[9px] font-black px-3 py-1 rounded-full">TOURS + COMBO + BUILD YOUR OWN</span>
+            <span className="bg-[#FF8A1A] text-white text-[9px] font-black px-3 py-1 rounded-full">TOURS + COMBO + BUILD YOUR OWN - 17 REAL TOURS PER CAR</span>
             <h2 className="mt-4 font-black text-[#0A2342] text-[26px] md:text-[32px] leading-tight">Add Tours to Your Transfer<br/><span className="text-[#0A2342]">Build Your Own Itinerary - <span className="text-[#FF8A1A]">Save More</span></span></h2>
-            <p className="mt-3 text-[#0A2342]/60 text-[11px] max-w-[700px] mx-auto">Select tours, add to transfer, book combo on WhatsApp in 2 minutes. Pay driver after each trip. Free cancellation 24h. Prices FOR CAR - same CAR up to 6 pax same price.</p>
+            <p className="mt-3 text-[#0A2342]/60 text-[11px] max-w-[700px] mx-auto">17 real tours from admin - Prison Island $250 per CAR, Safari Blue $190 per CAR, Mnemba $180 per CAR. Select tours, add to transfer, book combo on WhatsApp in 2 minutes. Pay driver after each trip. Free cancellation 24h. Prices FOR CAR - same CAR up to 6 pax same price.</p>
             <div className="mt-6 inline-flex bg-white rounded-full p-1 gap-1 shadow-sm border">
               {["Popular","Half Day","Full Day"].map(c=>(
                 <button key={c} onClick={()=>setFilter(c)} className={`px-5 py-2 rounded-full text-[11px] font-black ${filter===c? "bg-[#0A2342] text-white" : "text-[#0A2342]/60"}`}>{c}</button>
@@ -239,17 +260,24 @@ export default function HomePage(){
             )})}
           </div>
 
-          {/* DETAILED COMBO SELECTION - NEW DESIGN */}
+          <div className="mt-6 text-center">
+            <Link href="/tours" className="inline-flex bg-white border-2 border-[#0A2342] text-[#0A2342] px-8 py-3 rounded-full font-black text-[12px] hover:bg-[#0A2342] hover:text-white transition">View All 17 Tours per CAR →</Link>
+          </div>
+
+          {/* SEO BOOST FOR TOURS */}
+          <div className="mt-8 bg-white rounded-[16px] border p-5 max-w-[1000px] mx-auto">
+            <h3 className="font-black text-[13px] text-[#0A2342]">Zanzibar Tours Price per CAR SEO - 17 Real Tours</h3>
+            <p className="text-[11px] text-gray-600 mt-2 leading-relaxed">Prison Island + Nakupenda $250 per CAR most popular - tortoise sanctuary 100+ years + white sandbank. Safari Blue Sharing $190 per CAR full day BBQ - sandbank snorkeling seafood dhow. Mnemba Atoll $180 per CAR best coral reef dolphins. Stone Town Walking $120 per CAR UNESCO slave market. Jozani Forest $90 per CAR red colobus monkeys only in Zanzibar. Salaam Cave Turtle Swim $100 per CAR swim with turtles. All prices per CAR up to 6 pax same price - same car same driver. Market price $350 vs our $250 save $100 per CAR. Admin connected - price and 3 pictures update instantly from tours admin DB + localStorage fallback.</p>
+          </div>
+
           {(selectedTours.length>0 || selectedTransfers.length>0) && (
             <div className="mt-8 bg-white rounded-[20px] p-5 max-w-[1100px] mx-auto border-2 border-[#0A2342] shadow-2xl sticky bottom-4 z-30">
               <div className="flex flex-col md:flex-row gap-5">
-                {/* LEFT DETAILED LIST */}
                 <div className="flex-1">
                   <div className="flex justify-between items-center mb-3">
                     <p className="font-black text-[14px] text-[#0A2342]">🛒 Your Selection - Detailed</p>
                     <p className="font-black text-[14px] text-[#0A2342]">${grandTotal} <span className="text-[10px] font-medium">per CAR</span></p>
                   </div>
-
                   <div className="space-y-2.5 max-h-[320px] overflow-auto pr-1">
                     {selectedTransfers.map((tr:any)=>(
                       <div key={tr.id} className="flex gap-3 border rounded-xl p-2.5 bg-[#F0F6FF]">
@@ -270,7 +298,6 @@ export default function HomePage(){
                         <button onClick={()=>setSelectedTransfers(p=>p.filter(x=>x.id!==tr.id))} className="text-red-500 font-black text-[12px] px-1">✕</button>
                       </div>
                     ))}
-
                     {selectedTours.map((t:any)=>(
                       <div key={t.id} className="flex gap-3 border rounded-xl p-2.5 bg-[#FFF8ED]">
                         <div className="w-14 h-14 rounded-lg overflow-hidden bg-[#0A2342] flex-shrink-0">
@@ -292,8 +319,6 @@ export default function HomePage(){
                     ))}
                   </div>
                 </div>
-
-                {/* RIGHT SUMMARY */}
                 <div className="md:w-[260px] bg-[#F8FAFF] rounded-[14px] p-4 border h-fit">
                   <p className="font-black text-[12px] text-[#0A2342]">Price Breakdown (per CAR)</p>
                   <div className="mt-3 space-y-1.5 text-[11px]">
