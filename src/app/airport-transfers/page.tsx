@@ -53,11 +53,11 @@ export default function TransfersPage(){
       <div className="bg-[#0a2342] text-white px-4 md:px-12 py-8">
         <div className="max-w-[1400px] mx-auto">
           <div className="flex flex-wrap gap-2 mb-3">
-            <span className="bg-[#ff8a1a] text-white text-[10px] font-black px-3 py-1 rounded-full">REAL LOCAL PRICE • PER CAR NOT PER PERSON</span>
-            <span className="bg-white/10 text-[10px] px-3 py-1 rounded-full">Pay After Trip • Free Cancellation 24h</span>
+            <span className="bg-[#ff8a1a] text-white text-[10px] font-black px-3 py-1 rounded-full"></span>
+            <span className="bg-white/10 text-[10px] px-3 py-1 rounded-full"></span>
           </div>
           <h1 className="font-black text-[28px] md:text-[36px] leading-[0.9]">Zanzibar Airport Transfers<br/>$15 - $40 per CAR up to 6 pax</h1>
-          <p className="text-[13px] mt-3 opacity-80 max-w-3xl">No per person scam. Other sites charge $40 per person x4=$160. Our price $40 per CAR up to 6 pax same price - Save $120. Driver + fuel + car - Alphard/Minivan. Admin can edit price/images instantly.</p>
+          <p className="text-[13px] mt-3 opacity-80 max-w-3xl"></p>
         </div>
       </div>
 
@@ -115,16 +115,16 @@ export default function TransfersPage(){
               <h2 className="font-black text-[18px] text-[#0a2342]">Zanzibar Transfers Price per CAR - No Scam</h2>
               <div className="grid md:grid-cols-2 gap-6 mt-4 text-[12px] leading-relaxed text-gray-600">
                 <div>
-                  <h3 className="font-bold text-[#0a2342]">Airport to Stone Town $15 per CAR (6km)</h3>
+                  <h3 className="font-bold text-[#0a2342]">Airport to Stone Town $15 (6km)</h3>
                   <p className="mt-1">Shortest transfer 12-15 min. Alphard up to 6 pax same price. Market $25 we charge $15 direct.</p>
-                  <h3 className="font-bold text-[#0a2342] mt-4">Airport to Nungwi Kendwa $40 per CAR (58km)</h3>
-                  <p className="mt-1">North beach best sunset. 65-75 min. Per CAR $40 includes driver + fuel. Save $160 vs per person scam.</p>
+                  <h3 className="font-bold text-[#0a2342] mt-4">Airport to Nungwi Kendwa $40 (58km)</h3>
+                  <p className="mt-1">North beach best sunset. 65-75 min. $40.</p>
                 </div>
                 <div>
-                  <h3 className="font-bold text-[#0a2342]">Airport to Paje $35 per CAR (48km)</h3>
-                  <p className="mt-1">Kitesurf area South-East most popular. 50-60 min. Per CAR up to 6 pax.</p>
+                  <h3 className="font-bold text-[#0a2342]">Airport to Paje $35 (48km)</h3>
+                  <p className="mt-1">Kitesurf area South-East most popular. 50-60 min.up to 6 pax.</p>
                   <h3 className="font-bold text-[#0a2342] mt-4">Scam Alert Explained</h3>
-                  <p className="mt-1">Other sites show $35 per person. For 4 people = $140. Our price $35 per CAR up to 6 pax same price. You save $105. Local owner, direct drivers, no middleman. No hidden fees.</p>
+                  <p className="mt-1">Other sites show $35 per person. For 4 people = $140. Our price $35 up to 6 pax same price.No hidden fees.</p>
                 </div>
               </div>
             </div>
@@ -161,8 +161,8 @@ export default function TransfersPage(){
             </div>
 
             <div className="bg-[#0a2342] text-white rounded-[18px] p-5">
-              <p className="font-black text-[12px]">Scam Alert: Other sites show $35 per person. For 4 people = $140. Our price $35 per CAR up to 6 pax same price. Save $105. Local owner, direct drivers, no middleman.</p>
-              <div className="mt-3 text-[10px] opacity-60">Keywords: zanzibar airport transfer price per car, airport to nungwi per car $40, airport to paje per car $35</div>
+              <p className="font-black text-[12px]"></p>
+              <div className="mt-3 text-[10px] opacity-60">Looking for a Zanzibar airport transfer price per car? We offer private transfers at a fixed rate per vehicle, not per person. Airport to Nungwi $40, Airport to Paje $35, and Airport to Stone Town $15. One price covers the entire car up to 6 passengers. $35</div>
             </div>
           </div>
         </div>

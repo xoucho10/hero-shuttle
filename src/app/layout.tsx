@@ -1,6 +1,7 @@
 ﻿import type { Metadata } from "next";
 import "./globals.css";
 import { GlobalEffects } from "@/components/effects/GlobalEffects";
+import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 
 export const viewport = {
   width: "device-width",
@@ -8,8 +9,8 @@ export const viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "HERO Shuttle & Tours - Zanzibar Transfers per CAR",
-  description: "Zanzibar Airport Transfers and Tours - Price per CAR up to 6 pax same price - Pay after trip",
+  title: "HERO Shuttle & Tours - Private Zanzibar Transfers & Tours",
+  description: "Private Zanzibar Airport Transfers and Private Tours - Licensed local team based in Stone Town, Nungwi, Paje. Private vehicle for your group, pay after trip, free cancellation 24h.",
   icons: {
     icon: "/icon.png",
     shortcut: "/favicon.ico",
@@ -27,10 +28,8 @@ export default function RootLayout({
       <body className="bg-white text-[#0A2342] overflow-x-hidden min-w-0 antialiased">
         <GlobalEffects />
         {children}
+        <FloatingWhatsApp />
       </body>
     </html>
   );
 }
-
-
-
