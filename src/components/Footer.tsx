@@ -93,11 +93,11 @@ export default function Footer(){
           <Link href="/tours" className="underline hover:text-white">Tours</Link>
         </div>
 
-        {/* TALENT256 - BEST OPTION: logo mark + words + WhatsApp - NOT just logo */}
-        <a href={`https://wa.me/${waDev}?text=Hi T256 Group LTD, I saw your work on HERO Shuttle site`} target="_blank" className="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 px-3 py-1.5 rounded-full transition group">
-          <div className="w-5 h-5 bg-[#FF8A1A] rounded-full flex items-center justify-center text-[10px] font-black text-[#0A2342]">T</div>
-          <span className="text-[11px] font-bold text-white/70 group-hover:text-white">Developed by <span className="text-white">TALENT256 GROUP LTD</span></span>
-          <span className="text-[10px] bg-[#25D366] text-white px-2 py-0.5 rounded-full font-black">WhatsApp</span>
+        {/* TALENT256 - Using tdev.png logo */}
+        <a href={`https://wa.me/${waDev}?text=Hi T256 Group LTD, I saw your work on HERO Shuttle site`} target="_blank" className="flex items-center gap-2.5 bg-white hover:bg-gray-100 border border-white/10 pl-1.5 pr-3 py-1 rounded-full transition group shadow-sm">
+          <img src="/tdev.png" alt="Talent256" className="w-7 h-7 rounded-full object-contain bg-white" onError={(e)=>{ (e.target as any).style.display='none' }} />
+          <span className="text-[11px] font-bold text-[#0A2342]/70 group-hover:text-[#0A2342]">Developed by <span className="text-[#0A2342] font-black">TALENT256 GROUP LTD</span></span>
+          <span className="text-[9px] bg-[#25D366] text-white px-2 py-0.5 rounded-full font-black">WhatsApp</span>
         </a>
       </div>
     </div>
