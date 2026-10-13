@@ -62,18 +62,16 @@ export default function HomePage(){
   const [blogs, setBlogs] = useState(HOME_BLOGS)
   const [lastSync, setLastSync] = useState("")
 
-  // FULLY DYNAMIC SYNC FUNCTION - READ EXACTLY FROM ORIGIN
   const syncAll = ()=>{
     const now = new Date().toLocaleTimeString()
     setLastSync(now)
 
-    // 1. Announcements dynamic
     try{
       const rawA = localStorage.getItem("hero_announcements")
       if(rawA){ const p=JSON.parse(rawA); if(Array.isArray(p)&&p.length>0) setAnnouncements(p.filter((a:any)=>a.active!==false)) }
     }catch{}
 
-    // 2. Tours dynamic - read exactly from origin
+    // FIXED - added pickup, featured, includes to avoid type error
     fetch('/api/tours',{cache:'no-store'}).then(r=>r.json()).then((data:any)=>{
       if(!Array.isArray(data)||data.length===0) return
       const merged = FIXED_8_TOURS.map(fixed=>{
@@ -81,27 +79,28 @@ export default function HomePage(){
         if(!db) return fixed
         const urls = db.image_urls||db.images||[]
         return {
-         ...fixed,
+        ...fixed,
           name: db.name||db.title||fixed.name,
           price: db.price?? db.offer_price?? fixed.price,
           market: db.market_price?? db.market?? db.original_price?? fixed.market,
           duration: db.duration||fixed.duration,
+          pickup: db.pickup||fixed.pickup,
           desc: db.description||db.desc||fixed.desc,
           area: db.area||fixed.area,
           cat: db.category? [db.category] : fixed.cat,
+          featured: db.featured?? fixed.featured,
           imageData: urls[0]||db.imageData||fixed.imageData,
           imageDatas: urls.length?urls:fixed.imageDatas,
+          image: urls[0]||fixed.image,
           active: db.active!==false
         }
       })
-      // Also add new tours from DB that are not in fixed
       const extra = data.filter((d:any)=>!FIXED_8_TOURS.find(f=>f.id===d.id)).map((d:any)=>({
-        id:d.id, name:d.name||d.title, cat:[d.category||"Popular"], price:d.price||d.offer_price, market:d.market_price||d.market||d.price, duration:d.duration||"3 Hours", desc:d.description||"", area:d.area||"Zanzibar", active:d.active!==false, imageData:(d.image_urls||[])[0]||"", imageDatas:d.image_urls||[], image:""
+        id:d.id, name:d.name||d.title, cat:[d.category||"Popular"], price:d.price||d.offer_price, market:d.market_price||d.market||d.price, duration:d.duration||"3 Hours", pickup:d.pickup||"Stone Town", desc:d.description||"", area:d.area||"Zanzibar", active:d.active!==false, featured:d.featured||false, imageData:(d.image_urls||[])[0]||"", imageDatas:d.image_urls||[], image:(d.image_urls||[])[0]||"", includes:d.includes||""
       }))
-      setTours([...merged.filter((t:any)=>t.active!==false),...extra])
+      setTours([...merged.filter((t:any)=>t.active!==false),...extra] as any)
     }).catch(()=>{})
 
-    // 3. Transfers dynamic
     fetch('/api/transfers',{cache:'no-store'}).then(r=>r.json()).then((data:any)=>{
       if(!Array.isArray(data)||data.length===0) return
       const dbMap = new Map(data.map((d:any)=>[d.id,d]))
@@ -111,19 +110,17 @@ export default function HomePage(){
           const db:any = dbMap.get(t.id)
           if(!db) return t
           const urls = db.image_urls||[]
-          return {...t, name:db.name||t.name, price:db.price??db.offer_price??t.price, market:db.market_price??db.market??t.market, duration:db.duration||t.duration, desc:db.description||t.desc, area:db.area||t.area, imageDatas:urls, imageData:urls[0]||t.imageData, active:db.active!==false}
+          return {...t, name:db.name||t.name, price:db.price??db.offer_price??t.price, market:db.market_price??db.market??t.market, duration:db.duration||t.duration, desc:db.description||t.desc, area:db.area||t.area, imageDatas:urls, imageData:urls[0]||t.imageData, image:urls[0]||t.image, active:db.active!==false}
         }).filter((t:any)=>t.active!==false)
       })
     }).catch(()=>{})
 
-    // 4. Blogs dynamic
     try{
       const rawB = localStorage.getItem("hero_blogs")
       if(rawB){ const p=JSON.parse(rawB); if(Array.isArray(p)&&p.length>0) setBlogs(p.slice(0,6).map((b:any)=>({ slug:b.slug, cat:b.cat, title:b.title, excerpt:b.excerpt||b.desc||"" }))) }
     }catch{}
     fetch('/api/blogs',{cache:'no-store'}).then(r=>r.json()).then((data:any)=>{ if(Array.isArray(data)&&data.length>0) setBlogs(data.slice(0,6).map((b:any)=>({ slug:b.slug||b.id, cat:b.cat||b.category, title:b.title, excerpt:b.excerpt||b.desc||"" }))) }).catch(()=>{})
 
-    // 5. Reviews dynamic
     fetch('/api/reviews',{cache:'no-store'}).then(r=>r.json()).then((data:any)=>{ if(Array.isArray(data)&&data.length>0) setReviews(data) }).catch(()=>{
       try{
         const raw = localStorage.getItem("hero_reviews")
@@ -131,7 +128,6 @@ export default function HomePage(){
       }catch{}
     })
 
-    // 6. WhatsApp dynamic
     try{
       const rawS = localStorage.getItem("hero_settings")
       if(rawS){ const s=JSON.parse(rawS); if(s.whatsapp) setWaNumber(s.whatsapp) }
@@ -141,7 +137,7 @@ export default function HomePage(){
   useEffect(()=>{
     syncAll()
     const ivSlide = setInterval(()=> setActiveSlide(s=> (s+1)%announcements.length), 6000)
-    const ivSync = setInterval(syncAll, 15000) // FULLY DYNAMIC EVERY 15s
+    const ivSync = setInterval(syncAll, 15000)
     const onFocus = ()=> syncAll()
     window.addEventListener('focus', onFocus)
     window.addEventListener('storage', syncAll)
@@ -166,7 +162,6 @@ export default function HomePage(){
   return (
     <main className="min-h-screen bg-[#F8FAFF]">
       <Header/>
-
       <section className="relative bg-white border-b overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-[#FFF6E8] via-white to-[#EAF2FF]" />
         <div className="relative max-w-[1400px] mx-auto px-6 md:px-12 py-10 md:py-14 grid md:grid-cols-2 gap-8 items-center">
