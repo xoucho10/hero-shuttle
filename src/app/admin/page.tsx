@@ -8,11 +8,21 @@ const MAX_IMAGES = 3
 const DEFAULT_TOURS = [
   { id:"prison-nakupenda", name:"Prison Island + Nakupenda", cat:["Popular","Half Day"], price:250, market:350, duration:"5 Hours", pickup:"Stone Town 8:30 AM", desc:"Tortoise sanctuary + sandbank + fruit • Boat, Guide, Entrance", includes:"Boat, Guide, Entrance, Fruit", area:"West", active:true, featured:true, imageDatas:[""], images:[] },
   { id:"nakupenda-only", name:"Nakupenda Sandbank Only", cat:["Half Day","Popular"], price:130, market:200, duration:"4 Hours", pickup:"Stone Town 9 AM", desc:"White sandbank in ocean, swimming • Boat, Fruit, Water", includes:"Boat, Fruit, Water", area:"West", active:true, featured:true, imageDatas:[""], images:[] },
+  { id:"prison-only", name:"Prison Island Tortoises", cat:["Half Day"], price:135, market:210, duration:"3 Hours", pickup:"Stone Town", desc:"Giant tortoises 100+ years • Boat, Entrance, Guide", includes:"Boat, Entrance, Guide", area:"West", active:true, featured:true, imageDatas:[""], images:[] },
   { id:"stone-town", name:"Stone Town Walking Tour", cat:["Popular","Half Day","Cultural"], price:120, market:180, duration:"3 Hours", pickup:"Stone Town", desc:"UNESCO, Slave Market, House of Wonders • Guide, Entrances", includes:"Guide, Entrances", area:"West", active:true, featured:true, imageDatas:[""], images:[] },
+  { id:"spice", name:"Spice Farm Tour", cat:["Half Day","Cultural"], price:100, market:150, duration:"3 Hours", pickup:"Stone Town", desc:"30+ spices + fruits tasting • Guide, Tasting", includes:"Guide, Tasting", area:"Central", active:true, featured:true, imageDatas:[""], images:[] },
   { id:"jozani", name:"Jozani Forest Monkeys", cat:["Popular","Half Day"], price:90, market:140, duration:"2.5 Hours", pickup:"Paje / Stone Town", desc:"Red colobus monkeys only in Zanzibar • Entrance, Guide", includes:"Entrance, Guide", area:"South-Central", active:true, featured:true, imageDatas:[""], images:[] },
+  { id:"salaam", name:"Salaam Cave Turtle Swim", cat:["Half Day"], price:100, market:150, duration:"2 Hours", pickup:"Paje / Jambiani", desc:"Swim with turtles in cave • Entrance, Guide", includes:"Entrance, Guide", area:"South-East", active:true, featured:true, imageDatas:[""], images:[] },
+  { id:"kuza", name:"Kuza Cave Sacred Swim", cat:["Half Day","Cultural"], price:130, market:190, duration:"3 Hours", pickup:"Paje / Jambiani", desc:"Sacred limestone cave + culture • Entrance, Guide", includes:"Entrance, Guide", area:"South-East", active:true, featured:true, imageDatas:[""], images:[] },
   { id:"mnemba", name:"Mnemba Atoll Snorkeling", cat:["Popular","Half Day","North"], price:180, market:260, duration:"4 Hours", pickup:"Matemwe 8 AM", desc:"Best coral reef, colorful fish, dolphins • Boat, Gear", includes:"Boat, Gear, Guide", area:"North-East", active:true, featured:true, imageDatas:[""], images:[] },
+  { id:"nungwi-sunset", name:"Nungwi Beach & Sunset Cruise", cat:["Popular","Half Day","North"], price:60, market:100, duration:"3 Hours", pickup:"Nungwi / Kendwa", desc:"Best beach + sunset dhow cruise north • Dhow, Drinks", includes:"Dhow, Drinks", area:"North", active:true, featured:true, imageDatas:[""], images:[] },
   { id:"safari-blue", name:"Sharing Safari Blue Full Day BBQ", cat:["Full Day","Popular","South"], price:190, market:280, duration:"8 Hours", pickup:"Fumba 8 AM", desc:"Sandbank + snorkeling + seafood BBQ • Dhow, BBQ, Drinks", includes:"Dhow, BBQ, Drinks, Gear", area:"South-West", active:true, featured:true, imageDatas:[""], images:[] },
   { id:"dhow-stone", name:"Sunset Dhow Stone Town", cat:["Popular","Half Day"], price:80, market:130, duration:"2 Hours", pickup:"Stone Town 4:30 PM", desc:"Traditional dhow sunset cruise • Dhow, Drinks", includes:"Dhow, Drinks", area:"West", active:true, featured:true, imageDatas:[""], images:[] },
+  { id:"dolphin", name:"Kizimkazi Dolphin Tour", cat:["Half Day","South"], price:70, market:120, duration:"4 Hours", pickup:"Kizimkazi 6 AM", desc:"Dolphin watching early morning • Boat, Guide", includes:"Boat, Guide", area:"South", active:true, featured:true, imageDatas:[""], images:[] },
+  { id:"rock", name:"The Rock Restaurant Tour", cat:["Half Day","East"], price:30, market:60, duration:"4 Hours", pickup:"East coast", desc:"Iconic Rock photo + Pongwe beach • Guide", includes:"Guide", area:"East", active:true, featured:true, imageDatas:[""], images:[] },
+  { id:"kite-lesson", name:"Paje Kite Surfing Lesson", cat:["Half Day","East","Water"], price:70, market:120, duration:"2 Hours", pickup:"Paje beach", desc:"Beginner kite with instructor + gear • Instructor, Gear", includes:"Instructor, Gear", area:"South-East", active:true, featured:true, imageDatas:[""], images:[] },
+  { id:"quad", name:"Quad Bike + Village", cat:["Half Day","Cultural","East"], price:70, market:110, duration:"3 Hours", pickup:"Paje / Bwejuu", desc:"Village + school + beach • Quad, Guide, Helmet", includes:"Quad, Guide, Helmet", area:"South-East", active:true, featured:true, imageDatas:[""], images:[] },
+  { id:"chumbe", name:"Chumbe Island Coral Park", cat:["Full Day","South-West"], price:90, market:150, duration:"7 Hours", pickup:"Fumba", desc:"Best coral sanctuary private island • Boat, Entrance $60, Lunch", includes:"Boat, Entrance $60, Lunch", area:"South-West", active:true, featured:true, imageDatas:[""], images:[] },
   { id:"private-safari-blue", name:"Private Safari Blue Full Day BBQ", cat:["Full Day","Popular","South"], price:220, market:320, duration:"8 Hours", pickup:"8:30 AM", desc:"Sandbank + snorkeling + seafood BBQ • Private dhow", includes:"Private Dhow, BBQ, Drinks", area:"West", active:true, featured:true, imageDatas:[""], images:[] },
 ]
 
@@ -65,7 +75,6 @@ export default function AdminPage(){
   const [editingReview, setEditingReview] = useState<any>(null)
   const [saving, setSaving] = useState(false)
 
-  // FAST COMPRESS 400px 0.5 = 70KB per pic = LAUNCH FAST
   const toBase64 = (file: File, cb:(b64:string)=>void)=>{
     const r=new FileReader(); r.onload=(e)=>{
       const img=new Image(); img.onload=()=>{
@@ -75,7 +84,6 @@ export default function AdminPage(){
     }; r.readAsDataURL(file)
   }
 
-  // TOURS - FULL POWER
   const handleTourFiles = (tourId:string, files: FileList)=>{
     Array.from(files).slice(0, MAX_IMAGES).forEach(file=>{
       toBase64(file, (b64)=>{
@@ -113,7 +121,6 @@ export default function AdminPage(){
   const duplicateTour = (tour:any)=>{ const copy={...tour, id:tour.id+"-copy-"+Date.now(), name:tour.name+" (Copy)"}; setTours(prev=>[copy,...prev]) }
   const toggleTourActive = (id:string)=> setTours(prev=>prev.map(t=>t.id===id? {...t, active:!t.active}:t))
 
-  // TRANSFERS - FULL POWER
   const handleTransferFiles = (transferId:string, files: FileList)=>{
     Array.from(files).slice(0, MAX_IMAGES).forEach(file=>{
       toBase64(file,(b64)=>{
@@ -151,7 +158,6 @@ export default function AdminPage(){
   const duplicateTransfer = (tr:any)=>{ const copy={...tr, id:tr.id+"-copy-"+Date.now(), name:tr.name+" (Copy)"}; setTransfers(prev=>[copy,...prev]) }
   const toggleTransferActive = (id:string)=> setTransfers(prev=>prev.map(t=>t.id===id? {...t, active:!t.active}:t))
 
-  // QUICK INLINE PRICE EDIT
   const quickUpdatePrice = (type:string, id:string, field:string, value:any)=>{
     if(type==="tour") setTours(prev=>prev.map(t=>t.id===id? {...t, [field]:value}:t))
     if(type==="transfer") setTransfers(prev=>prev.map(t=>t.id===id? {...t, [field]:value}:t))
@@ -285,7 +291,7 @@ export default function AdminPage(){
 
         {tab==="tours" && (
           <div>
-            <div className="bg-white p-4 rounded-xl border flex justify-between items-center flex-wrap gap-3"><h2 className="font-black">Tours - Full Control - Prices, Add, Delete, Active, Featured</h2><button onClick={()=>setEditingTour({id:"new-tour-"+Date.now(),name:"New Tour",cat:["Popular"],price:100,market:150,duration:"3 Hours",pickup:"Stone Town",desc:"Description",includes:"Guide, Entrance",area:"West",active:true,featured:true,imageDatas:[],images:[]})} className="bg-[#0A2342] text-white px-4 py-2 rounded-full text-[11px] font-bold">+ Add Tour</button></div>
+            <div className="bg-white p-4 rounded-xl border flex justify-between items-center flex-wrap gap-3"><h2 className="font-black">Tours - Full Control - {tours.length} Tours Matched with Tours Page</h2><button onClick={()=>setEditingTour({id:"new-tour-"+Date.now(),name:"New Tour",cat:["Popular"],price:100,market:150,duration:"3 Hours",pickup:"Stone Town",desc:"Description",includes:"Guide, Entrance",area:"West",active:true,featured:true,imageDatas:[],images:[]})} className="bg-[#0A2342] text-white px-4 py-2 rounded-full text-[11px] font-bold">+ Add Tour</button></div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 mt-5">
               {filteredTours.map(t=>{
                 const pics=(t.imageDatas||[]).filter(Boolean)
@@ -375,7 +381,7 @@ export default function AdminPage(){
 
       {editingTour && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4"><div className="bg-white rounded-[24px] p-6 max-w-2xl w-full max-h-[95vh] overflow-y-auto">
-          <h3 className="font-black text-[16px]">Edit Tour - Full Power - { (editingTour.imageDatas||[]).filter(Boolean).length }/3 {editingTour.active? "🟢 LIVE":"🔴 HIDDEN"}</h3>
+          <h3 className="font-black text-[16px]">Edit Tour - { (editingTour.imageDatas||[]).filter(Boolean).length }/3 {editingTour.active? "🟢 LIVE":"🔴 HIDDEN"}</h3>
           <div className="mt-4 grid grid-cols-3 gap-3">
             {[0,1,2].map(i=>{
               const img = (editingTour.imageDatas||[]).filter(Boolean)[i]
@@ -386,11 +392,11 @@ export default function AdminPage(){
           <div className="mt-4 grid md:grid-cols-2 gap-3">
             <input value={editingTour.id} onChange={e=>setEditingTour({...editingTour,id:e.target.value.toLowerCase().replace(/[^a-z0-9-]/g,'-')})} placeholder="ID (url)" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><input value={editingTour.name} onChange={e=>setEditingTour({...editingTour,name:e.target.value})} placeholder="Name" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] font-bold border"/>
             <input type="number" value={editingTour.price} onChange={e=>setEditingTour({...editingTour,price:parseInt(e.target.value)||0})} placeholder="Price $" className="bg-[#F0FFF0] rounded-full px-4 py-3 text-[12px] font-black border-2 border-green-500"/><input type="number" value={editingTour.market} onChange={e=>setEditingTour({...editingTour,market:parseInt(e.target.value)||0})} placeholder="Market $" className="bg-[#FFF0F0] rounded-full px-4 py-3 text-[12px] font-black border-2 border-red-300"/>
-            <input value={editingTour.duration} onChange={e=>setEditingTour({...editingTour,duration:e.target.value})} placeholder="Duration e.g. 5 Hours" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><input value={editingTour.pickup} onChange={e=>setEditingTour({...editingTour,pickup:e.target.value})} placeholder="Pickup e.g. Stone Town 8:30 AM" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/>
-            <input value={editingTour.area} onChange={e=>setEditingTour({...editingTour,area:e.target.value})} placeholder="Area e.g. West" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><input value={editingTour.cat?.join(",")} onChange={e=>setEditingTour({...editingTour,cat:e.target.value.split(",").map((s:string)=>s.trim()).filter(Boolean)})} placeholder="Categories comma separated" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/>
-            <input value={editingTour.desc} onChange={e=>setEditingTour({...editingTour,desc:e.target.value})} placeholder="Short Desc" className="md:col-span-2 bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><input value={editingTour.includes} onChange={e=>setEditingTour({...editingTour,includes:e.target.value})} placeholder="Includes e.g. Boat, Guide" className="md:col-span-2 bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/>
-            <label className="flex items-center gap-2 text-[12px] font-bold"><input type="checkbox" checked={editingTour.active} onChange={e=>setEditingTour({...editingTour,active:e.target.checked})}/> Active (Live on site)</label>
-            <label className="flex items-center gap-2 text-[12px] font-bold"><input type="checkbox" checked={editingTour.featured} onChange={e=>setEditingTour({...editingTour,featured:e.target.checked})}/> Featured on Home</label>
+            <input value={editingTour.duration} onChange={e=>setEditingTour({...editingTour,duration:e.target.value})} placeholder="Duration" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><input value={editingTour.pickup} onChange={e=>setEditingTour({...editingTour,pickup:e.target.value})} placeholder="Pickup" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/>
+            <input value={editingTour.area} onChange={e=>setEditingTour({...editingTour,area:e.target.value})} placeholder="Area" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><input value={editingTour.cat?.join(",")} onChange={e=>setEditingTour({...editingTour,cat:e.target.value.split(",").map((s:string)=>s.trim()).filter(Boolean)})} placeholder="Categories" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/>
+            <input value={editingTour.desc} onChange={e=>setEditingTour({...editingTour,desc:e.target.value})} placeholder="Short Desc" className="md:col-span-2 bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><input value={editingTour.includes} onChange={e=>setEditingTour({...editingTour,includes:e.target.value})} placeholder="Includes" className="md:col-span-2 bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/>
+            <label className="flex items-center gap-2 text-[12px] font-bold"><input type="checkbox" checked={editingTour.active} onChange={e=>setEditingTour({...editingTour,active:e.target.checked})}/> Active</label>
+            <label className="flex items-center gap-2 text-[12px] font-bold"><input type="checkbox" checked={editingTour.featured} onChange={e=>setEditingTour({...editingTour,featured:e.target.checked})}/> Featured</label>
           </div>
           <div className="flex gap-2 mt-5"><button onClick={()=>{ if(tours.find(t=>t.id===editingTour.id)) setTours(prev=>prev.map(t=>t.id===editingTour.id? editingTour:t)); else setTours(prev=>[editingTour,...prev]); saveOne("tour",editingTour); setEditingTour(null)}} className="flex-1 bg-[#0A2342] text-white py-3 rounded-full font-black text-[12px]">💾 Save Tour Live</button><button onClick={()=>setEditingTour(null)} className="px-6 py-3 bg-[#F5F7FA] rounded-full font-bold text-[12px]">Cancel</button></div>
         </div></div>
@@ -407,13 +413,13 @@ export default function AdminPage(){
           </div>
           <label className={`mt-3 block text-center py-3 rounded-full font-black text-[12px] border-2 cursor-pointer ${(editingTransfer.imageDatas||[]).filter(Boolean).length>=3? "bg-gray-100 opacity-40" : "bg-[#FF8A00] text-black border-[#FF8A00]"}`}>📸 Add Pictures<input type="file" accept="image/*" multiple className="hidden" disabled={(editingTransfer.imageDatas||[]).filter(Boolean).length>=3} onChange={e=>{ if(e.target.files) handleTransferEditFiles(e.target.files)}}/></label>
           <div className="mt-4 grid gap-3">
-            <input value={editingTransfer.id} onChange={e=>setEditingTransfer({...editingTransfer,id:e.target.value.toLowerCase().replace(/[^a-z0-9-]/g,'-')})} placeholder="ID airport-stone" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/>
-            <input value={editingTransfer.name} onChange={e=>setEditingTransfer({...editingTransfer,name:e.target.value})} placeholder="Name Airport → X" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] font-bold border"/>
+            <input value={editingTransfer.id} onChange={e=>setEditingTransfer({...editingTransfer,id:e.target.value.toLowerCase().replace(/[^a-z0-9-]/g,'-')})} placeholder="ID" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/>
+            <input value={editingTransfer.name} onChange={e=>setEditingTransfer({...editingTransfer,name:e.target.value})} placeholder="Name" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] font-bold border"/>
             <div className="grid grid-cols-2 gap-3"><input type="number" value={editingTransfer.price} onChange={e=>setEditingTransfer({...editingTransfer,price:parseInt(e.target.value)||0})} placeholder="Price" className="bg-[#F0FFF0] rounded-full px-4 py-3 text-[12px] font-black border-2 border-green-500"/><input type="number" value={editingTransfer.market} onChange={e=>setEditingTransfer({...editingTransfer,market:parseInt(e.target.value)||0})} placeholder="Market" className="bg-[#FFF0F0] rounded-full px-4 py-3 text-[12px] font-black border-2 border-red-300"/></div>
-            <div className="grid grid-cols-2 gap-3"><input value={editingTransfer.duration} onChange={e=>setEditingTransfer({...editingTransfer,duration:e.target.value})} placeholder="Duration e.g. 12-15 min" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><input value={editingTransfer.area} onChange={e=>setEditingTransfer({...editingTransfer,area:e.target.value})} placeholder="Area e.g. West" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/></div>
+            <div className="grid grid-cols-2 gap-3"><input value={editingTransfer.duration} onChange={e=>setEditingTransfer({...editingTransfer,duration:e.target.value})} placeholder="Duration" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><input value={editingTransfer.area} onChange={e=>setEditingTransfer({...editingTransfer,area:e.target.value})} placeholder="Area" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/></div>
             <input value={editingTransfer.desc} onChange={e=>setEditingTransfer({...editingTransfer,desc:e.target.value})} placeholder="Description" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/>
-            <input value={editingTransfer.cat?.join(",")} onChange={e=>setEditingTransfer({...editingTransfer,cat:e.target.value.split(",").map((s:string)=>s.trim()).filter(Boolean)})} placeholder="Categories Popular, North" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/>
-            <label className="flex items-center gap-2 text-[12px] font-bold"><input type="checkbox" checked={editingTransfer.active} onChange={e=>setEditingTransfer({...editingTransfer,active:e.target.checked})}/> Active (Live on site)</label>
+            <input value={editingTransfer.cat?.join(",")} onChange={e=>setEditingTransfer({...editingTransfer,cat:e.target.value.split(",").map((s:string)=>s.trim()).filter(Boolean)})} placeholder="Categories" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/>
+            <label className="flex items-center gap-2 text-[12px] font-bold"><input type="checkbox" checked={editingTransfer.active} onChange={e=>setEditingTransfer({...editingTransfer,active:e.target.checked})}/> Active</label>
           </div>
           <div className="flex gap-2 mt-5"><button onClick={()=>{ if(transfers.find(t=>t.id===editingTransfer.id)) setTransfers(prev=>prev.map(t=>t.id===editingTransfer.id? editingTransfer:t)); else setTransfers(prev=>[editingTransfer,...prev]); saveOne("transfer",editingTransfer); setEditingTransfer(null)}} className="flex-1 bg-[#0A2342] text-white py-3 rounded-full font-black text-[12px]">💾 Save Transfer Live</button><button onClick={()=>setEditingTransfer(null)} className="px-6 py-3 bg-[#F5F7FA] rounded-full font-bold text-[12px]">Cancel</button></div>
         </div></div>
