@@ -9,13 +9,19 @@ export const viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "HERO Shuttle & Tours - Private Zanzibar Transfers & Tours",
+  title: "Hero Shuttle & Tours Zanzibar - Private Transfers & Tours",
   description: "Private Zanzibar Airport Transfers and Private Tours - Licensed local team based in Stone Town, Nungwi, Paje. Private vehicle for your group, pay after trip, free cancellation 24h.",
   icons: {
-    icon: "/icon.png",
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/icon.png", sizes: "512x512", type: "image/png" },
+    ],
     shortcut: "/favicon.ico",
-    apple: "/apple-icon.png",
+    apple: "/apple-touch-icon.png",
   },
+  manifest: "/site.webmanifest",
 };
 
 export default function RootLayout({
