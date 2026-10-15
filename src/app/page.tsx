@@ -62,94 +62,145 @@ export default function HomePage(){
   const [blogs, setBlogs] = useState(HOME_BLOGS)
   const [lastSync, setLastSync] = useState("")
 
-  const syncAll = ()=>{
+  const syncAll = async ()=>{
     const now = new Date().toLocaleTimeString()
     setLastSync(now)
 
+    // 1. ANNOUNCEMENTS - DB FIRST
     try{
-      const rawA = localStorage.getItem("hero_announcements")
-      if(rawA){ const p=JSON.parse(rawA); if(Array.isArray(p)&&p.length>0) setAnnouncements(p.filter((a:any)=>a.active!==false)) }
+      const r = await fetch('/api/announcements',{cache:'no-store'})
+      const data = await r.json()
+      if(Array.isArray(data) && data.length>0){
+        setAnnouncements(data.filter((a:any)=>a.active!==false).map((a:any)=>({
+          id:a.id, badge:a.badge, title:a.title, subtitle:a.subtitle,
+          cta:a.cta, link:a.link, active:a.active!==false,
+          imageData:(a.image_urls?.[0]||a.imageData||"")
+        })))
+      } else {
+        const rawA = localStorage.getItem("hero_announcements")
+        if(rawA){ const p=JSON.parse(rawA); if(Array.isArray(p)&&p.length>0) setAnnouncements(p.filter((a:any)=>a.active!==false)) }
+      }
+    }catch{
+      try{
+        const rawA = localStorage.getItem("hero_announcements")
+        if(rawA){ const p=JSON.parse(rawA); if(Array.isArray(p)&&p.length>0) setAnnouncements(p.filter((a:any)=>a.active!==false)) }
+      }catch{}
+    }
+
+    // 2. TOURS - DB FIRST, 100% responsive to admin edits
+    try{
+      const r = await fetch('/api/tours',{cache:'no-store'})
+      const data = await r.json()
+      if(Array.isArray(data) && data.length>0){
+        const mapped = data.filter((d:any)=>d.active!==false).map((d:any)=>{
+          const urls = d.image_urls || d.images || []
+          return {
+            id:d.id, name:d.name||d.title,
+            cat: Array.isArray(d.cat)? d.cat : d.category? [d.category] : ["Popular"],
+            price: Number(d.price?? d.offer_price?? 0),
+            market: Number(d.market_price?? d.market?? d.original_price?? 0),
+            duration: d.duration || "3 Hours",
+            pickup: d.pickup || "Stone Town",
+            desc: d.description || d.desc || "",
+            area: d.area || "Zanzibar",
+            active: d.active!==false,
+            featured:!!d.featured,
+            imageData: urls[0]||d.imageData||"",
+            imageDatas: urls,
+            image: urls[0]||"",
+            includes: d.includes||""
+          }
+        })
+        setTours(mapped)
+      }
     }catch{}
 
-    // FIXED - added pickup, featured, includes to avoid type error
-    fetch('/api/tours',{cache:'no-store'}).then(r=>r.json()).then((data:any)=>{
-      if(!Array.isArray(data)||data.length===0) return
-      const merged = FIXED_8_TOURS.map(fixed=>{
-        const db = data.find((d:any)=> d.id===fixed.id)
-        if(!db) return fixed
-        const urls = db.image_urls||db.images||[]
-        return {
-        ...fixed,
-          name: db.name||db.title||fixed.name,
-          price: db.price?? db.offer_price?? fixed.price,
-          market: db.market_price?? db.market?? db.original_price?? fixed.market,
-          duration: db.duration||fixed.duration,
-          pickup: db.pickup||fixed.pickup,
-          desc: db.description||db.desc||fixed.desc,
-          area: db.area||fixed.area,
-          cat: db.category? [db.category] : fixed.cat,
-          featured: db.featured?? fixed.featured,
-          imageData: urls[0]||db.imageData||fixed.imageData,
-          imageDatas: urls.length?urls:fixed.imageDatas,
-          image: urls[0]||fixed.image,
-          active: db.active!==false
-        }
-      })
-      const extra = data.filter((d:any)=>!FIXED_8_TOURS.find(f=>f.id===d.id)).map((d:any)=>({
-        id:d.id, name:d.name||d.title, cat:[d.category||"Popular"], price:d.price||d.offer_price, market:d.market_price||d.market||d.price, duration:d.duration||"3 Hours", pickup:d.pickup||"Stone Town", desc:d.description||"", area:d.area||"Zanzibar", active:d.active!==false, featured:d.featured||false, imageData:(d.image_urls||[])[0]||"", imageDatas:d.image_urls||[], image:(d.image_urls||[])[0]||"", includes:d.includes||""
-      }))
-      setTours([...merged.filter((t:any)=>t.active!==false),...extra] as any)
-    }).catch(()=>{})
-
-    fetch('/api/transfers',{cache:'no-store'}).then(r=>r.json()).then((data:any)=>{
-      if(!Array.isArray(data)||data.length===0) return
-      const dbMap = new Map(data.map((d:any)=>[d.id,d]))
-      setTransfers(prev=>{
-        const base = prev.length>0? prev : REAL_10_TRANSFERS
-        return base.map(t=>{
-          const db:any = dbMap.get(t.id)
-          if(!db) return t
-          const urls = db.image_urls||[]
-          return {...t, name:db.name||t.name, price:db.price??db.offer_price??t.price, market:db.market_price??db.market??t.market, duration:db.duration||t.duration, desc:db.description||t.desc, area:db.area||t.area, imageDatas:urls, imageData:urls[0]||t.imageData, image:urls[0]||t.image, active:db.active!==false}
-        }).filter((t:any)=>t.active!==false)
-      })
-    }).catch(()=>{})
-
+    // 3. TRANSFERS - DB FIRST, 100% responsive to admin edits
     try{
-      const rawB = localStorage.getItem("hero_blogs")
-      if(rawB){ const p=JSON.parse(rawB); if(Array.isArray(p)&&p.length>0) setBlogs(p.slice(0,6).map((b:any)=>({ slug:b.slug, cat:b.cat, title:b.title, excerpt:b.excerpt||b.desc||"" }))) }
+      const r = await fetch('/api/transfers',{cache:'no-store'})
+      const data = await r.json()
+      if(Array.isArray(data) && data.length>0){
+        const mapped = data.filter((d:any)=>d.active!==false).map((d:any)=>{
+          const urls = d.image_urls || d.images || []
+          return {
+            id:d.id, name:d.name||d.title,
+            area: d.area || "West",
+            duration: d.duration || "",
+            distance: d.distance || "",
+            price: Number(d.price?? d.offer_price?? 0),
+            market: Number(d.market_price?? d.market?? d.original_price?? d.market_price?? 0),
+            desc: d.description || d.desc || "",
+            image: urls[0]||d.image||"",
+            imageData: urls[0]||d.imageData||"",
+            imageDatas: urls,
+            active: d.active!==false,
+            cat: Array.isArray(d.cat)? d.cat : d.category? [d.category] : ["Popular"]
+          }
+        })
+        setTransfers(mapped)
+      }
     }catch{}
-    fetch('/api/blogs',{cache:'no-store'}).then(r=>r.json()).then((data:any)=>{ if(Array.isArray(data)&&data.length>0) setBlogs(data.slice(0,6).map((b:any)=>({ slug:b.slug||b.id, cat:b.cat||b.category, title:b.title, excerpt:b.excerpt||b.desc||"" }))) }).catch(()=>{})
 
-    fetch('/api/reviews',{cache:'no-store'}).then(r=>r.json()).then((data:any)=>{ if(Array.isArray(data)&&data.length>0) setReviews(data) }).catch(()=>{
+    // 4. BLOGS - DB FIRST
+    try{
+      const r = await fetch('/api/blogs',{cache:'no-store'})
+      const data = await r.json()
+      if(Array.isArray(data)&&data.length>0) setBlogs(data.slice(0,6).map((b:any)=>({ slug:b.slug||b.id, cat:b.cat||b.category, title:b.title, excerpt:b.excerpt||b.desc||"" })))
+      else {
+        const rawB = localStorage.getItem("hero_blogs")
+        if(rawB){ const p=JSON.parse(rawB); if(Array.isArray(p)&&p.length>0) setBlogs(p.slice(0,6).map((b:any)=>({ slug:b.slug, cat:b.cat, title:b.title, excerpt:b.excerpt||b.desc||"" }))) }
+      }
+    }catch{}
+
+    // 5. REVIEWS - DB FIRST
+    try{
+      const r = await fetch('/api/reviews',{cache:'no-store'})
+      const data = await r.json()
+      if(Array.isArray(data)&&data.length>0) setReviews(data)
+      else {
+        const raw = localStorage.getItem("hero_reviews")
+        if(raw){ const p=JSON.parse(raw); if(p.length>0) setReviews(p) }
+      }
+    }catch{
       try{
         const raw = localStorage.getItem("hero_reviews")
         if(raw){ const p=JSON.parse(raw); if(p.length>0) setReviews(p) }
       }catch{}
-    })
+    }
 
+    // 6. SETTINGS
     try{
-      const rawS = localStorage.getItem("hero_settings")
-      if(rawS){ const s=JSON.parse(rawS); if(s.whatsapp) setWaNumber(s.whatsapp) }
-    }catch{}
+      const r = await fetch('/api/settings',{cache:'no-store'})
+      const data = await r.json()
+      if(data?.whatsapp) setWaNumber(data.whatsapp)
+      else {
+        const rawS = localStorage.getItem("hero_settings")
+        if(rawS){ const s=JSON.parse(rawS); if(s.whatsapp) setWaNumber(s.whatsapp) }
+      }
+    }catch{
+      try{
+        const rawS = localStorage.getItem("hero_settings")
+        if(rawS){ const s=JSON.parse(rawS); if(s.whatsapp) setWaNumber(s.whatsapp) }
+      }catch{}
+    }
   }
 
   useEffect(()=>{
     syncAll()
     const ivSlide = setInterval(()=> setActiveSlide(s=> (s+1)%announcements.length), 6000)
-    const ivSync = setInterval(syncAll, 15000)
+    const ivSync = setInterval(syncAll, 10000)
     const onFocus = ()=> syncAll()
     window.addEventListener('focus', onFocus)
     window.addEventListener('storage', syncAll)
     return ()=>{ clearInterval(ivSlide); clearInterval(ivSync); window.removeEventListener('focus', onFocus); window.removeEventListener('storage', syncAll) }
-  },[])
+  },[announcements.length])
 
   const filteredForDisplay = useMemo(()=>{
     if(filter==="Popular") return tours
     return tours.filter(t=> t.cat?.includes(filter))
   },[tours, filter])
 
-  const toursToShow = filteredForDisplay.length>0? filteredForDisplay.slice(0,8) : FIXED_8_TOURS.slice(0,8)
+  const toursToShow = filteredForDisplay.length>0? filteredForDisplay.slice(0,8) : tours.slice(0,8)
   const toursTotal = useMemo(()=> selectedTours.reduce((s,t)=> s + (t.price*(t.guests||1)),0),[selectedTours])
   const transfersTotal = useMemo(()=> selectedTransfers.reduce((s,t)=> s + (t.price*(t.guests||1)),0),[selectedTransfers])
   const grandTotal = toursTotal + transfersTotal
@@ -220,7 +271,7 @@ export default function HomePage(){
             )})}
           </div>
           <div className="text-center">
-            <Link href="/transfers" className="inline-block mt-9 bg-white border-2 border-[#0A2342] text-[#0A2342] px-8 py-3.5 rounded-full font-black text-[13px] hover:bg-[#0A2342] hover:text-white transition">View All Transfers →</Link>
+            <Link href="/airport-transfers" className="inline-block mt-9 bg-white border-2 border-[#0A2342] text-[#0A2342] px-8 py-3.5 rounded-full font-black text-[13px] hover:bg-[#0A2342] hover:text-white transition">View All Transfers →</Link>
           </div>
         </div>
       </section>
