@@ -5,9 +5,36 @@ import Footer from '@/components/Footer'
 import Link from 'next/link'
 
 const DEFAULT_ANNOUNCEMENTS = [
-  { id:1, badge:"🔥 POPULAR", title:"Prison Island & Nakupenda Private Tour", subtitle:"Tortoise sanctuary + white sandbank + fruit & snorkeling - Private boat and guide included", cta:"View Tours", link:"#tours", imageData:"", active:true },
-  { id:2, badge:"⚡ FULL DAY", title:"Safari Blue - Sandbank, Snorkeling & Seafood BBQ", subtitle:"Full day from Fumba to Kwale Island - Dhow sailing, BBQ and mangrove lagoon", cta:"Build Itinerary", link:"#tours", imageData:"", active:true },
-  { id:3, badge:"TRUSTED", title:"Licensed Local Team • Pay After Trip • Free Cancellation", subtitle:"Stone Town based team, drivers live in Nungwi, Paje and Kizimkazi - WhatsApp support 24/7", cta:"Why Choose Us", link:"#reviews", imageData:"", active:true },
+  {
+    id:1,
+    badge:"✈️ BEST TRANSFERS • PRIVATE CAR",
+    title:"Zanzibar Airport Transfers - Private Vehicle per CAR",
+    subtitle:"Meet & Greet with name sign + Flight Tracking + AC vehicle for your group + Child seat free + Pay After Trip - Airport to Stone Town, Nungwi, Paje, Jambiani, Kizimkazi",
+    cta:"View Transfers",
+    link:"#transfers",
+    imageData:"https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=800&q=80&auto=format&fit=crop",
+    active:true
+  },
+  {
+    id:2,
+    badge:"🐢 TOP RATED • PRIVATE BOAT",
+    title:"Prison Island & Nakupenda Private Tour",
+    subtitle:"Giant tortoises 100+ years + white sandbank + fruit & snorkeling - Private boat & licensed guide for your group - Entrance, fruit, water included - Stone Town pickup",
+    cta:"View Tours",
+    link:"#tours",
+    imageData:"https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80&auto=format&fit=crop",
+    active:true
+  },
+  {
+    id:3,
+    badge:"🏝️ FULL DAY • BEST SNORKELING",
+    title:"Safari Blue & Mnemba Atoll - Private Dhow & Boat",
+    subtitle:"Safari Blue sandbank + snorkeling + seafood BBQ from Fumba & Mnemba best reef from Matemwe - Private dhow/boat, guide, gear, BBQ & drinks - Pay After Trip",
+    cta:"Build Itinerary",
+    link:"#tours",
+    imageData:"https://images.unsplash.com/photo-1583212292454-1fe6229603b7?w=800&q=80&auto=format&fit=crop",
+    active:true
+  },
 ]
 
 const REAL_10_TRANSFERS = [
@@ -87,7 +114,7 @@ export default function HomePage(){
       }catch{}
     }
 
-    // 2. TOURS - DB FIRST, 100% responsive to admin edits
+    // 2. TOURS - DB FIRST
     try{
       const r = await fetch('/api/tours',{cache:'no-store'})
       const data = await r.json()
@@ -115,7 +142,7 @@ export default function HomePage(){
       }
     }catch{}
 
-    // 3. TRANSFERS - DB FIRST, 100% responsive to admin edits
+    // 3. TRANSFERS - DB FIRST
     try{
       const r = await fetch('/api/transfers',{cache:'no-store'})
       const data = await r.json()
@@ -141,7 +168,7 @@ export default function HomePage(){
       }
     }catch{}
 
-    // 4. BLOGS - DB FIRST
+    // 4. BLOGS
     try{
       const r = await fetch('/api/blogs',{cache:'no-store'})
       const data = await r.json()
@@ -152,7 +179,7 @@ export default function HomePage(){
       }
     }catch{}
 
-    // 5. REVIEWS - DB FIRST
+    // 5. REVIEWS
     try{
       const r = await fetch('/api/reviews',{cache:'no-store'})
       const data = await r.json()
@@ -187,7 +214,7 @@ export default function HomePage(){
 
   useEffect(()=>{
     syncAll()
-    const ivSlide = setInterval(()=> setActiveSlide(s=> (s+1)%announcements.length), 6000)
+    const ivSlide = setInterval(()=> setActiveSlide(s=> (s+1)%announcements.length), 3000) // SHUFFLE EVERY 3 SECONDS
     const ivSync = setInterval(syncAll, 10000)
     const onFocus = ()=> syncAll()
     window.addEventListener('focus', onFocus)
