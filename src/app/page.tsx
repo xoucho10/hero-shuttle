@@ -1,5 +1,5 @@
 ﻿"use client"
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, useRef } from "react"
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import Link from 'next/link'
@@ -9,7 +9,7 @@ const DEFAULT_ANNOUNCEMENTS = [
     id:1,
     badge:"✈️ BEST TRANSFERS • PRIVATE CAR",
     title:"Zanzibar Airport Transfers - Private Vehicle per CAR",
-    subtitle:"Meet & Greet with name sign + Flight Tracking + AC vehicle for your group + Child seat free + Pay After Trip - Airport to Stone Town, Nungwi, Paje, Jambiani, Kizimkazi",
+    subtitle:"Meet & Greet + Flight Tracking + AC vehicle for your group + Child seat free + Pay After Trip - Airport to Stone Town, Nungwi, Paje, Jambiani, Kizimkazi",
     cta:"View Transfers",
     link:"#transfers",
     imageData:"https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=800&q=80&auto=format&fit=crop",
@@ -89,30 +89,44 @@ export default function HomePage(){
   const [blogs, setBlogs] = useState(HOME_BLOGS)
   const [lastSync, setLastSync] = useState("")
 
+  const announcementsRef = useRef(announcements)
+  useEffect(()=>{ announcementsRef.current = announcements }, [announcements])
+
+  // Fix blinking: clamp activeSlide if DB returns fewer items
+  useEffect(()=>{
+    if(activeSlide >= announcements.length){
+      setActiveSlide(0)
+    }
+  },[announcements.length, activeSlide])
+
   const syncAll = async ()=>{
     const now = new Date().toLocaleTimeString()
     setLastSync(now)
 
-    // 1. ANNOUNCEMENTS - DB FIRST
+    // 1. ANNOUNCEMENTS - DB FIRST but keep image fallback
     try{
       const r = await fetch('/api/announcements',{cache:'no-store'})
       const data = await r.json()
       if(Array.isArray(data) && data.length>0){
-        setAnnouncements(data.filter((a:any)=>a.active!==false).map((a:any)=>({
-          id:a.id, badge:a.badge, title:a.title, subtitle:a.subtitle,
-          cta:a.cta, link:a.link, active:a.active!==false,
-          imageData:(a.image_urls?.[0]||a.imageData||"")
-        })))
-      } else {
-        const rawA = localStorage.getItem("hero_announcements")
-        if(rawA){ const p=JSON.parse(rawA); if(Array.isArray(p)&&p.length>0) setAnnouncements(p.filter((a:any)=>a.active!==false)) }
+        const filtered = data.filter((a:any)=>a.active!==false)
+        if(filtered.length>0){
+          const mapped = filtered.map((a:any, idx:number)=>{
+            const fallbackImg = DEFAULT_ANNOUNCEMENTS[idx % DEFAULT_ANNOUNCEMENTS.length]?.imageData || DEFAULT_ANNOUNCEMENTS[0].imageData
+            return {
+              id:a.id,
+              badge:a.badge || DEFAULT_ANNOUNCEMENTS[idx % DEFAULT_ANNOUNCEMENTS.length].badge,
+              title:a.title || DEFAULT_ANNOUNCEMENTS[idx % DEFAULT_ANNOUNCEMENTS.length].title,
+              subtitle:a.subtitle || DEFAULT_ANNOUNCEMENTS[idx % DEFAULT_ANNOUNCEMENTS.length].subtitle,
+              cta:a.cta || "View Tours",
+              link:a.link || "#tours",
+              active:a.active!==false,
+              imageData:(a.image_urls?.[0]||a.imageData||a.image||"") || fallbackImg
+            }
+          })
+          setAnnouncements(mapped)
+        }
       }
-    }catch{
-      try{
-        const rawA = localStorage.getItem("hero_announcements")
-        if(rawA){ const p=JSON.parse(rawA); if(Array.isArray(p)&&p.length>0) setAnnouncements(p.filter((a:any)=>a.active!==false)) }
-      }catch{}
-    }
+    }catch{}
 
     // 2. TOURS - DB FIRST
     try{
@@ -138,7 +152,7 @@ export default function HomePage(){
             includes: d.includes||""
           }
         })
-        setTours(mapped)
+        if(mapped.length>0) setTours(mapped)
       }
     }catch{}
 
@@ -155,7 +169,7 @@ export default function HomePage(){
             duration: d.duration || "",
             distance: d.distance || "",
             price: Number(d.price?? d.offer_price?? 0),
-            market: Number(d.market_price?? d.market?? d.original_price?? d.market_price?? 0),
+            market: Number(d.market_price?? d.market?? d.original_price?? 0),
             desc: d.description || d.desc || "",
             image: urls[0]||d.image||"",
             imageData: urls[0]||d.imageData||"",
@@ -164,7 +178,7 @@ export default function HomePage(){
             cat: Array.isArray(d.cat)? d.cat : d.category? [d.category] : ["Popular"]
           }
         })
-        setTransfers(mapped)
+        if(mapped.length>0) setTransfers(mapped)
       }
     }catch{}
 
@@ -173,10 +187,6 @@ export default function HomePage(){
       const r = await fetch('/api/blogs',{cache:'no-store'})
       const data = await r.json()
       if(Array.isArray(data)&&data.length>0) setBlogs(data.slice(0,6).map((b:any)=>({ slug:b.slug||b.id, cat:b.cat||b.category, title:b.title, excerpt:b.excerpt||b.desc||"" })))
-      else {
-        const rawB = localStorage.getItem("hero_blogs")
-        if(rawB){ const p=JSON.parse(rawB); if(Array.isArray(p)&&p.length>0) setBlogs(p.slice(0,6).map((b:any)=>({ slug:b.slug, cat:b.cat, title:b.title, excerpt:b.excerpt||b.desc||"" }))) }
-      }
     }catch{}
 
     // 5. REVIEWS
@@ -184,43 +194,34 @@ export default function HomePage(){
       const r = await fetch('/api/reviews',{cache:'no-store'})
       const data = await r.json()
       if(Array.isArray(data)&&data.length>0) setReviews(data)
-      else {
-        const raw = localStorage.getItem("hero_reviews")
-        if(raw){ const p=JSON.parse(raw); if(p.length>0) setReviews(p) }
-      }
-    }catch{
-      try{
-        const raw = localStorage.getItem("hero_reviews")
-        if(raw){ const p=JSON.parse(raw); if(p.length>0) setReviews(p) }
-      }catch{}
-    }
+    }catch{}
 
     // 6. SETTINGS
     try{
       const r = await fetch('/api/settings',{cache:'no-store'})
       const data = await r.json()
       if(data?.whatsapp) setWaNumber(data.whatsapp)
-      else {
-        const rawS = localStorage.getItem("hero_settings")
-        if(rawS){ const s=JSON.parse(rawS); if(s.whatsapp) setWaNumber(s.whatsapp) }
-      }
-    }catch{
-      try{
-        const rawS = localStorage.getItem("hero_settings")
-        if(rawS){ const s=JSON.parse(rawS); if(s.whatsapp) setWaNumber(s.whatsapp) }
-      }catch{}
-    }
+    }catch{}
   }
 
+  // FIXED: Separate effects - one for data, one for slider (no more blink)
   useEffect(()=>{
     syncAll()
-    const ivSlide = setInterval(()=> setActiveSlide(s=> (s+1)%announcements.length), 3000) // SHUFFLE EVERY 3 SECONDS
-    const ivSync = setInterval(syncAll, 10000)
+    const ivSync = setInterval(syncAll, 15000)
     const onFocus = ()=> syncAll()
     window.addEventListener('focus', onFocus)
-    window.addEventListener('storage', syncAll)
-    return ()=>{ clearInterval(ivSlide); clearInterval(ivSync); window.removeEventListener('focus', onFocus); window.removeEventListener('storage', syncAll) }
-  },[announcements.length])
+    return ()=>{ clearInterval(ivSync); window.removeEventListener('focus', onFocus) }
+  },[])
+
+  useEffect(()=>{
+    const ivSlide = setInterval(()=>{
+      setActiveSlide(prev=>{
+        const len = announcementsRef.current.length || 1
+        return (prev + 1) % len
+      })
+    }, 3000)
+    return ()=> clearInterval(ivSlide)
+  },[])
 
   const filteredForDisplay = useMemo(()=>{
     if(filter==="Popular") return tours
@@ -232,7 +233,7 @@ export default function HomePage(){
   const transfersTotal = useMemo(()=> selectedTransfers.reduce((s,t)=> s + (t.price*(t.guests||1)),0),[selectedTransfers])
   const grandTotal = toursTotal + transfersTotal
   const savings = useMemo(()=> [...selectedTours,...selectedTransfers].reduce((s,t:any)=> s + (((t.market||t.price)-t.price)*(t.guests||1)),0),[selectedTours, selectedTransfers])
-  const activeAnn = announcements[activeSlide] || announcements[0]
+  const activeAnn = announcements[activeSlide] || announcements[0] || DEFAULT_ANNOUNCEMENTS[0]
 
   const toggleTour = (tour:any)=> setSelectedTours(prev=> prev.find(p=>p.id===tour.id)? prev.filter(p=>p.id!==tour.id) : [...prev, {...tour, guests:1}])
   const toggleTransfer = (tr:any)=> setSelectedTransfers(prev=> prev.find(p=>p.id===tr.id)? prev.filter(p=>p.id!==tr.id) : [...prev, {...tr, guests:1}])
@@ -258,11 +259,11 @@ export default function HomePage(){
             </div>
             <div className="mt-4 flex gap-2 items-center">
               {announcements.map((_,i)=><button key={i} onClick={()=>setActiveSlide(i)} className={`h-1.5 rounded-full transition-all ${i===activeSlide? "w-8 bg-[#0A2342]" : "w-3 bg-[#0A2342]/20"}`} />)}
-              {lastSync && <span className="ml-3 text-[10px] text-[#0A2342]/30">Live • Synced {lastSync}</span>}
+              {lastSync && <span className="ml-3 text-[10px] text-[#0A2342]/30">Live • {activeSlide+1}/{announcements.length}</span>}
             </div>
           </div>
           <div className="h-[300px] md:h-[380px] bg-[#F8FAFF] rounded-[20px] border border-[#0A2342]/5 overflow-hidden shadow-sm">
-            {activeAnn?.imageData? <img src={activeAnn.imageData} className="w-full h-full object-cover"/> : <div className="w-full h-full bg-gradient-to-br from-[#0A2342] to-[#2a5a8a] flex items-center justify-center"><p className="text-white/60 text-[13px] font-bold">Add image in Admin → Announcements</p></div>}
+            {activeAnn?.imageData? <img src={activeAnn.imageData} className="w-full h-full object-cover" alt={activeAnn.title}/> : <div className="w-full h-full bg-gradient-to-br from-[#0A2342] to-[#2a5a8a] flex items-center justify-center"><p className="text-white/60 text-[13px] font-bold">Add image in Admin → Announcements</p></div>}
           </div>
         </div>
       </section>
