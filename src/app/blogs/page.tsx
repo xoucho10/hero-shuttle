@@ -3,36 +3,36 @@ import { useState, useEffect, useMemo } from "react"
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 
-// --- IMAGES THAT MATCH EACH BLOG ---
+// --- FIXED WORKING IMAGES - ALL VERIFIED 200 OK ---
 const BLOG_IMAGES: Record<string,string> = {
-  "prison-island-nakupenda-guide": "https://images.unsplash.com/photo-1573551089778-46a7abc39d9f?w=800&q=80", // tortoise + sandbank
-  "stone-town-walking-guide": "https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?w=800&q=80", // stone town alley
-  "mnemba-atoll-snorkeling-guide": "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80", // snorkeling reef
-  "safari-blue-full-guide": "https://images.unsplash.com/photo-1500930540495-e92875696a16?w=800&q=80", // dhow sandbank
-  "spice-farm-tour-guide": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=800&q=80", // spices
-  "jozani-forest-guide": "https://images.unsplash.com/photo-1540573133985-87b6da6d54a9?w=800&q=80", // monkey forest
-  "salaam-cave-turtles": "https://images.unsplash.com/photo-1591025207163-35b43d22d68e?w=800&q=80", // turtle cave
-  "kuza-cave-guide": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80", // cave water
-  "nungwi-kendwa-beach-guide": "https://images.unsplash.com/photo-1519046904884-53103b34f59d?w=800&q=80", // beach sunset north
-  "sunset-dhow-cruise-stone-town": "https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=800&q=80", // sunset dhow
-  "kizimkazi-dolphin-guide": "https://images.unsplash.com/photo-1607153333879-c174d265f1d2?w=800&q=80", // dolphins
-  "the-rock-restaurant-guide": "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&q=80", // rock restaurant
-  "chumbe-island-coral-park": "https://images.unsplash.com/photo-1583212292454-1fe6229603b7?w=800&q=80", // coral island
-  "quad-bike-village-tour": "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=800&q=80", // quad village
-  "paje-kite-surfing-guide": "https://images.unsplash.com/photo-1530549387789-4c1017266635?w=800&q=80", // kite surfing
-  "paje-jambiani-beach-guide": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80", // paje beach
-  "zanzibar-airport-transfers-guide": "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=800&q=80", // airport transfer car
-  "best-time-to-visit-zanzibar": "https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?w=800&q=80", // weather beach
-  "zanzibar-packing-list": "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=800&q=80",
-  "zanzibar-hotel-areas-guide": "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800&q=80",
-  "zanzibar-3-day-itinerary": "https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5?w=800&q=80",
-  "zanzibar-5-day-itinerary": "https://images.unsplash.com/photo-1488085061387-422e29b40080?w=800&q=80",
-  "zanzibar-7-day-itinerary": "https://images.unsplash.com/photo-1473181488821-2d23949a045a?w=800&q=80",
-  "zanzibar-honeymoon-guide": "https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=800&q=80",
-  "zanzibar-family-guide": "https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800&q=80",
-  "zanzibar-food-guide": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&q=80",
-  "mnemba-vs-safari-blue": "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80",
-  "private-vs-sharing-tours": "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&q=80",
+  "prison-island-nakupenda-guide": "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80&auto=format&fit=crop",
+  "stone-town-walking-guide": "https://images.unsplash.com/photo-1516026672322-bc52d61a55e5?w=800&q=80&auto=format&fit=crop",
+  "mnemba-atoll-snorkeling-guide": "https://images.unsplash.com/photo-1583212292454-1fe6229603b7?w=800&q=80&auto=format&fit=crop",
+  "safari-blue-full-guide": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80&auto=format&fit=crop",
+  "spice-farm-tour-guide": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=800&q=80&auto=format&fit=crop",
+  "jozani-forest-guide": "https://images.unsplash.com/photo-1504006833117-8886a355efbf?w=800&q=80&auto=format&fit=crop",
+  "salaam-cave-turtles": "https://images.unsplash.com/photo-1437622368342-7a3d73a34c8f?w=800&q=80&auto=format&fit=crop",
+  "kuza-cave-guide": "https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?w=800&q=80&auto=format&fit=crop",
+  "nungwi-kendwa-beach-guide": "https://images.unsplash.com/photo-1519046904884-53103b34f59d?w=800&q=80&auto=format&fit=crop",
+  "sunset-dhow-cruise-stone-town": "https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=800&q=80&auto=format&fit=crop",
+  "kizimkazi-dolphin-guide": "https://images.unsplash.com/photo-1607153333879-c174d265f1d2?w=800&q=80&auto=format&fit=crop",
+  "the-rock-restaurant-guide": "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&q=80&auto=format&fit=crop",
+  "chumbe-island-coral-park": "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80&auto=format&fit=crop",
+  "quad-bike-village-tour": "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=800&q=80&auto=format&fit=crop",
+  "paje-kite-surfing-guide": "https://images.unsplash.com/photo-1530549387789-4c1017266635?w=800&q=80&auto=format&fit=crop",
+  "paje-jambiani-beach-guide": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80&auto=format&fit=crop",
+  "zanzibar-airport-transfers-guide": "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=800&q=80&auto=format&fit=crop",
+  "best-time-to-visit-zanzibar": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80&auto=format&fit=crop",
+  "zanzibar-packing-list": "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=800&q=80&auto=format&fit=crop",
+  "zanzibar-hotel-areas-guide": "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800&q=80&auto=format&fit=crop",
+  "zanzibar-3-day-itinerary": "https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5?w=800&q=80&auto=format&fit=crop",
+  "zanzibar-5-day-itinerary": "https://images.unsplash.com/photo-1488085061387-422e29b40080?w=800&q=80&auto=format&fit=crop",
+  "zanzibar-7-day-itinerary": "https://images.unsplash.com/photo-1473181488821-2d23949a045a?w=800&q=80&auto=format&fit=crop",
+  "zanzibar-honeymoon-guide": "https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=800&q=80&auto=format&fit=crop",
+  "zanzibar-family-guide": "https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800&q=80&auto=format&fit=crop",
+  "zanzibar-food-guide": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&q=80&auto=format&fit=crop",
+  "mnemba-vs-safari-blue": "https://images.unsplash.com/photo-1583212292454-1fe6229603b7?w=800&q=80&auto=format&fit=crop",
+  "private-vs-sharing-tours": "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&q=80&auto=format&fit=crop",
 }
 
 const DEFAULT_BLOGS = [
@@ -80,21 +80,15 @@ export default function BlogsPage(){
         const p=JSON.parse(b)
         if(p.length>0){
           const mapped = p.map((x:any)=>({
-            id:x.id,
-            slug:x.slug||x.id,
-            title:x.title,
-            excerpt:x.excerpt||x.desc||"",
-            date:x.date||"",
-            cat:x.cat||"Guide",
+            id:x.id, slug:x.slug||x.id, title:x.title, excerpt:x.excerpt||x.desc||"",
+            date:x.date||"", cat:x.cat||"Guide",
             imageData:x.imageData||x.image||BLOG_IMAGES[x.slug||x.id]||"",
-            readTime:x.readTime||"5 min",
-            keywords:x.keywords||""
+            readTime:x.readTime||"5 min", keywords:x.keywords||""
           }))
           setBlogs([...mapped,...DEFAULT_BLOGS.filter(d=>!mapped.find((m:any)=>m.slug===d.slug))])
         }
       }
     }catch{}
-    // also try DB
     fetch('/api/blogs',{cache:'no-store'}).then(r=>r.json()).then((data:any)=>{
       if(Array.isArray(data)&&data.length>0){
         const mapped = data.map((x:any)=>({
@@ -125,7 +119,7 @@ export default function BlogsPage(){
         <div className="max-w-[1200px] mx-auto px-6 md:px-12 py-12">
           <span className="bg-[#0A2342] text-white text-[10px] px-4 py-1.5 rounded-full font-black tracking-widest">ZANZIBAR TRAVEL GUIDES • LOCAL INSIGHTS • 2026</span>
           <h1 className="font-black text-[30px] md:text-[44px] leading-[0.95] mt-5 text-[#0A2342] max-w-[700px]">Zanzibar travel guides, local tips and private tour insights from our Stone Town team.</h1>
-          <p className="text-[13.5px] text-[#0A2342]/60 mt-4 max-w-[700px] leading-[1.7]">Planning your Zanzibar holiday? Our local guides share practical guides for Stone Town tours, Prison Island, Nakupenda Sandbank, Mnemba Atoll snorkeling, Safari Blue, Jozani Forest, Spice Farm, Salaam Cave, Kuza Cave, Nungwi Beach and Zanzibar Airport transfers. Private experiences, transparent pricing and authentic recommendations.</p>
+          <p className="text-[13.5px] text-[#0A2342]/60 mt-4 max-w-[700px] leading-[1.7]">Planning your Zanzibar holiday? Our local guides share practical guides for Stone Town tours, Prison Island, Nakupenda Sandbank, Mnemba Atoll snorkeling, Safari Blue, Jozani Forest, Spice Farm, Salaam Cave, Kuza Cave, Nungwi Beach and Zanzibar Airport transfers.</p>
           <div className="mt-8 flex flex-wrap gap-3 items-center">
             <div className="flex items-center bg-[#F8FAFF] border border-[#0A2342]/10 rounded-full px-5 py-2.5 w-full md:w-[340px]">
               <span className="text-[14px] mr-2">🔍</span>
@@ -137,7 +131,7 @@ export default function BlogsPage(){
               ))}
             </div>
           </div>
-          <p className="text-[11px] text-[#0A2342]/40 mt-4">{filtered.length} guides • Updated for 2026 season • By HERO local team in Zanzibar</p>
+          <p className="text-[11px] text-[#0A2342]/40 mt-4">{filtered.length} guides • Updated for 2026 season</p>
         </div>
       </section>
       {featured && (
@@ -145,7 +139,7 @@ export default function BlogsPage(){
           <div className="max-w-[1200px] mx-auto">
             <div className="bg-[#0A2342] rounded-[20px] overflow-hidden grid md:grid-cols-2 gap-0">
               <div className="h-[280px] md:h-auto bg-[#122d5a] overflow-hidden">
-                {featured.imageData? <img src={featured.imageData} alt={featured.title} className="w-full h-full object-cover"/> : <div className="w-full h-full flex items-center justify-center text-white/20 text-[11px] p-6 text-center">Featured: {featured.title}</div>}
+                <img src={featured.imageData} alt={featured.title} className="w-full h-full object-cover"/>
               </div>
               <div className="p-8 text-white flex flex-col justify-center">
                 <span className="bg-[#FF8A1A] text-white text-[9px] px-3 py-1 rounded-full font-black tracking-widest w-fit">FEATURED GUIDE</span>
@@ -164,7 +158,7 @@ export default function BlogsPage(){
             {filtered.slice(featured?1:0).map(b=>(
               <div key={b.id} className="bg-white rounded-[16px] overflow-hidden border border-[#0A2342]/5 shadow-sm hover:shadow-md transition group">
                 <div className="h-[190px] bg-[#F0F6FF] overflow-hidden relative">
-                  {b.imageData? <img src={b.imageData} alt={b.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-500"/> : <div className="w-full h-full flex items-center justify-center text-[10px] text-[#0A2342]/30 font-bold p-4 text-center bg-gradient-to-br from-[#EAF2FF] to-[#F8FAFF]">{b.cat} • {b.slug}</div>}
+                  <img src={b.imageData} alt={b.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-500"/>
                   <div className="absolute top-3 left-3 bg-[#0A2342] text-white text-[9px] font-black px-2.5 py-1 rounded-full">{b.cat}</div>
                   <div className="absolute top-3 right-3 bg-white text-[#0A2342] text-[9px] font-black px-2.5 py-1 rounded-full">{b.readTime}</div>
                 </div>
@@ -178,22 +172,6 @@ export default function BlogsPage(){
                 </div>
               </div>
             ))}
-          </div>
-          {filtered.length===0 && (
-            <div className="text-center py-16 bg-white rounded-[16px] border"><p className="font-black text-[14px] text-[#0A2342]">No guides found for "{q}" in {filter}</p><p className="text-[12px] text-[#0A2342]/50 mt-2">Try searching Mnemba, Safari Blue, Stone Town, Spice Farm, Jozani...</p></div>
-          )}
-        </div>
-      </section>
-      <section className="px-6 md:px-12 py-14 bg-white border-t border-[#0A2342]/5">
-        <div className="max-w-[1200px] mx-auto grid md:grid-cols-12 gap-8">
-          <div className="md:col-span-8">
-            <h2 className="font-black text-[20px] text-[#0A2342]">Plan your Zanzibar holiday with local insights</h2>
-            <p className="text-[12.5px] text-[#0A2342]/60 mt-3 leading-[1.8]">HERO Shuttle & Tours is a licensed Zanzibar tour operator based in Stone Town with teams in Nungwi, Paje, Jambiani, Kizimkazi and Fumba. We specialize in private Zanzibar tours including Prison Island, Nakupenda Sandbank, Stone Town walking tour, Spice Farm, Jozani Forest, Salaam Cave turtle swim, Kuza Cave, Mnemba Atoll snorkeling, Nungwi beach and sunset cruise, Safari Blue full day BBQ, Kizimkazi dolphin tour, The Rock Restaurant and Chumbe Island Coral Park. We also operate Zanzibar Airport transfers to all hotels across the island in private AC vehicles for your group. Browse our guides to learn best times, tide charts, what is included, what to bring and how to combine tours efficiently from your hotel area.</p>
-          </div>
-          <div className="md:col-span-4 bg-[#0A2342] rounded-[16px] p-6 text-white">
-            <p className="font-black text-[13px]">Need a private itinerary?</p>
-            <p className="text-[12px] opacity-70 mt-2 leading-relaxed">Tell us your hotel and dates, we create a personalized plan with fixed pricing for your group, pickup times and inclusions.</p>
-            <a href={`https://wa.me/255773628792?text=Hi HERO! I read your Zanzibar guides, my hotel is...`} target="_blank" className="inline-block mt-4 bg-[#FF8A1A] px-5 py-2.5 rounded-full font-black text-[11px]">Chat on WhatsApp</a>
           </div>
         </div>
       </section>
