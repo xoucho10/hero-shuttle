@@ -117,9 +117,38 @@ export default function AdminPage(){
     const datas=[...(editingTour.imageDatas||[])].filter(Boolean); datas.splice(index,1)
     setEditingTour({...editingTour, imageDatas:datas, images:datas})
   }
-  const deleteTour = (id:string)=>{ if(confirm(`Delete tour ${id}? This goes live after SAVE.`)){ setTours(prev=>prev.filter(t=>t.id!==id)) } }
+
+  // LIVE DELETE + LIVE HIDE - saves to DB instantly
+  const deleteTour = async (id:string)=>{
+    if(confirm(`Delete tour ${id}? Will go LIVE now on Tours page.`)){
+      const newTours = tours.filter(t=>t.id!==id)
+      setTours(newTours)
+      localStorage.setItem("hero_tours", JSON.stringify(newTours))
+      try{
+        await fetch('/api/tours',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(newTours.map(t=>({id:t.id,name:t.name,price:Number(t.price),market_price:Number(t.market),market:Number(t.market),duration:t.duration,description:t.desc,area:t.area,cat:t.cat,featured:t.featured,active:t.active,pickup:t.pickup,includes:t.includes,image_urls:(t.imageDatas||[]).filter(Boolean)})))})
+        alert(`✅ Deleted ${id} - LIVE in 10 sec on tours page`)
+      }catch(e){ alert("Deleted locally but DB failed - click SAVE ALL LIVE") }
+    }
+  }
   const duplicateTour = (tour:any)=>{ const copy={...tour, id:tour.id+"-copy-"+Date.now(), name:tour.name+" (Copy)"}; setTours(prev=>[copy,...prev]) }
-  const toggleTourActive = (id:string)=> setTours(prev=>prev.map(t=>t.id===id? {...t, active:!t.active}:t))
+  const toggleTourActive = async (id:string)=> {
+    let changedTour:any = null
+    const newTours = tours.map(t=>{
+      if(t.id===id){
+        const updated = {...t, active:!t.active}
+        changedTour = updated
+        return updated
+      }
+      return t
+    })
+    setTours(newTours)
+    localStorage.setItem("hero_tours", JSON.stringify(newTours))
+    if(changedTour){
+      try{
+        await fetch('/api/tours',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:changedTour.id,name:changedTour.name,price:Number(changedTour.price),market_price:Number(changedTour.market),market:Number(changedTour.market),description:changedTour.desc,duration:changedTour.duration,area:changedTour.area,cat:changedTour.cat,featured:changedTour.featured,active:changedTour.active,pickup:changedTour.pickup,includes:changedTour.includes,image_urls:(changedTour.imageDatas||[]).filter(Boolean)})})
+      }catch{}
+    }
+  }
 
   const handleTransferFiles = (transferId:string, files: FileList)=>{
     Array.from(files).slice(0, MAX_IMAGES).forEach(file=>{
@@ -154,20 +183,56 @@ export default function AdminPage(){
     const datas=[...(editingTransfer.imageDatas||[])].filter(Boolean); datas.splice(index,1)
     setEditingTransfer({...editingTransfer, imageDatas:datas, images:datas})
   }
-  const deleteTransfer = (id:string)=>{ if(confirm(`Delete transfer ${id}?`)){ setTransfers(prev=>prev.filter(t=>t.id!==id)) } }
+  const deleteTransfer = async (id:string)=>{
+    if(confirm(`Delete transfer ${id}? LIVE now.`)){
+      const newTransfers = transfers.filter(t=>t.id!==id)
+      setTransfers(newTransfers)
+      localStorage.setItem("hero_transfers", JSON.stringify(newTransfers))
+      try{
+        await fetch('/api/transfers',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(newTransfers.map(t=>({id:t.id,name:t.name,price:Number(t.price),market_price:Number(t.market),market:Number(t.market),duration:t.duration,description:t.desc,area:t.area,cat:t.cat,active:t.active,image_urls:(t.imageDatas||[]).filter(Boolean)})))})
+        alert(`✅ Deleted ${id} LIVE`)
+      }catch{}
+    }
+  }
   const duplicateTransfer = (tr:any)=>{ const copy={...tr, id:tr.id+"-copy-"+Date.now(), name:tr.name+" (Copy)"}; setTransfers(prev=>[copy,...prev]) }
-  const toggleTransferActive = (id:string)=> setTransfers(prev=>prev.map(t=>t.id===id? {...t, active:!t.active}:t))
-
-  const quickUpdatePrice = (type:string, id:string, field:string, value:any)=>{
-    if(type==="tour") setTours(prev=>prev.map(t=>t.id===id? {...t, [field]:value}:t))
-    if(type==="transfer") setTransfers(prev=>prev.map(t=>t.id===id? {...t, [field]:value}:t))
+  const toggleTransferActive = async (id:string)=>{
+    let changed:any = null
+    const newTransfers = transfers.map(t=>{
+      if(t.id===id){ const u={...t, active:!t.active}; changed=u; return u }
+      return t
+    })
+    setTransfers(newTransfers)
+    localStorage.setItem("hero_transfers", JSON.stringify(newTransfers))
+    if(changed){
+      await fetch('/api/transfers',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:changed.id,name:changed.name,price:Number(changed.price),market_price:Number(changed.market),market:Number(changed.market),duration:changed.duration,description:changed.desc,area:changed.area,cat:changed.cat,active:changed.active,image_urls:(changed.imageDatas||[]).filter(Boolean)})})
+    }
   }
 
-  // FIXED: Auto-upgrade if old localStorage has 8 tours, use 18
+  const quickUpdatePrice = async (type:string, id:string, field:string, value:any)=>{
+    if(type==="tour"){
+      const newTours = tours.map(t=>t.id===id? {...t, [field]:value}:t)
+      setTours(newTours)
+      localStorage.setItem("hero_tours", JSON.stringify(newTours))
+      const changed = newTours.find(t=>t.id===id)
+      if(changed && (field==="price"||field==="market"||field==="duration"||field==="area")){
+        try{
+          await fetch('/api/tours',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:changed.id,name:changed.name,price:Number(changed.price),market_price:Number(changed.market),market:Number(changed.market),description:changed.desc,duration:changed.duration,area:changed.area,cat:changed.cat,featured:changed.featured,active:changed.active,pickup:changed.pickup,includes:changed.includes,image_urls:(changed.imageDatas||[]).filter(Boolean)})})
+        }catch{}
+      }
+    }
+    if(type==="transfer"){
+      const newTransfers = transfers.map(t=>t.id===id? {...t, [field]:value}:t)
+      setTransfers(newTransfers)
+      localStorage.setItem("hero_transfers", JSON.stringify(newTransfers))
+      const changed = newTransfers.find(t=>t.id===id)
+      if(changed){
+        await fetch('/api/transfers',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:changed.id,name:changed.name,price:Number(changed.price),market_price:Number(changed.market),market:Number(changed.market),duration:changed.duration,description:changed.desc,area:changed.area,cat:changed.cat,active:changed.active,image_urls:(changed.imageDatas||[]).filter(Boolean)})})
+      }
+    }
+  }
+
   useEffect(()=>{
     if(localStorage.getItem("hero_admin_auth")==="1") setAuth(true)
-
-    // Load only if saved count >= default count, otherwise keep 18
     const tryLoadWithUpgrade=(key:string, setter:any, defaultArr:any[])=>{
       try{
         const v=localStorage.getItem(key);
@@ -175,7 +240,6 @@ export default function AdminPage(){
           const p=JSON.parse(v);
           if(Array.isArray(p) && p.length>0){
             if(p.length < defaultArr.length){
-              // Old cache is smaller - merge missing tours from default
               const existingIds = new Set(p.map((x:any)=>x.id))
               const missing = defaultArr.filter((d:any)=>!existingIds.has(d.id))
               const merged = [...p,...missing]
@@ -190,10 +254,8 @@ export default function AdminPage(){
         }
       }catch{}
     }
-
     tryLoadWithUpgrade("hero_tours", setTours, DEFAULT_TOURS)
     tryLoadWithUpgrade("hero_transfers", setTransfers, DEFAULT_TRANSFERS)
-
     const tryLoad=(key:string, setter:any)=>{
       try{ const v=localStorage.getItem(key); if(v){ const p=JSON.parse(v); if(Array.isArray(p)&&p.length>0||!Array.isArray(p)) setter(p) } }catch{}
     }
@@ -201,14 +263,11 @@ export default function AdminPage(){
     tryLoad("hero_blogs", setBlogs)
     tryLoad("hero_reviews", setReviews)
     tryLoad("hero_settings", setSettings)
-
     const loadDB=async()=>{
       try{ const r=await fetch('/api/tours',{cache:'no-store'}); const d=await r.json(); if(Array.isArray(d)&&d.length>0){
-        // If DB has all 18, use DB; if DB has 8, merge missing from default
         if(d.length >= DEFAULT_TOURS.length){
           const m=new Map(d.map((x:any)=>[x.id,x]));
           setTours(prev=>{
-            // Keep DB as source but add images from prev
             return d.map((db:any)=>{
               const prevTour = prev.find((t:any)=>t.id===db.id)
               return {
@@ -230,11 +289,9 @@ export default function AdminPage(){
             })
           })
         } else {
-          // DB old - merge
           const existingIds = new Set(d.map((x:any)=>x.id))
           const missingDefaults = DEFAULT_TOURS.filter((t:any)=>!existingIds.has(t.id))
           const mergedIds = [...d,...missingDefaults.map((t:any)=>({id:t.id,name:t.name,price:t.price,market_price:t.market,market:t.market,duration:t.duration,description:t.desc,area:t.area,cat:t.cat,featured:t.featured,active:t.active,pickup:t.pickup,includes:t.includes,image_urls:t.imageDatas}))]
-          // set immediately from merged
           const m=new Map(mergedIds.map((x:any)=>[x.id,x]));
           setTours(prev=>DEFAULT_TOURS.map(t=>{ const db:any=m.get(t.id); if(!db) return t; return {...t, name:db.name||t.name, price:db.price??t.price, market:db.market_price??db.market??t.market, duration:db.duration||t.duration, desc:db.description||t.desc, area:db.area||t.area, cat:db.cat||t.cat, pickup:db.pickup||t.pickup, includes:db.includes||t.includes, active:db.active??t.active, featured:db.featured??t.featured, imageDatas:db.image_urls?.length? db.image_urls : t.imageDatas } }))
         }
@@ -265,7 +322,7 @@ export default function AdminPage(){
         fetch('/api/reviews',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(reviews)}),
         fetch('/api/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(settings)}),
       ])
-      alert(`✅ LIVE SAVED - Tours:${tours.length} Transfers:${transfers.length} - All prices & pics live!`)
+      alert(`✅ LIVE SAVED - Tours:${tours.length} Transfers:${transfers.length}`)
     }catch(e:any){ alert("Error: "+e.message) }
     setSaving(false)
   }
@@ -279,7 +336,7 @@ export default function AdminPage(){
 
   if(!auth){
     return <main className="min-h-screen bg-[#0A2342] flex items-center justify-center px-6">
-      <div className="bg-white rounded-[24px] p-8 max-w-sm w-full text-center"><p className="text-[36px]">🔐</p><h1 className="font-black text-[22px] mt-2">HERO COCKPIT V2 - FULL POWER</h1><p className="text-[11px] opacity-60 mt-1">18 Tours matched - Edit prices, add/delete tours & transfers live</p><input type="password" value={pass} onChange={e=>setPass(e.target.value)} placeholder="hero2026" className="mt-6 w-full bg-[#F5F7FA] border rounded-full px-4 py-3 text-[13px] text-center"/><button onClick={()=>{ if(pass===ADMIN_PASSWORD){ localStorage.setItem("hero_admin_auth","1"); setAuth(true)} else alert("Wrong")}} className="mt-3 w-full bg-[#FF8A00] text-black py-3 rounded-full font-black">Login → Cockpit</button></div>
+      <div className="bg-white rounded-[24px] p-8 max-w-sm w-full text-center"><p className="text-[36px]">🔐</p><h1 className="font-black text-[22px] mt-2">HERO COCKPIT V2 - LIVE HIDE/DELETE</h1><p className="text-[11px] opacity-60 mt-1">Toggle 👁️ now saves LIVE to tours page instantly</p><input type="password" value={pass} onChange={e=>setPass(e.target.value)} placeholder="hero2026" className="mt-6 w-full bg-[#F5F7FA] border rounded-full px-4 py-3 text-[13px] text-center"/><button onClick={()=>{ if(pass===ADMIN_PASSWORD){ localStorage.setItem("hero_admin_auth","1"); setAuth(true)} else alert("Wrong")}} className="mt-3 w-full bg-[#FF8A00] text-black py-3 rounded-full font-black">Login → Cockpit</button></div>
     </main>
   }
 
@@ -301,8 +358,8 @@ export default function AdminPage(){
     <main className="min-h-screen bg-[#F8FAFF]">
       <Header/>
       <section className="bg-[#0A2342] text-white px-6 md:px-12 py-4 flex justify-between items-center flex-wrap gap-3">
-        <div><h1 className="font-black text-[18px]">FULL POWER COCKPIT V2 • {tours.length} Tours • {transfers.length} Transfers • {tours.reduce((s,t)=>s+(t.imageDatas?.filter(Boolean).length||0),0)+transfers.reduce((s,t)=>s+(t.imageDatas?.filter(Boolean).length||0),0)} Pics • FAST 400px</h1><p className="text-[11px] opacity-60">18 Tours matched with Tours page - auto-upgrade from old 8</p></div>
-        <div className="flex gap-2"><input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search tours/transfers..." className="bg-white/10 border border-white/20 rounded-full px-4 py-2 text-[11px] placeholder:text-white/50 w-[200px]"/><button onClick={()=>{ localStorage.clear(); location.reload()}} className="bg-white/10 px-4 py-2 rounded-full text-[11px] font-bold">Reset</button><button onClick={saveAll} disabled={saving} className="bg-[#FF8A00] text-black px-6 py-2.5 rounded-full font-black text-[12px] disabled:opacity-50">{saving?"Saving...":"💾 SAVE ALL LIVE"}</button></div>
+        <div><h1 className="font-black text-[18px]">COCKPIT LIVE • {tours.length} Tours • Hide/Delete = Instant LIVE • Price edit = LIVE</h1><p className="text-[11px] opacity-60">Click 👁️ to hide tour - goes live in 10 sec on tours page - no need SAVE ALL</p></div>
+        <div className="flex gap-2"><input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search..." className="bg-white/10 border border-white/20 rounded-full px-4 py-2 text-[11px] placeholder:text-white/50 w-[200px]"/><button onClick={()=>{ localStorage.clear(); location.reload()}} className="bg-white/10 px-4 py-2 rounded-full text-[11px] font-bold">Reset</button><button onClick={saveAll} disabled={saving} className="bg-[#FF8A00] text-black px-6 py-2.5 rounded-full font-black text-[12px] disabled:opacity-50">{saving?"Saving...":"💾 SAVE ALL LIVE"}</button></div>
       </section>
       <section className="bg-white border-b sticky top-0 z-30 shadow-sm px-6 md:px-12 py-2.5 flex gap-2 overflow-x-auto">
         {TABS.map(t=><button key={t.id} onClick={()=>setTab(t.id)} className={`px-4 py-2 rounded-full text-[11px] font-black border whitespace-nowrap ${tab===t.id?"bg-[#0A2342] text-white":"bg-[#F5F7FA]"}`}>{t.label}</button>)}
@@ -311,8 +368,8 @@ export default function AdminPage(){
       <section className="px-6 md:px-12 py-8 max-w-[1600px] mx-auto">
         {tab==="overview" && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-white p-5 rounded-[18px] border"><p className="text-[10px] font-black opacity-50">TRANSFERS LIVE</p><p className="font-black text-[26px]">{transfers.filter(t=>t.active).length}/{transfers.length}</p><p className="text-[11px] opacity-60 mt-1">{transfers.reduce((s,t)=>s+(t.imageDatas?.filter(Boolean).length||0),0)} pics</p></div>
-            <div className="bg-white p-5 rounded-[18px] border"><p className="text-[10px] font-black opacity-50">TOURS LIVE</p><p className="font-black text-[26px]">{tours.filter(t=>t.active).length}/{tours.length}</p><p className="text-[11px] opacity-60 mt-1">{tours.reduce((s,t)=>s+(t.imageDatas?.filter(Boolean).length||0),0)} pics</p></div>
+            <div className="bg-white p-5 rounded-[18px] border"><p className="text-[10px] font-black opacity-50">TRANSFERS LIVE</p><p className="font-black text-[26px]">{transfers.filter(t=>t.active).length}/{transfers.length}</p></div>
+            <div className="bg-white p-5 rounded-[18px] border"><p className="text-[10px] font-black opacity-50">TOURS LIVE</p><p className="font-black text-[26px]">{tours.filter(t=>t.active).length}/{tours.length} LIVE</p><p className="text-[11px] opacity-60 mt-1">{tours.filter(t=>!t.active).length} hidden</p></div>
             <div className="bg-white p-5 rounded-[18px] border"><p className="text-[10px] font-black opacity-50">BLOGS / REVIEWS</p><p className="font-black text-[26px]">{blogs.length}/{reviews.length}</p></div>
             <div className="bg-[#FF8A00] p-5 rounded-[18px] border"><p className="text-[10px] font-black text-black/60">WHATSAPP</p><p className="font-black text-[14px] text-black">+{settings.whatsapp}</p></div>
           </div>
@@ -320,16 +377,16 @@ export default function AdminPage(){
 
         {tab==="transfers" && (
           <div>
-            <div className="bg-white p-4 rounded-xl border flex justify-between items-center flex-wrap gap-3"><h2 className="font-black">Transfers - {transfers.length} - Full Control</h2><button onClick={()=>setEditingTransfer({id:"airport-new-"+Date.now(),name:"Airport → New Place",price:30,market:50,duration:"30 min",area:"West",desc:"Private vehicle",cat:["Popular"],active:true,imageDatas:[],images:[]})} className="bg-[#0A2342] text-white px-4 py-2 rounded-full text-[11px] font-bold">+ Add Transfer</button></div>
+            <div className="bg-white p-4 rounded-xl border flex justify-between items-center flex-wrap gap-3"><h2 className="font-black">Transfers - {transfers.filter(t=>t.active).length} LIVE / {transfers.length}</h2><button onClick={()=>setEditingTransfer({id:"airport-new-"+Date.now(),name:"Airport → New Place",price:30,market:50,duration:"30 min",area:"West",desc:"Private vehicle",cat:["Popular"],active:true,imageDatas:[],images:[]})} className="bg-[#0A2342] text-white px-4 py-2 rounded-full text-[11px] font-bold">+ Add Transfer</button></div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 mt-5">
               {filteredTransfers.map(t=>{
                 const pics = (t.imageDatas||[]).filter(Boolean)
                 return (
-                <div key={t.id} className={`bg-white rounded-[18px] border-2 overflow-hidden ${!t.active? "opacity-50 grayscale":""}`}>
+                <div key={t.id} className={`bg-white rounded-[18px] border-2 overflow-hidden ${!t.active? "opacity-40 grayscale border-red-300":""}`}>
                   <div className="h-[160px] bg-[#F5F7FA] relative">
                     {pics[0]? <img src={pics[0]} className="w-full h-full object-cover"/> : <div className="w-full h-full bg-gradient-to-br from-[#0A2342] to-[#2a5a8a] flex items-center justify-center text-white text-[11px]">No pic</div>}
                     <span className="absolute top-2 left-2 bg-black/70 text-white text-[9px] px-2 py-1 rounded-full font-black">{t.area}</span>
-                    <span className={`absolute top-2 right-2 text-white text-[9px] px-2 py-1 rounded-full font-black ${t.active? "bg-green-600":"bg-red-600"}`}>{t.active? "LIVE":"HIDDEN"}</span>
+                    <span className={`absolute top-2 right-2 text-white text-[9px] px-2 py-1 rounded-full font-black ${t.active? "bg-green-600":"bg-red-600"}`}>{t.active? "LIVE":"HIDDEN - not on site"}</span>
                   </div>
                   <div className="p-4">
                     <p className="font-black text-[13px]">{t.name}</p><p className="text-[10px] opacity-40">{t.id}</p>
@@ -340,12 +397,12 @@ export default function AdminPage(){
                     </div>
                     <div className="flex gap-2 mt-3">
                       <button onClick={()=>setEditingTransfer(t)} className="flex-1 bg-[#0A2342] text-white py-2 rounded-full text-[11px] font-black">✏️ Edit All</button>
-                      <button onClick={()=>toggleTransferActive(t.id)} className={`px-3 py-2 rounded-full text-[11px] font-bold border ${t.active? "bg-green-50":"bg-red-50"}`}>{t.active? "👁️":"🚫"}</button>
+                      <button onClick={()=>toggleTransferActive(t.id)} className={`px-4 py-2 rounded-full text-[11px] font-black border-2 ${t.active? "bg-green-600 text-white border-green-600":"bg-red-600 text-white border-red-600"}`}>{t.active? "👁️ LIVE":"🚫 HIDDEN"}</button>
                       <label className={`px-3 py-2 rounded-full text-[11px] font-bold border cursor-pointer ${pics.length>=3? "bg-gray-100 opacity-50" : "bg-[#FFFBF5]"}`}>📸<input type="file" accept="image/*" multiple className="hidden" disabled={pics.length>=3} onChange={e=>{ if(e.target.files) handleTransferFiles(t.id, e.target.files)}}/></label>
                     </div>
                     <div className="flex gap-1 mt-2">
                       <button onClick={()=>duplicateTransfer(t)} className="text-[9px] bg-[#F5F7FA] px-2 py-1 rounded-full border">Duplicate</button>
-                      <button onClick={()=>deleteTransfer(t.id)} className="text-[9px] bg-red-50 text-red-600 px-2 py-1 rounded-full border border-red-100">Delete</button>
+                      <button onClick={()=>deleteTransfer(t.id)} className="text-[9px] bg-red-600 text-white px-2 py-1 rounded-full">Delete LIVE</button>
                     </div>
                   </div>
                 </div>
@@ -357,16 +414,16 @@ export default function AdminPage(){
 
         {tab==="tours" && (
           <div>
-            <div className="bg-white p-4 rounded-xl border flex justify-between items-center flex-wrap gap-3"><h2 className="font-black">Tours - {tours.length} Tours - Matched with Tours Page ✅</h2><button onClick={()=>setEditingTour({id:"new-tour-"+Date.now(),name:"New Tour",cat:["Popular"],price:100,market:150,duration:"3 Hours",pickup:"Stone Town",desc:"Description",includes:"Guide, Entrance",area:"West",active:true,featured:true,imageDatas:[],images:[]})} className="bg-[#0A2342] text-white px-4 py-2 rounded-full text-[11px] font-bold">+ Add Tour</button></div>
+            <div className="bg-white p-4 rounded-xl border flex justify-between items-center flex-wrap gap-3"><h2 className="font-black">Tours - {tours.filter(t=>t.active).length} LIVE / {tours.length} Total - Hide = instant LIVE</h2><button onClick={()=>setEditingTour({id:"new-tour-"+Date.now(),name:"New Tour",cat:["Popular"],price:100,market:150,duration:"3 Hours",pickup:"Stone Town",desc:"Description",includes:"Guide, Entrance",area:"West",active:true,featured:true,imageDatas:[],images:[]})} className="bg-[#0A2342] text-white px-4 py-2 rounded-full text-[11px] font-bold">+ Add Tour</button></div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 mt-5">
               {filteredTours.map(t=>{
                 const pics=(t.imageDatas||[]).filter(Boolean)
                 return (
-                <div key={t.id} className={`bg-white rounded-[18px] border-2 overflow-hidden ${!t.active? "opacity-50 grayscale":""}`}>
+                <div key={t.id} className={`bg-white rounded-[18px] border-2 overflow-hidden ${!t.active? "opacity-40 grayscale border-red-300":""}`}>
                   <div className="h-[180px] bg-[#F5F7FA] relative">
-                    {pics[0]? <img src={pics[0]} className="w-full h-full object-cover"/> : <div className="w-full h-full bg-gradient-to-br from-[#1eb3a5] to-[#0A2342] flex items-center justify-center text-white text-[11px]">No pic - Add in admin</div>}
+                    {pics[0]? <img src={pics[0]} className="w-full h-full object-cover"/> : <div className="w-full h-full bg-gradient-to-br from-[#1eb3a5] to-[#0A2342] flex items-center justify-center text-white text-[11px]">No pic</div>}
                     <span className="absolute top-2 left-2 bg-[#0A2342] text-white text-[9px] px-2 py-1 rounded-full font-black">{t.cat?.[0]}</span>
-                    <span className={`absolute top-2 right-2 text-white text-[9px] px-2 py-1 rounded-full font-black ${t.active? "bg-green-600":"bg-red-600"}`}>{t.active? "LIVE":"HIDDEN"}</span>
+                    <span className={`absolute top-2 right-2 text-white text-[9px] px-2 py-1 rounded-full font-black ${t.active? "bg-green-600":"bg-red-600"}`}>{t.active? "LIVE on /tours":"HIDDEN - not on site"}</span>
                   </div>
                   <div className="p-4">
                     <p className="font-black text-[13px]">{t.name}</p><p className="text-[10px] opacity-40">{t.id} • {t.duration}</p>
@@ -377,12 +434,12 @@ export default function AdminPage(){
                     </div>
                     <div className="flex gap-2 mt-3">
                       <button onClick={()=>setEditingTour(t)} className="flex-1 bg-[#0A2342] text-white py-2 rounded-full text-[11px] font-black">✏️ Edit All</button>
-                      <button onClick={()=>toggleTourActive(t.id)} className={`px-3 py-2 rounded-full text-[11px] font-bold border ${t.active? "bg-green-50":"bg-red-50"}`}>{t.active? "👁️":"🚫"}</button>
+                      <button onClick={()=>toggleTourActive(t.id)} className={`px-4 py-2 rounded-full text-[11px] font-black border-2 ${t.active? "bg-green-600 text-white border-green-600":"bg-red-600 text-white border-red-600"}`}>{t.active? "👁️ LIVE":"🚫 HIDDEN"}</button>
                       <label className={`px-3 py-2 rounded-full text-[11px] font-bold border cursor-pointer ${pics.length>=3? "bg-gray-100 opacity-50" : "bg-[#FFFBF5]"}`}>📸<input type="file" accept="image/*" multiple className="hidden" disabled={pics.length>=3} onChange={e=>{ if(e.target.files) handleTourFiles(t.id, e.target.files)}}/></label>
                     </div>
                     <div className="flex gap-1 mt-2 flex-wrap">
                       <button onClick={()=>duplicateTour(t)} className="text-[9px] bg-[#F5F7FA] px-2 py-1 rounded-full border">Duplicate</button>
-                      <button onClick={()=>deleteTour(t.id)} className="text-[9px] bg-red-50 text-red-600 px-2 py-1 rounded-full border border-red-100">Delete</button>
+                      <button onClick={()=>deleteTour(t.id)} className="text-[9px] bg-red-600 text-white px-2 py-1 rounded-full">Delete LIVE</button>
                     </div>
                   </div>
                 </div>
@@ -459,10 +516,10 @@ export default function AdminPage(){
             <input value={editingTour.duration} onChange={e=>setEditingTour({...editingTour,duration:e.target.value})} placeholder="Duration" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><input value={editingTour.pickup} onChange={e=>setEditingTour({...editingTour,pickup:e.target.value})} placeholder="Pickup" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/>
             <input value={editingTour.area} onChange={e=>setEditingTour({...editingTour,area:e.target.value})} placeholder="Area" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><input value={editingTour.cat?.join(",")} onChange={e=>setEditingTour({...editingTour,cat:e.target.value.split(",").map((s:string)=>s.trim()).filter(Boolean)})} placeholder="Categories" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/>
             <input value={editingTour.desc} onChange={e=>setEditingTour({...editingTour,desc:e.target.value})} placeholder="Short Desc" className="md:col-span-2 bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><input value={editingTour.includes} onChange={e=>setEditingTour({...editingTour,includes:e.target.value})} placeholder="Includes" className="md:col-span-2 bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/>
-            <label className="flex items-center gap-2 text-[12px] font-bold"><input type="checkbox" checked={editingTour.active} onChange={e=>setEditingTour({...editingTour,active:e.target.checked})}/> Active</label>
+            <label className="flex items-center gap-2 text-[12px] font-bold"><input type="checkbox" checked={editingTour.active} onChange={e=>setEditingTour({...editingTour,active:e.target.checked})}/> Active = LIVE on /tours</label>
             <label className="flex items-center gap-2 text-[12px] font-bold"><input type="checkbox" checked={editingTour.featured} onChange={e=>setEditingTour({...editingTour,featured:e.target.checked})}/> Featured</label>
           </div>
-          <div className="flex gap-2 mt-5"><button onClick={()=>{ if(tours.find(t=>t.id===editingTour.id)) setTours(prev=>prev.map(t=>t.id===editingTour.id? editingTour:t)); else setTours(prev=>[editingTour,...prev]); saveOne("tour",editingTour); setEditingTour(null)}} className="flex-1 bg-[#0A2342] text-white py-3 rounded-full font-black text-[12px]">💾 Save Tour Live</button><button onClick={()=>setEditingTour(null)} className="px-6 py-3 bg-[#F5F7FA] rounded-full font-bold text-[12px]">Cancel</button></div>
+          <div className="flex gap-2 mt-5"><button onClick={()=>{ if(tours.find(t=>t.id===editingTour.id)) setTours(prev=>prev.map(t=>t.id===editingTour.id? editingTour:t)); else setTours(prev=>[editingTour,...prev]); saveOne("tour",editingTour); setEditingTour(null)}} className="flex-1 bg-[#0A2342] text-white py-3 rounded-full font-black text-[12px]">💾 Save Tour LIVE</button><button onClick={()=>setEditingTour(null)} className="px-6 py-3 bg-[#F5F7FA] rounded-full font-bold text-[12px]">Cancel</button></div>
         </div></div>
       )}
 
@@ -485,7 +542,7 @@ export default function AdminPage(){
             <input value={editingTransfer.cat?.join(",")} onChange={e=>setEditingTransfer({...editingTransfer,cat:e.target.value.split(",").map((s:string)=>s.trim()).filter(Boolean)})} placeholder="Categories" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/>
             <label className="flex items-center gap-2 text-[12px] font-bold"><input type="checkbox" checked={editingTransfer.active} onChange={e=>setEditingTransfer({...editingTransfer,active:e.target.checked})}/> Active</label>
           </div>
-          <div className="flex gap-2 mt-5"><button onClick={()=>{ if(transfers.find(t=>t.id===editingTransfer.id)) setTransfers(prev=>prev.map(t=>t.id===editingTransfer.id? editingTransfer:t)); else setTransfers(prev=>[editingTransfer,...prev]); saveOne("transfer",editingTransfer); setEditingTransfer(null)}} className="flex-1 bg-[#0A2342] text-white py-3 rounded-full font-black text-[12px]">💾 Save Transfer Live</button><button onClick={()=>setEditingTransfer(null)} className="px-6 py-3 bg-[#F5F7FA] rounded-full font-bold text-[12px]">Cancel</button></div>
+          <div className="flex gap-2 mt-5"><button onClick={()=>{ if(transfers.find(t=>t.id===editingTransfer.id)) setTransfers(prev=>prev.map(t=>t.id===editingTransfer.id? editingTransfer:t)); else setTransfers(prev=>[editingTransfer,...prev]); saveOne("transfer",editingTransfer); setEditingTransfer(null)}} className="flex-1 bg-[#0A2342] text-white py-3 rounded-full font-black text-[12px]">💾 Save Transfer LIVE</button><button onClick={()=>setEditingTransfer(null)} className="px-6 py-3 bg-[#F5F7FA] rounded-full font-bold text-[12px]">Cancel</button></div>
         </div></div>
       )}
 
