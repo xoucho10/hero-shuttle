@@ -50,17 +50,6 @@ const REAL_10_TRANSFERS = [
   { id:"airport-kizimkazi", name:"Airport → Kizimkazi / Fumba", area:"South", duration:"60-70 min", distance:"56 km", price:40, market:60, desc:"Private vehicle - Safari Blue departure", image:"airport-kizimkazi.jpg", imageData:"", imageDatas:[], active:true, cat:["South"] },
 ]
 
-const FIXED_8_TOURS = [
-  { id:"prison-nakupenda", name:"Prison Island + Nakupenda", cat:["Popular","Half Day"], price:250, market:350, duration:"5 Hours", pickup:"Stone Town 8:30 AM", desc:"Tortoise sanctuary + sandbank + fruit • Boat, Guide, Entrance", area:"West", active:true, image:"prison-nakupenda.jpg", imageDatas:[""], featured:true, imageData:"" },
-  { id:"nakupenda-only", name:"Nakupenda Sandbank Only", cat:["Half Day","Popular"], price:130, market:200, duration:"4 Hours", pickup:"Stone Town 9 AM", desc:"White sandbank in ocean, swimming • Boat, Fruit, Water", area:"West", active:true, image:"nakupenda-only.jpg", imageDatas:[""], featured:true, imageData:"" },
-  { id:"stone-town", name:"Stone Town Walking Tour", cat:["Popular","Half Day","Cultural"], price:120, market:180, duration:"3 Hours", pickup:"Stone Town", desc:"UNESCO, Slave Market, House of Wonders • Guide, Entrances", area:"West", active:true, image:"stone-town.jpg", imageDatas:[""], featured:true, imageData:"" },
-  { id:"jozani", name:"Jozani Forest Monkeys", cat:["Popular","Half Day"], price:90, market:140, duration:"2.5 Hours", pickup:"Paje / Stone Town", desc:"Red colobus monkeys only in Zanzibar • Entrance, Guide", area:"South-Central", active:true, image:"jozani.jpg", imageDatas:[""], featured:true, imageData:"" },
-  { id:"mnemba", name:"Mnemba Atoll Snorkeling", cat:["Popular","Half Day","North"], price:180, market:260, duration:"4 Hours", pickup:"Matemwe 8 AM", desc:"Best coral reef, colorful fish, dolphins • Boat, Gear", area:"North-East", active:true, image:"mnemba.jpg", imageDatas:[""], featured:true, imageData:"" },
-  { id:"safari-blue", name:"Sharing Safari Blue Full Day BBQ", cat:["Full Day","Popular","South"], price:190, market:280, duration:"8 Hours", pickup:"Fumba 8 AM", desc:"Sandbank + snorkeling + seafood BBQ • Dhow, BBQ, Drinks", area:"South-West", active:true, image:"safari-blue.jpg", imageDatas:[""], featured:true, imageData:"" },
-  { id:"dhow-stone", name:"Sunset Dhow Stone Town", cat:["Popular","Half Day"], price:80, market:130, duration:"2 Hours", pickup:"Stone Town 4:30 PM", desc:"Traditional dhow sunset cruise • Dhow, Drinks", area:"West", active:true, image:"dhow-stone.jpg", imageDatas:[""], featured:true, imageData:"" },
-  { id:"private-safari-blue", name:"Private Safari Blue Full Day BBQ", cat:["Full Day","Popular","South"], price:220, market:320, duration:"8 Hours", pickup:"8:30 AM", desc:"Sandbank + snorkeling + seafood BBQ • Private dhow", area:"West", active:true, image:"private-safari-blue.jpg", imageDatas:[""], featured:true, imageData:"" },
-]
-
 const HOME_BLOGS = [
   { slug:"prison-island-nakupenda-guide", cat:"Guide", title:"Prison Island & Nakupenda: Complete Guide 2026", excerpt:"Giant tortoises 100+ years + white sandbank - best time, itinerary and private boat inclusions from Stone Town." },
   { slug:"mnemba-atoll-snorkeling-guide", cat:"Snorkeling", title:"Mnemba Atoll Snorkeling: Best Reef in Zanzibar", excerpt:"Why Mnemba is considered the best snorkeling spot, visibility, tropical fish and private boat from Matemwe." },
@@ -76,10 +65,13 @@ const DEFAULT_REVIEWS = [
   { name:"Emily R.", country:"USA • Dec 2025", text:"Stone Town tour with Hassan was amazing. He is from Stone Town, knew every alley. No rush, very respectful.", rating:5, tour:"Stone Town Walking", verified:true },
 ]
 
+// DELETED TOURS - These will NEVER show on homepage or tours page
+const HIDDEN_TOUR_IDS = ["kite-lesson","chumbe","rock","nungwi-sunset","paje-kite","chumbe-island","the-rock","nungwi-beach","kite-surfing","quad-bike-village"]
+
 export default function HomePage(){
   const [announcements, setAnnouncements] = useState(DEFAULT_ANNOUNCEMENTS)
   const [activeSlide, setActiveSlide] = useState(0)
-  const [tours, setTours] = useState(FIXED_8_TOURS)
+  const [tours, setTours] = useState<any[]>([]) // NO HARDCODE - starts empty, only from API
   const [transfers, setTransfers] = useState(REAL_10_TRANSFERS)
   const [filter, setFilter] = useState("Popular")
   const [selectedTours, setSelectedTours] = useState<any[]>([])
@@ -92,7 +84,6 @@ export default function HomePage(){
   const announcementsRef = useRef(announcements)
   useEffect(()=>{ announcementsRef.current = announcements }, [announcements])
 
-  // Fix blinking: clamp activeSlide if DB returns fewer items
   useEffect(()=>{
     if(activeSlide >= announcements.length){
       setActiveSlide(0)
@@ -103,7 +94,7 @@ export default function HomePage(){
     const now = new Date().toLocaleTimeString()
     setLastSync(now)
 
-    // 1. ANNOUNCEMENTS - DB FIRST but keep image fallback
+    // 1. ANNOUNCEMENTS
     try{
       const r = await fetch('/api/announcements',{cache:'no-store'})
       const data = await r.json()
@@ -128,13 +119,16 @@ export default function HomePage(){
       }
     }catch{}
 
-    // 2. TOURS - DB FIRST
+    // 2. TOURS - 100% FROM API (same as /tours page)
     try{
       const r = await fetch('/api/tours',{cache:'no-store'})
       const data = await r.json()
       if(Array.isArray(data) && data.length>0){
-        const mapped = data.filter((d:any)=>d.active!==false).map((d:any)=>{
-          const urls = d.image_urls || d.images || []
+        const mapped = data
+       .filter((d:any)=>d.active!==false)
+       .filter((d:any)=>!HIDDEN_TOUR_IDS.includes(d.id)) // REMOVE 4 TOURS
+       .map((d:any)=>{
+          const urls = d.image_urls || d.images || d.imageDatas || []
           return {
             id:d.id, name:d.name||d.title,
             cat: Array.isArray(d.cat)? d.cat : d.category? [d.category] : ["Popular"],
@@ -156,7 +150,7 @@ export default function HomePage(){
       }
     }catch{}
 
-    // 3. TRANSFERS - DB FIRST
+    // 3. TRANSFERS
     try{
       const r = await fetch('/api/transfers',{cache:'no-store'})
       const data = await r.json()
@@ -204,7 +198,6 @@ export default function HomePage(){
     }catch{}
   }
 
-  // FIXED: Separate effects - one for data, one for slider (no more blink)
   useEffect(()=>{
     syncAll()
     const ivSync = setInterval(syncAll, 15000)
@@ -224,7 +217,8 @@ export default function HomePage(){
   },[])
 
   const filteredForDisplay = useMemo(()=>{
-    if(filter==="Popular") return tours
+    if(tours.length===0) return []
+    if(filter==="Popular") return tours.filter(t=>t.cat?.includes("Popular") || t.featured)
     return tours.filter(t=> t.cat?.includes(filter))
   },[tours, filter])
 
@@ -263,7 +257,7 @@ export default function HomePage(){
             </div>
           </div>
           <div className="h-[300px] md:h-[380px] bg-[#F8FAFF] rounded-[20px] border border-[#0A2342]/5 overflow-hidden shadow-sm">
-            {activeAnn?.imageData? <img src={activeAnn.imageData} className="w-full h-full object-cover" alt={activeAnn.title}/> : <div className="w-full h-full bg-gradient-to-br from-[#0A2342] to-[#2a5a8a] flex items-center justify-center"><p className="text-white/60 text-[13px] font-bold">Add image in Admin → Announcements</p></div>}
+            {activeAnn?.imageData? <img src={activeAnn.imageData} className="w-full h-full object-cover" alt={activeAnn.title}/> : <div className="w-full h-full bg-gradient-to-br from-[#0A2342] to-[#2a5a8a] flex items-center justify-center"><p className="text-white/60 text-[13px] font-bold">No Image</p></div>}
           </div>
         </div>
       </section>
@@ -307,8 +301,8 @@ export default function HomePage(){
       <section id="tours" className="px-6 md:px-12 py-12 bg-[#EEF4FF]">
         <div className="max-w-[1400px] mx-auto">
           <div className="text-center">
-            <h2 className="font-black text-[#0A2342] text-[30px] md:text-[34px]">Private Zanzibar Tours - Build Your Itinerary</h2>
-            <p className="text-[13.5px] md:text-[14px] text-[#0A2342]/65 mt-2 max-w-[650px] mx-auto leading-relaxed font-medium">Private tours for your group only with licensed guide, boat, entrance fees and hotel pickup included where listed. Transparent fixed pricing.</p>
+            <h2 className="font-black text-[#0A2342] text-[30px] md:text-[34px]">Private Zanzibar Tours - Build Your Itinerary • {tours.length} LIVE</h2>
+            <p className="text-[13.5px] md:text-[14px] text-[#0A2342]/65 mt-2 max-w-[650px] mx-auto leading-relaxed font-medium">Private tours for your group only with licensed guide, boat, entrance fees and hotel pickup included where listed. Live from Admin.</p>
             <div className="mt-6 inline-flex bg-white rounded-full p-1.5 gap-1 shadow-sm border border-[#0A2342]/10">
               {["Popular","Half Day","Full Day"].map(c=>(
                 <button key={c} onClick={()=>setFilter(c)} className={`px-7 py-2.5 rounded-full text-[12px] font-black transition ${filter===c? "bg-[#0A2342] text-white shadow" : "text-[#0A2342]/60 hover:text-[#0A2342]"}`}>{c}</button>
@@ -317,12 +311,14 @@ export default function HomePage(){
           </div>
 
           <div className="mt-10 grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {toursToShow.map((t:any)=>{
+            {tours.length===0? (
+              <div className="col-span-4 text-center py-10"><p className="text-[14px] font-bold opacity-50">Loading tours from Admin... or no active tours. Go to Admin → SAVE ALL LIVE</p></div>
+            ) : toursToShow.map((t:any)=>{
               const isSel = selectedTours.find(s=>s.id===t.id)
               return (
               <div key={t.id} className={`bg-white rounded-[18px] overflow-hidden shadow-sm hover:shadow-xl transition flex flex-col border-2 ${isSel?'border-[#0A2342] shadow-lg':'border-[#0A2342]/5 hover:border-[#0A2342]/10'}`}>
                 <div className="h-[200px] bg-[#E6F5F3] relative overflow-hidden">
-                  {t.imageData? <img src={t.imageData} alt={t.name} className="w-full h-full object-cover"/> : <div className="w-full h-full bg-gradient-to-br from-[#1eb3a5] to-[#0A2342]" />}
+                  {t.imageData? <img src={t.imageData} alt={t.name} className="w-full h-full object-cover"/> : <div className="w-full h-full bg-gradient-to-br from-[#1eb3a5] to-[#0A2342] flex items-center justify-center text-white/60 text-[12px]">No Image</div>}
                   <span className="absolute top-2.5 left-2.5 bg-[#0A2342] text-white text-[10px] px-3 py-1 rounded-full font-black">{t.cat?.[0]} • {t.duration}</span>
                   <span className="absolute bottom-2.5 left-2.5 bg-white text-[#0A2342] text-[10px] px-3 py-1 rounded-full font-bold shadow">{t.area}</span>
                   {t.market>t.price && <span className="absolute top-2.5 right-2.5 bg-[#16A34A] text-white text-[10px] px-2.5 py-1 rounded-full font-black shadow">Save ${t.market-t.price}</span>}
@@ -397,7 +393,6 @@ export default function HomePage(){
         <div className="max-w-[1400px] mx-auto">
           <div className="flex flex-col md:flex-row justify-between md:items-end gap-4">
             <div>
-              <span className="bg-[#16A34A] text-white text-[11px] px-3.5 py-1 rounded-full font-black tracking-widest"></span>
               <h2 className="font-black text-[24px] md:text-[32px] text-[#0A2342] mt-3 leading-tight">What guests say after their private tours with HERO</h2>
               <p className="text-[13px] text-[#0A2342]/65 mt-2 max-w-[650px] font-medium">Real reviews from WhatsApp guests. Live sync from Admin and API.</p>
             </div>
