@@ -3,37 +3,38 @@ import { useState, useEffect, useMemo } from "react"
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 
-// --- FIXED WORKING IMAGES - ALL VERIFIED 200 OK ---
 const BLOG_IMAGES: Record<string,string> = {
-  "prison-island-nakupenda-guide": "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80&auto=format&fit=crop",
-  "stone-town-walking-guide": "https://images.unsplash.com/photo-1516026672322-bc52d61a55e5?w=800&q=80&auto=format&fit=crop",
-  "mnemba-atoll-snorkeling-guide": "https://images.unsplash.com/photo-1583212292454-1fe6229603b7?w=800&q=80&auto=format&fit=crop",
-  "safari-blue-full-guide": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80&auto=format&fit=crop",
-  "spice-farm-tour-guide": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=800&q=80&auto=format&fit=crop",
-  "jozani-forest-guide": "https://images.unsplash.com/photo-1504006833117-8886a355efbf?w=800&q=80&auto=format&fit=crop",
-  "salaam-cave-turtles": "https://images.unsplash.com/photo-1437622368342-7a3d73a34c8f?w=800&q=80&auto=format&fit=crop",
-  "kuza-cave-guide": "https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?w=800&q=80&auto=format&fit=crop",
-  "nungwi-kendwa-beach-guide": "https://images.unsplash.com/photo-1519046904884-53103b34f59d?w=800&q=80&auto=format&fit=crop",
-  "sunset-dhow-cruise-stone-town": "https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=800&q=80&auto=format&fit=crop",
-  "kizimkazi-dolphin-guide": "https://images.unsplash.com/photo-1607153333879-c174d265f1d2?w=800&q=80&auto=format&fit=crop",
-  "the-rock-restaurant-guide": "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&q=80&auto=format&fit=crop",
-  "chumbe-island-coral-park": "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80&auto=format&fit=crop",
-  "quad-bike-village-tour": "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=800&q=80&auto=format&fit=crop",
-  "paje-kite-surfing-guide": "https://images.unsplash.com/photo-1530549387789-4c1017266635?w=800&q=80&auto=format&fit=crop",
-  "paje-jambiani-beach-guide": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80&auto=format&fit=crop",
-  "zanzibar-airport-transfers-guide": "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=800&q=80&auto=format&fit=crop",
-  "best-time-to-visit-zanzibar": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80&auto=format&fit=crop",
-  "zanzibar-packing-list": "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=800&q=80&auto=format&fit=crop",
-  "zanzibar-hotel-areas-guide": "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800&q=80&auto=format&fit=crop",
-  "zanzibar-3-day-itinerary": "https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5?w=800&q=80&auto=format&fit=crop",
-  "zanzibar-5-day-itinerary": "https://images.unsplash.com/photo-1488085061387-422e29b40080?w=800&q=80&auto=format&fit=crop",
-  "zanzibar-7-day-itinerary": "https://images.unsplash.com/photo-1473181488821-2d23949a045a?w=800&q=80&auto=format&fit=crop",
-  "zanzibar-honeymoon-guide": "https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=800&q=80&auto=format&fit=crop",
-  "zanzibar-family-guide": "https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800&q=80&auto=format&fit=crop",
-  "zanzibar-food-guide": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&q=80&auto=format&fit=crop",
-  "mnemba-vs-safari-blue": "https://images.unsplash.com/photo-1583212292454-1fe6229603b7?w=800&q=80&auto=format&fit=crop",
-  "private-vs-sharing-tours": "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&q=80&auto=format&fit=crop",
+  "prison-island-nakupenda-guide": "/blogs/prison-nakupenda.jpg",
+  "stone-town-walking-guide": "/blogs/stone-town.jpg",
+  "mnemba-atoll-snorkeling-guide": "/blogs/mnemba.jpg",
+  "safari-blue-full-guide": "/blogs/safari-blue.jpg",
+  "spice-farm-tour-guide": "/blogs/spice-farm.jpg",
+  "jozani-forest-guide": "/blogs/jozani.jpg",
+  "salaam-cave-turtles": "/blogs/salaam-turtle.jpg",
+  "kuza-cave-guide": "/blogs/kuza-cave.jpg",
+  "nungwi-kendwa-beach-guide": "/blogs/nungwi-kendwa.jpg",
+  "sunset-dhow-cruise-stone-town": "/blogs/sunset-dhow.jpg",
+  "kizimkazi-dolphin-guide": "/blogs/dolphin.jpg",
+  "the-rock-restaurant-guide": "/blogs/rock-restaurant.jpg",
+  "chumbe-island-coral-park": "/blogs/chumbe.jpg",
+  "quad-bike-village-tour": "/blogs/quad-bike-paje.jpg",
+  "paje-kite-surfing-guide": "/blogs/kite-paje.jpg",
+  "paje-jambiani-beach-guide": "/blogs/paje-beach.jpg",
+  "zanzibar-airport-transfers-guide": "/blogs/transfers-paje-nungwi.jpg",
+  "best-time-to-visit-zanzibar": "/blogs/best-time.jpg",
+  "zanzibar-packing-list": "/blogs/packing.jpg",
+  "zanzibar-hotel-areas-guide": "/blogs/hotel-areas.jpg",
+  "zanzibar-3-day-itinerary": "/blogs/3-day-itinerary.jpg",
+  "zanzibar-5-day-itinerary": "/blogs/5-day.jpg",
+  "zanzibar-7-day-itinerary": "/blogs/7-day.jpg",
+  "zanzibar-honeymoon-guide": "/blogs/honeymoon.jpg",
+  "zanzibar-family-guide": "/blogs/family.jpg",
+  "zanzibar-food-guide": "/blogs/food.jpg",
+  "mnemba-vs-safari-blue": "/blogs/mnemba-vs-safari.jpg",
+  "private-vs-sharing-tours": "/blogs/private-vs-shared.jpg",
 }
+
+const ZANZIBAR_HERO = "/blogs/zanzibar-hero.jpg"
 
 const DEFAULT_BLOGS = [
   { id:"prison-island-nakupenda-guide", slug:"prison-island-nakupenda-guide", title:"Prison Island & Nakupenda Sandbank: Complete Guide 2026", excerpt:"Giant tortoises over 100 years old, historic prison ruins and a white sandbank in the Indian Ocean. Best time to visit, what to bring, boat timings and private tour inclusions.", date:"Jan 15, 2026", cat:"Guide", imageData:BLOG_IMAGES["prison-island-nakupenda-guide"], readTime:"8 min", keywords:"Prison Island Zanzibar, Nakupenda Sandbank" },
@@ -52,7 +53,7 @@ const DEFAULT_BLOGS = [
   { id:"quad-bike-village-tour", slug:"quad-bike-village-tour", title:"Quad Bike Tour in Paje: Village, Beach & Local Life", excerpt:"Ride through villages, meet locals, visit a local school and finish at the beach. Route, safety, what to wear and cultural respect tips.", date:"Jan 2, 2026", cat:"Cultural", imageData:BLOG_IMAGES["quad-bike-village-tour"], readTime:"5 min", keywords:"Quad bike Zanzibar" },
   { id:"paje-kite-surfing-guide", slug:"paje-kite-surfing-guide", title:"Kite Surfing in Paje: Best Spot in Zanzibar for Beginners", excerpt:"Why Paje is world famous for kite surfing, wind seasons, beginner lessons, equipment and safety with certified instructors.", date:"Jan 1, 2026", cat:"Beaches", imageData:BLOG_IMAGES["paje-kite-surfing-guide"], readTime:"6 min", keywords:"Kite surfing Paje Zanzibar" },
   { id:"paje-jambiani-beach-guide", slug:"paje-jambiani-beach-guide", title:"Paje & Jambiani: Best Beach for Kite, Swimming & Restaurants", excerpt:"South-east Zanzibar beach guide, best restaurants, tide chart, kite schools and how to enjoy Paje and Jambiani like a local.", date:"Dec 28, 2025", cat:"Beaches", imageData:BLOG_IMAGES["paje-jambiani-beach-guide"], readTime:"6 min", keywords:"Paje beach Zanzibar" },
-  { id:"zanzibar-airport-transfers-guide", slug:"zanzibar-airport-transfers-guide", title:"Zanzibar Airport Transfers: Complete Guide to All Areas 2026", excerpt:"How to get from Zanzibar Airport to Stone Town, Nungwi, Kendwa, Paje, Jambiani and Kizimkazi. Private vehicle options, meet and greet, flight tracking and luggage tips.", date:"Dec 27, 2025", cat:"Transfers", imageData:BLOG_IMAGES["zanzibar-airport-transfers-guide"], readTime:"7 min", keywords:"Zanzibar Airport transfer" },
+  { id:"zanzibar-airport-transfers-guide", slug:"zanzibar-airport-transfers-guide", title:"Zanzibar Transfers: Airport to Paje, Nungwi Price per CAR 2026", excerpt:"How to get from Zanzibar Airport to Stone Town, Nungwi, Kendwa, Paje, Jambiani and Kizimkazi. Private vehicle options, meet and greet, flight tracking and luggage tips.", date:"Dec 27, 2025", cat:"Transfers", imageData:BLOG_IMAGES["zanzibar-airport-transfers-guide"], readTime:"7 min", keywords:"Zanzibar Airport transfer" },
   { id:"best-time-to-visit-zanzibar", slug:"best-time-to-visit-zanzibar", title:"Best Time to Visit Zanzibar: Weather, Seasons & Tours by Month", excerpt:"Dry season June to October, short rains, best months for Mnemba snorkeling, Safari Blue and Stone Town. Month by month guide for planning your trip.", date:"Dec 26, 2025", cat:"Tips", imageData:BLOG_IMAGES["best-time-to-visit-zanzibar"], readTime:"8 min", keywords:"Best time to visit Zanzibar" },
   { id:"zanzibar-packing-list", slug:"zanzibar-packing-list", title:"What to Pack for Zanzibar: Checklist for Beach & Tours", excerpt:"Essentials for Stone Town, beach, snorkeling and spice farm, reef-safe sunscreen, modest clothing for cultural sites and what not to bring.", date:"Dec 25, 2025", cat:"Tips", imageData:BLOG_IMAGES["zanzibar-packing-list"], readTime:"5 min", keywords:"Zanzibar packing list" },
   { id:"zanzibar-hotel-areas-guide", slug:"zanzibar-hotel-areas-guide", title:"Where to Stay in Zanzibar: North vs East vs South Guide", excerpt:"Nungwi and Kendwa for sunset and swimming, Paje and Jambiani for kite and restaurants, Stone Town for culture, Kizimkazi for dolphins and quiet stays.", date:"Dec 24, 2025", cat:"Tips", imageData:BLOG_IMAGES["zanzibar-hotel-areas-guide"], readTime:"7 min", keywords:"Where to stay Zanzibar" },
@@ -115,11 +116,15 @@ export default function BlogsPage(){
   return (
     <main className="min-h-screen bg-[#F8FAFF]">
       <Header/>
-      <section className="bg-white border-b border-[#0A2342]/5">
-        <div className="max-w-[1200px] mx-auto px-6 md:px-12 py-12">
+      <section className="bg-white border-b border-[#0A2342]/5 relative overflow-hidden">
+        <div className="absolute inset-0">
+          <img src={ZANZIBAR_HERO} alt="Beauty of Zanzibar" className="w-full h-full object-cover opacity-[0.18]"/>
+          <div className="absolute inset-0 bg-gradient-to-r from-white via-white/90 to-white/60"/>
+        </div>
+        <div className="relative max-w-[1200px] mx-auto px-6 md:px-12 py-12">
           <span className="bg-[#0A2342] text-white text-[10px] px-4 py-1.5 rounded-full font-black tracking-widest">ZANZIBAR TRAVEL GUIDES • LOCAL INSIGHTS • 2026</span>
           <h1 className="font-black text-[30px] md:text-[44px] leading-[0.95] mt-5 text-[#0A2342] max-w-[700px]">Zanzibar travel guides, local tips and private tour insights from our Stone Town team.</h1>
-          <p className="text-[13.5px] text-[#0A2342]/60 mt-4 max-w-[700px] leading-[1.7]">Planning your Zanzibar holiday? Our local guides share practical guides for Stone Town tours, Prison Island, Nakupenda Sandbank, Mnemba Atoll snorkeling, Safari Blue, Jozani Forest, Spice Farm, Salaam Cave, Kuza Cave, Nungwi Beach and Zanzibar Airport transfers.</p>
+          <p className="text-[13.5px] text-[#0A2342]/60 mt-4 max-w-[700px] leading-[1.7]">Planning your Zanzibar holiday? Our local guides share practical guides for Stone Town tours, Prison Island, Nakupenda Sandbank, Mnemba Atoll snorkeling, Safari Blue, Jozani Forest, Spice Farm, Salaam Cave, Kuza Cave, Nungwi Beach and Zanzibar Airport transfers. Private experiences, transparent pricing and authentic recommendations.</p>
           <div className="mt-8 flex flex-wrap gap-3 items-center">
             <div className="flex items-center bg-[#F8FAFF] border border-[#0A2342]/10 rounded-full px-5 py-2.5 w-full md:w-[340px]">
               <span className="text-[14px] mr-2">🔍</span>
@@ -131,7 +136,7 @@ export default function BlogsPage(){
               ))}
             </div>
           </div>
-          <p className="text-[11px] text-[#0A2342]/40 mt-4">{filtered.length} guides • Updated for 2026 season</p>
+          <p className="text-[11px] text-[#0A2342]/40 mt-4">{filtered.length} guides • Updated for 2026 season • Beauty of Zanzibar</p>
         </div>
       </section>
       {featured && (
