@@ -397,7 +397,7 @@ export default function HomePage(){
         <div className="max-w-[1400px] mx-auto">
           <div className="flex flex-col md:flex-row justify-between md:items-end gap-4">
             <div>
-              <span className="bg-[#16A34A] text-white text-[11px] px-3.5 py-1 rounded-full font-black tracking-widest">REAL GUEST REVIEWS • VERIFIED</span>
+              <span className="bg-[#16A34A] text-white text-[11px] px-3.5 py-1 rounded-full font-black tracking-widest"></span>
               <h2 className="font-black text-[24px] md:text-[32px] text-[#0A2342] mt-3 leading-tight">What guests say after their private tours with HERO</h2>
               <p className="text-[13px] text-[#0A2342]/65 mt-2 max-w-[650px] font-medium">Real reviews from WhatsApp guests. Live sync from Admin and API.</p>
             </div>
