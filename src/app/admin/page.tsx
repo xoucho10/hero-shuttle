@@ -60,7 +60,7 @@ const DEFAULT_REVIEWS = [
 export default function AdminPage(){
   const [auth, setAuth] = useState(false)
   const [pass, setPass] = useState("")
-  const [tab, setTab] = useState("transfers")
+  const [tab, setTab] = useState("tours")
   const [search, setSearch] = useState("")
   const [tours, setTours] = useState<any[]>(DEFAULT_TOURS)
   const [transfers, setTransfers] = useState<any[]>(DEFAULT_TRANSFERS)
@@ -163,14 +163,82 @@ export default function AdminPage(){
     if(type==="transfer") setTransfers(prev=>prev.map(t=>t.id===id? {...t, [field]:value}:t))
   }
 
+  // FIXED: Auto-upgrade if old localStorage has 8 tours, use 18
   useEffect(()=>{
     if(localStorage.getItem("hero_admin_auth")==="1") setAuth(true)
+
+    // Load only if saved count >= default count, otherwise keep 18
+    const tryLoadWithUpgrade=(key:string, setter:any, defaultArr:any[])=>{
+      try{
+        const v=localStorage.getItem(key);
+        if(v){
+          const p=JSON.parse(v);
+          if(Array.isArray(p) && p.length>0){
+            if(p.length < defaultArr.length){
+              // Old cache is smaller - merge missing tours from default
+              const existingIds = new Set(p.map((x:any)=>x.id))
+              const missing = defaultArr.filter((d:any)=>!existingIds.has(d.id))
+              const merged = [...p,...missing]
+              setter(merged)
+              localStorage.setItem(key, JSON.stringify(merged))
+            } else {
+              setter(p)
+            }
+          } else if(!Array.isArray(p)){
+            setter(p)
+          }
+        }
+      }catch{}
+    }
+
+    tryLoadWithUpgrade("hero_tours", setTours, DEFAULT_TOURS)
+    tryLoadWithUpgrade("hero_transfers", setTransfers, DEFAULT_TRANSFERS)
+
     const tryLoad=(key:string, setter:any)=>{
       try{ const v=localStorage.getItem(key); if(v){ const p=JSON.parse(v); if(Array.isArray(p)&&p.length>0||!Array.isArray(p)) setter(p) } }catch{}
     }
-    tryLoad("hero_tours", setTours); tryLoad("hero_transfers", setTransfers); tryLoad("hero_announcements", setAnnouncements); tryLoad("hero_blogs", setBlogs); tryLoad("hero_reviews", setReviews); tryLoad("hero_settings", setSettings)
+    tryLoad("hero_announcements", setAnnouncements)
+    tryLoad("hero_blogs", setBlogs)
+    tryLoad("hero_reviews", setReviews)
+    tryLoad("hero_settings", setSettings)
+
     const loadDB=async()=>{
-      try{ const r=await fetch('/api/tours',{cache:'no-store'}); const d=await r.json(); if(Array.isArray(d)&&d.length>0){ const m=new Map(d.map((x:any)=>[x.id,x])); setTours(prev=>prev.map(t=>{ const db:any=m.get(t.id); if(!db) return t; return {...t, name:db.name||t.name, price:db.price??t.price, market:db.market_price??db.market??t.market, duration:db.duration||t.duration, desc:db.description||t.desc, area:db.area||t.area, cat:db.cat||t.cat, pickup:db.pickup||t.pickup, includes:db.includes||t.includes, active:db.active??t.active, featured:db.featured??t.featured, imageDatas:db.image_urls?.length? db.image_urls : t.imageDatas } })) } }catch{}
+      try{ const r=await fetch('/api/tours',{cache:'no-store'}); const d=await r.json(); if(Array.isArray(d)&&d.length>0){
+        // If DB has all 18, use DB; if DB has 8, merge missing from default
+        if(d.length >= DEFAULT_TOURS.length){
+          const m=new Map(d.map((x:any)=>[x.id,x]));
+          setTours(prev=>{
+            // Keep DB as source but add images from prev
+            return d.map((db:any)=>{
+              const prevTour = prev.find((t:any)=>t.id===db.id)
+              return {
+                id: db.id,
+                name: db.name||db.title||"",
+                cat: db.cat||["Popular"],
+                price: Number(db.price??0),
+                market: Number(db.market_price??db.market??0),
+                duration: db.duration||"",
+                pickup: db.pickup||"Stone Town",
+                desc: db.description||db.desc||"",
+                includes: db.includes||"",
+                area: db.area||"West",
+                active: db.active!==false,
+                featured:!!db.featured,
+                imageDatas: db.image_urls?.length? db.image_urls : prevTour?.imageDatas || [""],
+                images: db.image_urls?.length? db.image_urls : prevTour?.imageDatas || [""],
+              }
+            })
+          })
+        } else {
+          // DB old - merge
+          const existingIds = new Set(d.map((x:any)=>x.id))
+          const missingDefaults = DEFAULT_TOURS.filter((t:any)=>!existingIds.has(t.id))
+          const mergedIds = [...d,...missingDefaults.map((t:any)=>({id:t.id,name:t.name,price:t.price,market_price:t.market,market:t.market,duration:t.duration,description:t.desc,area:t.area,cat:t.cat,featured:t.featured,active:t.active,pickup:t.pickup,includes:t.includes,image_urls:t.imageDatas}))]
+          // set immediately from merged
+          const m=new Map(mergedIds.map((x:any)=>[x.id,x]));
+          setTours(prev=>DEFAULT_TOURS.map(t=>{ const db:any=m.get(t.id); if(!db) return t; return {...t, name:db.name||t.name, price:db.price??t.price, market:db.market_price??db.market??t.market, duration:db.duration||t.duration, desc:db.description||t.desc, area:db.area||t.area, cat:db.cat||t.cat, pickup:db.pickup||t.pickup, includes:db.includes||t.includes, active:db.active??t.active, featured:db.featured??t.featured, imageDatas:db.image_urls?.length? db.image_urls : t.imageDatas } }))
+        }
+      } }catch{}
       try{ const r=await fetch('/api/transfers',{cache:'no-store'}); const d=await r.json(); if(Array.isArray(d)&&d.length>0){ const m=new Map(d.map((x:any)=>[x.id,x])); setTransfers(prev=>prev.map(t=>{ const db:any=m.get(t.id); if(!db) return t; return {...t, name:db.name||t.name, price:db.price??t.price, market:db.market_price??db.market??t.market, duration:db.duration||t.duration, desc:db.description||t.desc, area:db.area||t.area, cat:db.cat||t.cat, active:db.active??t.active, imageDatas:db.image_urls?.length? db.image_urls : t.imageDatas } })) } }catch{}
       try{ const r=await fetch('/api/announcements',{cache:'no-store'}); const d=await r.json(); if(Array.isArray(d)&&d.length>0) setAnnouncements(d) }catch{}
       try{ const r=await fetch('/api/blogs',{cache:'no-store'}); const d=await r.json(); if(Array.isArray(d)&&d.length>0) setBlogs(d) }catch{}
@@ -211,7 +279,7 @@ export default function AdminPage(){
 
   if(!auth){
     return <main className="min-h-screen bg-[#0A2342] flex items-center justify-center px-6">
-      <div className="bg-white rounded-[24px] p-8 max-w-sm w-full text-center"><p className="text-[36px]">🔐</p><h1 className="font-black text-[22px] mt-2">HERO COCKPIT V2 - FULL POWER</h1><p className="text-[11px] opacity-60 mt-1">Edit prices, add/delete tours & transfers live</p><input type="password" value={pass} onChange={e=>setPass(e.target.value)} placeholder="hero2026" className="mt-6 w-full bg-[#F5F7FA] border rounded-full px-4 py-3 text-[13px] text-center"/><button onClick={()=>{ if(pass===ADMIN_PASSWORD){ localStorage.setItem("hero_admin_auth","1"); setAuth(true)} else alert("Wrong")}} className="mt-3 w-full bg-[#FF8A00] text-black py-3 rounded-full font-black">Login → Cockpit</button></div>
+      <div className="bg-white rounded-[24px] p-8 max-w-sm w-full text-center"><p className="text-[36px]">🔐</p><h1 className="font-black text-[22px] mt-2">HERO COCKPIT V2 - FULL POWER</h1><p className="text-[11px] opacity-60 mt-1">18 Tours matched - Edit prices, add/delete tours & transfers live</p><input type="password" value={pass} onChange={e=>setPass(e.target.value)} placeholder="hero2026" className="mt-6 w-full bg-[#F5F7FA] border rounded-full px-4 py-3 text-[13px] text-center"/><button onClick={()=>{ if(pass===ADMIN_PASSWORD){ localStorage.setItem("hero_admin_auth","1"); setAuth(true)} else alert("Wrong")}} className="mt-3 w-full bg-[#FF8A00] text-black py-3 rounded-full font-black">Login → Cockpit</button></div>
     </main>
   }
 
@@ -233,7 +301,7 @@ export default function AdminPage(){
     <main className="min-h-screen bg-[#F8FAFF]">
       <Header/>
       <section className="bg-[#0A2342] text-white px-6 md:px-12 py-4 flex justify-between items-center flex-wrap gap-3">
-        <div><h1 className="font-black text-[18px]">FULL POWER COCKPIT V2 • {tours.length} Tours • {transfers.length} Transfers • {tours.reduce((s,t)=>s+(t.imageDatas?.filter(Boolean).length||0),0)+transfers.reduce((s,t)=>s+(t.imageDatas?.filter(Boolean).length||0),0)} Pics • FAST 400px</h1><p className="text-[11px] opacity-60">Edit price inline, toggle active, duplicate, delete, add new - all controls live</p></div>
+        <div><h1 className="font-black text-[18px]">FULL POWER COCKPIT V2 • {tours.length} Tours • {transfers.length} Transfers • {tours.reduce((s,t)=>s+(t.imageDatas?.filter(Boolean).length||0),0)+transfers.reduce((s,t)=>s+(t.imageDatas?.filter(Boolean).length||0),0)} Pics • FAST 400px</h1><p className="text-[11px] opacity-60">18 Tours matched with Tours page - auto-upgrade from old 8</p></div>
         <div className="flex gap-2"><input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search tours/transfers..." className="bg-white/10 border border-white/20 rounded-full px-4 py-2 text-[11px] placeholder:text-white/50 w-[200px]"/><button onClick={()=>{ localStorage.clear(); location.reload()}} className="bg-white/10 px-4 py-2 rounded-full text-[11px] font-bold">Reset</button><button onClick={saveAll} disabled={saving} className="bg-[#FF8A00] text-black px-6 py-2.5 rounded-full font-black text-[12px] disabled:opacity-50">{saving?"Saving...":"💾 SAVE ALL LIVE"}</button></div>
       </section>
       <section className="bg-white border-b sticky top-0 z-30 shadow-sm px-6 md:px-12 py-2.5 flex gap-2 overflow-x-auto">
@@ -252,7 +320,7 @@ export default function AdminPage(){
 
         {tab==="transfers" && (
           <div>
-            <div className="bg-white p-4 rounded-xl border flex justify-between items-center flex-wrap gap-3"><h2 className="font-black">Transfers - Full Control - Prices, Add, Delete, Active</h2><button onClick={()=>setEditingTransfer({id:"airport-new-"+Date.now(),name:"Airport → New Place",price:30,market:50,duration:"30 min",area:"West",desc:"Private vehicle",cat:["Popular"],active:true,imageDatas:[],images:[]})} className="bg-[#0A2342] text-white px-4 py-2 rounded-full text-[11px] font-bold">+ Add Transfer</button></div>
+            <div className="bg-white p-4 rounded-xl border flex justify-between items-center flex-wrap gap-3"><h2 className="font-black">Transfers - {transfers.length} - Full Control</h2><button onClick={()=>setEditingTransfer({id:"airport-new-"+Date.now(),name:"Airport → New Place",price:30,market:50,duration:"30 min",area:"West",desc:"Private vehicle",cat:["Popular"],active:true,imageDatas:[],images:[]})} className="bg-[#0A2342] text-white px-4 py-2 rounded-full text-[11px] font-bold">+ Add Transfer</button></div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 mt-5">
               {filteredTransfers.map(t=>{
                 const pics = (t.imageDatas||[]).filter(Boolean)
@@ -262,7 +330,6 @@ export default function AdminPage(){
                     {pics[0]? <img src={pics[0]} className="w-full h-full object-cover"/> : <div className="w-full h-full bg-gradient-to-br from-[#0A2342] to-[#2a5a8a] flex items-center justify-center text-white text-[11px]">No pic</div>}
                     <span className="absolute top-2 left-2 bg-black/70 text-white text-[9px] px-2 py-1 rounded-full font-black">{t.area}</span>
                     <span className={`absolute top-2 right-2 text-white text-[9px] px-2 py-1 rounded-full font-black ${t.active? "bg-green-600":"bg-red-600"}`}>{t.active? "LIVE":"HIDDEN"}</span>
-                    {pics.length>0 && <div className="absolute bottom-2 left-2 flex gap-1">{pics.map((img:string,i:number)=><div key={i} className="w-[32px] h-[24px] rounded-[6px] border-2 border-white overflow-hidden bg-white"><img src={img} className="w-full h-full object-cover"/></div>)}</div>}
                   </div>
                   <div className="p-4">
                     <p className="font-black text-[13px]">{t.name}</p><p className="text-[10px] opacity-40">{t.id}</p>
@@ -278,8 +345,7 @@ export default function AdminPage(){
                     </div>
                     <div className="flex gap-1 mt-2">
                       <button onClick={()=>duplicateTransfer(t)} className="text-[9px] bg-[#F5F7FA] px-2 py-1 rounded-full border">Duplicate</button>
-                      <button onClick={()=>deleteTransfer(t.id)} className="text-[9px] bg-red-50 text-red-600 px-2 py-1 rounded-full border border-red-100">Delete Transfer</button>
-                      {pics.map((_:string, idx:number)=><button key={idx} onClick={()=>removeTransferImage(t.id, idx)} className="text-[9px] bg-red-50 text-red-600 px-2 py-1 rounded-full border border-red-100">DelPic{idx+1}</button>)}
+                      <button onClick={()=>deleteTransfer(t.id)} className="text-[9px] bg-red-50 text-red-600 px-2 py-1 rounded-full border border-red-100">Delete</button>
                     </div>
                   </div>
                 </div>
@@ -291,17 +357,16 @@ export default function AdminPage(){
 
         {tab==="tours" && (
           <div>
-            <div className="bg-white p-4 rounded-xl border flex justify-between items-center flex-wrap gap-3"><h2 className="font-black">Tours - Full Control - {tours.length} Tours Matched with Tours Page</h2><button onClick={()=>setEditingTour({id:"new-tour-"+Date.now(),name:"New Tour",cat:["Popular"],price:100,market:150,duration:"3 Hours",pickup:"Stone Town",desc:"Description",includes:"Guide, Entrance",area:"West",active:true,featured:true,imageDatas:[],images:[]})} className="bg-[#0A2342] text-white px-4 py-2 rounded-full text-[11px] font-bold">+ Add Tour</button></div>
+            <div className="bg-white p-4 rounded-xl border flex justify-between items-center flex-wrap gap-3"><h2 className="font-black">Tours - {tours.length} Tours - Matched with Tours Page ✅</h2><button onClick={()=>setEditingTour({id:"new-tour-"+Date.now(),name:"New Tour",cat:["Popular"],price:100,market:150,duration:"3 Hours",pickup:"Stone Town",desc:"Description",includes:"Guide, Entrance",area:"West",active:true,featured:true,imageDatas:[],images:[]})} className="bg-[#0A2342] text-white px-4 py-2 rounded-full text-[11px] font-bold">+ Add Tour</button></div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 mt-5">
               {filteredTours.map(t=>{
                 const pics=(t.imageDatas||[]).filter(Boolean)
                 return (
                 <div key={t.id} className={`bg-white rounded-[18px] border-2 overflow-hidden ${!t.active? "opacity-50 grayscale":""}`}>
                   <div className="h-[180px] bg-[#F5F7FA] relative">
-                    {pics[0]? <img src={pics[0]} className="w-full h-full object-cover"/> : <div className="w-full h-full bg-gradient-to-br from-[#1eb3a5] to-[#0A2342] flex items-center justify-center text-white text-[11px]">No pic</div>}
+                    {pics[0]? <img src={pics[0]} className="w-full h-full object-cover"/> : <div className="w-full h-full bg-gradient-to-br from-[#1eb3a5] to-[#0A2342] flex items-center justify-center text-white text-[11px]">No pic - Add in admin</div>}
                     <span className="absolute top-2 left-2 bg-[#0A2342] text-white text-[9px] px-2 py-1 rounded-full font-black">{t.cat?.[0]}</span>
                     <span className={`absolute top-2 right-2 text-white text-[9px] px-2 py-1 rounded-full font-black ${t.active? "bg-green-600":"bg-red-600"}`}>{t.active? "LIVE":"HIDDEN"}</span>
-                    {t.featured && <span className="absolute top-8 left-2 bg-[#FF8A00] text-black text-[8px] px-2 py-0.5 rounded-full font-black">FEATURED</span>}
                   </div>
                   <div className="p-4">
                     <p className="font-black text-[13px]">{t.name}</p><p className="text-[10px] opacity-40">{t.id} • {t.duration}</p>
@@ -317,8 +382,7 @@ export default function AdminPage(){
                     </div>
                     <div className="flex gap-1 mt-2 flex-wrap">
                       <button onClick={()=>duplicateTour(t)} className="text-[9px] bg-[#F5F7FA] px-2 py-1 rounded-full border">Duplicate</button>
-                      <button onClick={()=>deleteTour(t.id)} className="text-[9px] bg-red-50 text-red-600 px-2 py-1 rounded-full border border-red-100">Delete Tour</button>
-                      {pics.map((_:string, idx:number)=><button key={idx} onClick={()=>removeTourImage(t.id, idx)} className="text-[9px] bg-red-50 text-red-600 px-2 py-1 rounded-full border">Del{idx+1}</button>)}
+                      <button onClick={()=>deleteTour(t.id)} className="text-[9px] bg-red-50 text-red-600 px-2 py-1 rounded-full border border-red-100">Delete</button>
                     </div>
                   </div>
                 </div>
