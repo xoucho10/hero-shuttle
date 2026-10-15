@@ -50,7 +50,8 @@ const DEFAULT_REVIEWS = [
 export default function AdminPage(){
   const [auth, setAuth] = useState(false)
   const [pass, setPass] = useState("")
-  const [tab, setTab] = useState("overview")
+  const [tab, setTab] = useState("transfers")
+  const [search, setSearch] = useState("")
   const [tours, setTours] = useState<any[]>(DEFAULT_TOURS)
   const [transfers, setTransfers] = useState<any[]>(DEFAULT_TRANSFERS)
   const [announcements, setAnnouncements] = useState<any[]>(DEFAULT_ANNOUNCEMENTS)
@@ -64,33 +65,24 @@ export default function AdminPage(){
   const [editingReview, setEditingReview] = useState<any>(null)
   const [saving, setSaving] = useState(false)
 
-  // COMPRESS 800px 0.6 - REQUIRED FOR 3 PICS
+  // FAST COMPRESS 400px 0.5 = 70KB per pic = LAUNCH FAST
   const toBase64 = (file: File, cb:(b64:string)=>void)=>{
     const r=new FileReader(); r.onload=(e)=>{
       const img=new Image(); img.onload=()=>{
-        const c=document.createElement('canvas'); let w=img.width,h=img.height; const max=800;
-        if(w>max){ h=(max/w)*h; w=max } c.width=w; c.height=h; c.getContext('2d')!.drawImage(img,0,0,w,h); cb(c.toDataURL('image/jpeg',0.6))
+        const c=document.createElement('canvas'); let w=img.width,h=img.height; const max=400;
+        if(w>max){ h=(max/w)*h; w=max } c.width=w; c.height=h; c.getContext('2d')!.drawImage(img,0,0,w,h); cb(c.toDataURL('image/jpeg',0.5))
       }; img.src=e.target?.result as string
     }; r.readAsDataURL(file)
   }
 
-  const addImagesToList = (list:string[], newB64:string[])=>{
-    const filtered = list.filter(Boolean)
-    const merged = [...filtered,...newB64].slice(0, MAX_IMAGES)
-    while(merged.length < MAX_IMAGES) merged.push("")
-    // keep empty slot as "" but filter later for DB
-    return merged
-  }
-
-  // TOUR IMAGES - 3 PICS ADD + DELETE
+  // TOURS - FULL POWER
   const handleTourFiles = (tourId:string, files: FileList)=>{
-    const fileArr = Array.from(files).slice(0, MAX_IMAGES)
-    fileArr.forEach(file=>{
+    Array.from(files).slice(0, MAX_IMAGES).forEach(file=>{
       toBase64(file, (b64)=>{
         setTours(prev=>prev.map(t=>{
           if(t.id!==tourId) return t
           const cur = (t.imageDatas||[]).filter(Boolean)
-          if(cur.length >= MAX_IMAGES){ alert(`Max ${MAX_IMAGES} pictures allowed - delete one first`); return t }
+          if(cur.length >= MAX_IMAGES) return t
           return {...t, imageDatas:[...cur, b64], images:[...cur, b64]}
         }))
       })
@@ -99,37 +91,36 @@ export default function AdminPage(){
   const removeTourImage = (tourId:string, index:number)=>{
     setTours(prev=>prev.map(t=>{
       if(t.id!==tourId) return t
-      const datas = [...(t.imageDatas||[])].filter(Boolean)
-      datas.splice(index,1)
+      const datas = [...(t.imageDatas||[])].filter(Boolean); datas.splice(index,1)
       return {...t, imageDatas:datas, images:datas}
     }))
   }
   const handleTourEditFiles = (files: FileList)=>{
     if(!editingTour) return
-    const fileArr = Array.from(files).slice(0, MAX_IMAGES)
-    fileArr.forEach(file=>{
+    Array.from(files).slice(0, MAX_IMAGES).forEach(file=>{
       toBase64(file,(b64)=>{
         const cur = (editingTour.imageDatas||[]).filter(Boolean)
-        if(cur.length >= MAX_IMAGES){ alert(`Max ${MAX_IMAGES} pictures - delete one first`); return }
+        if(cur.length >= MAX_IMAGES) return
         setEditingTour({...editingTour, imageDatas:[...cur, b64], images:[...cur, b64]})
       })
     })
   }
   const removeTourEditImage = (index:number)=>{
-    const datas=[...(editingTour.imageDatas||[])].filter(Boolean)
-    datas.splice(index,1)
+    const datas=[...(editingTour.imageDatas||[])].filter(Boolean); datas.splice(index,1)
     setEditingTour({...editingTour, imageDatas:datas, images:datas})
   }
+  const deleteTour = (id:string)=>{ if(confirm(`Delete tour ${id}? This goes live after SAVE.`)){ setTours(prev=>prev.filter(t=>t.id!==id)) } }
+  const duplicateTour = (tour:any)=>{ const copy={...tour, id:tour.id+"-copy-"+Date.now(), name:tour.name+" (Copy)"}; setTours(prev=>[copy,...prev]) }
+  const toggleTourActive = (id:string)=> setTours(prev=>prev.map(t=>t.id===id? {...t, active:!t.active}:t))
 
-  // AIRPORT-TRANSFER IMAGES - 3 PICS ADD + DELETE
+  // TRANSFERS - FULL POWER
   const handleTransferFiles = (transferId:string, files: FileList)=>{
-    const fileArr = Array.from(files).slice(0, MAX_IMAGES)
-    fileArr.forEach(file=>{
+    Array.from(files).slice(0, MAX_IMAGES).forEach(file=>{
       toBase64(file,(b64)=>{
         setTransfers(prev=>prev.map(t=>{
           if(t.id!==transferId) return t
           const cur=(t.imageDatas||[]).filter(Boolean)
-          if(cur.length >= MAX_IMAGES){ alert(`Max ${MAX_IMAGES} pictures allowed`); return t }
+          if(cur.length >= MAX_IMAGES) return t
           return {...t, imageDatas:[...cur,b64], images:[...cur,b64]}
         }))
       })
@@ -138,26 +129,32 @@ export default function AdminPage(){
   const removeTransferImage = (transferId:string, index:number)=>{
     setTransfers(prev=>prev.map(t=>{
       if(t.id!==transferId) return t
-      const datas=[...(t.imageDatas||[])].filter(Boolean)
-      datas.splice(index,1)
+      const datas=[...(t.imageDatas||[])].filter(Boolean); datas.splice(index,1)
       return {...t, imageDatas:datas, images:datas}
     }))
   }
   const handleTransferEditFiles = (files: FileList)=>{
     if(!editingTransfer) return
-    const fileArr=Array.from(files).slice(0,MAX_IMAGES)
-    fileArr.forEach(file=>{
+    Array.from(files).slice(0,MAX_IMAGES).forEach(file=>{
       toBase64(file,(b64)=>{
         const cur=(editingTransfer.imageDatas||[]).filter(Boolean)
-        if(cur.length>=MAX_IMAGES){ alert(`Max ${MAX_IMAGES} pictures`); return }
+        if(cur.length>=MAX_IMAGES) return
         setEditingTransfer({...editingTransfer, imageDatas:[...cur,b64], images:[...cur,b64]})
       })
     })
   }
   const removeTransferEditImage = (index:number)=>{
-    const datas=[...(editingTransfer.imageDatas||[])].filter(Boolean)
-    datas.splice(index,1)
+    const datas=[...(editingTransfer.imageDatas||[])].filter(Boolean); datas.splice(index,1)
     setEditingTransfer({...editingTransfer, imageDatas:datas, images:datas})
+  }
+  const deleteTransfer = (id:string)=>{ if(confirm(`Delete transfer ${id}?`)){ setTransfers(prev=>prev.filter(t=>t.id!==id)) } }
+  const duplicateTransfer = (tr:any)=>{ const copy={...tr, id:tr.id+"-copy-"+Date.now(), name:tr.name+" (Copy)"}; setTransfers(prev=>[copy,...prev]) }
+  const toggleTransferActive = (id:string)=> setTransfers(prev=>prev.map(t=>t.id===id? {...t, active:!t.active}:t))
+
+  // QUICK INLINE PRICE EDIT
+  const quickUpdatePrice = (type:string, id:string, field:string, value:any)=>{
+    if(type==="tour") setTours(prev=>prev.map(t=>t.id===id? {...t, [field]:value}:t))
+    if(type==="transfer") setTransfers(prev=>prev.map(t=>t.id===id? {...t, [field]:value}:t))
   }
 
   useEffect(()=>{
@@ -165,16 +162,10 @@ export default function AdminPage(){
     const tryLoad=(key:string, setter:any)=>{
       try{ const v=localStorage.getItem(key); if(v){ const p=JSON.parse(v); if(Array.isArray(p)&&p.length>0||!Array.isArray(p)) setter(p) } }catch{}
     }
-    tryLoad("hero_tours", setTours)
-    tryLoad("hero_transfers", setTransfers)
-    tryLoad("hero_announcements", setAnnouncements)
-    tryLoad("hero_blogs", setBlogs)
-    tryLoad("hero_reviews", setReviews)
-    tryLoad("hero_settings", setSettings)
-
+    tryLoad("hero_tours", setTours); tryLoad("hero_transfers", setTransfers); tryLoad("hero_announcements", setAnnouncements); tryLoad("hero_blogs", setBlogs); tryLoad("hero_reviews", setReviews); tryLoad("hero_settings", setSettings)
     const loadDB=async()=>{
-      try{ const r=await fetch('/api/tours',{cache:'no-store'}); const d=await r.json(); if(Array.isArray(d)&&d.length>0){ const m=new Map(d.map((x:any)=>[x.id,x])); setTours(prev=>prev.map(t=>{ const db:any=m.get(t.id); if(!db) return t; return {...t, name:db.name||t.name, price:db.price??t.price, market:db.market_price??db.market??t.market, duration:db.duration||t.duration, desc:db.description||t.desc, area:db.area||t.area, imageDatas:db.image_urls?.length? db.image_urls : t.imageDatas } })) } }catch{}
-      try{ const r=await fetch('/api/transfers',{cache:'no-store'}); const d=await r.json(); if(Array.isArray(d)&&d.length>0){ const m=new Map(d.map((x:any)=>[x.id,x])); setTransfers(prev=>prev.map(t=>{ const db:any=m.get(t.id); if(!db) return t; return {...t, name:db.name||t.name, price:db.price??t.price, market:db.market_price??db.market??t.market, imageDatas:db.image_urls?.length? db.image_urls : t.imageDatas } })) } }catch{}
+      try{ const r=await fetch('/api/tours',{cache:'no-store'}); const d=await r.json(); if(Array.isArray(d)&&d.length>0){ const m=new Map(d.map((x:any)=>[x.id,x])); setTours(prev=>prev.map(t=>{ const db:any=m.get(t.id); if(!db) return t; return {...t, name:db.name||t.name, price:db.price??t.price, market:db.market_price??db.market??t.market, duration:db.duration||t.duration, desc:db.description||t.desc, area:db.area||t.area, cat:db.cat||t.cat, pickup:db.pickup||t.pickup, includes:db.includes||t.includes, active:db.active??t.active, featured:db.featured??t.featured, imageDatas:db.image_urls?.length? db.image_urls : t.imageDatas } })) } }catch{}
+      try{ const r=await fetch('/api/transfers',{cache:'no-store'}); const d=await r.json(); if(Array.isArray(d)&&d.length>0){ const m=new Map(d.map((x:any)=>[x.id,x])); setTransfers(prev=>prev.map(t=>{ const db:any=m.get(t.id); if(!db) return t; return {...t, name:db.name||t.name, price:db.price??t.price, market:db.market_price??db.market??t.market, duration:db.duration||t.duration, desc:db.description||t.desc, area:db.area||t.area, cat:db.cat||t.cat, active:db.active??t.active, imageDatas:db.image_urls?.length? db.image_urls : t.imageDatas } })) } }catch{}
       try{ const r=await fetch('/api/announcements',{cache:'no-store'}); const d=await r.json(); if(Array.isArray(d)&&d.length>0) setAnnouncements(d) }catch{}
       try{ const r=await fetch('/api/blogs',{cache:'no-store'}); const d=await r.json(); if(Array.isArray(d)&&d.length>0) setBlogs(d) }catch{}
       try{ const r=await fetch('/api/reviews',{cache:'no-store'}); const d=await r.json(); if(Array.isArray(d)&&d.length>0) setReviews(d) }catch{}
@@ -192,50 +183,52 @@ export default function AdminPage(){
       localStorage.setItem("hero_blogs", JSON.stringify(blogs))
       localStorage.setItem("hero_reviews", JSON.stringify(reviews))
       localStorage.setItem("hero_settings", JSON.stringify(settings))
-
       await Promise.all([
-        fetch('/api/tours',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(tours.map(t=>({id:t.id,name:t.name,price:t.price,market_price:t.market,market:t.market,duration:t.duration,description:t.desc,area:t.area,cat:t.cat,featured:t.featured,image_urls:(t.imageDatas||[]).filter(Boolean)})))}),
-        fetch('/api/transfers',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(transfers.map(t=>({id:t.id,name:t.name,price:t.price,market_price:t.market,duration:t.duration,description:t.desc,area:t.area,image_urls:(t.imageDatas||[]).filter(Boolean)})))}),
+        fetch('/api/tours',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(tours.map(t=>({id:t.id,name:t.name,price:Number(t.price),market_price:Number(t.market),market:Number(t.market),duration:t.duration,description:t.desc,area:t.area,cat:t.cat,featured:t.featured,active:t.active,pickup:t.pickup,includes:t.includes,image_urls:(t.imageDatas||[]).filter(Boolean)})))}),
+        fetch('/api/transfers',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(transfers.map(t=>({id:t.id,name:t.name,price:Number(t.price),market_price:Number(t.market),market:Number(t.market),duration:t.duration,description:t.desc,area:t.area,cat:t.cat,active:t.active,image_urls:(t.imageDatas||[]).filter(Boolean)})))}),
         fetch('/api/announcements',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(announcements)}),
         fetch('/api/blogs',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(blogs)}),
         fetch('/api/reviews',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(reviews)}),
         fetch('/api/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(settings)}),
       ])
-      alert(`✅ SAVED - Tours:${tours.length} (${tours.reduce((s,t)=>s+(t.imageDatas?.filter(Boolean).length||0),0)} pics) Airport-Transfers:${transfers.length} (${transfers.reduce((s,t)=>s+(t.imageDatas?.filter(Boolean).length||0),0)} pics) - Live on /airport-transfers now!`)
+      alert(`✅ LIVE SAVED - Tours:${tours.length} Transfers:${transfers.length} - All prices & pics live!`)
     }catch(e:any){ alert("Error: "+e.message) }
     setSaving(false)
   }
 
   const saveOne=async(type:string, data:any)=>{
     try{
-      if(type==="tour") await fetch('/api/tours',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:data.id,name:data.name,price:data.price,market_price:data.market,description:data.desc,duration:data.duration,area:data.area,image_urls:(data.imageDatas||[]).filter(Boolean)})})
-      if(type==="transfer") await fetch('/api/transfers',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:data.id,name:data.name,price:data.price,market_price:data.market,description:data.desc,image_urls:(data.imageDatas||[]).filter(Boolean)})})
+      if(type==="tour") await fetch('/api/tours',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:data.id,name:data.name,price:Number(data.price),market_price:Number(data.market),market:Number(data.market),description:data.desc,duration:data.duration,area:data.area,cat:data.cat,featured:data.featured,active:data.active,pickup:data.pickup,includes:data.includes,image_urls:(data.imageDatas||[]).filter(Boolean)})})
+      if(type==="transfer") await fetch('/api/transfers',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:data.id,name:data.name,price:Number(data.price),market_price:Number(data.market),market:Number(data.market),duration:data.duration,description:data.desc,area:data.area,cat:data.cat,active:data.active,image_urls:(data.imageDatas||[]).filter(Boolean)})})
     }catch{}
   }
 
   if(!auth){
     return <main className="min-h-screen bg-[#0A2342] flex items-center justify-center px-6">
-      <div className="bg-white rounded-[24px] p-8 max-w-sm w-full text-center"><p className="text-[36px]">🔐</p><h1 className="font-black text-[22px] mt-2">HERO COCKPIT - 3 PICS</h1><p className="text-[11px] opacity-60 mt-1">Add 3 pics + delete - Tours & Airport-Transfers</p><input type="password" value={pass} onChange={e=>setPass(e.target.value)} placeholder="hero2026" className="mt-6 w-full bg-[#F5F7FA] border rounded-full px-4 py-3 text-[13px] text-center"/><button onClick={()=>{ if(pass===ADMIN_PASSWORD){ localStorage.setItem("hero_admin_auth","1"); setAuth(true)} else alert("Wrong")}} className="mt-3 w-full bg-[#FF8A00] text-black py-3 rounded-full font-black">Login → Cockpit</button></div>
+      <div className="bg-white rounded-[24px] p-8 max-w-sm w-full text-center"><p className="text-[36px]">🔐</p><h1 className="font-black text-[22px] mt-2">HERO COCKPIT V2 - FULL POWER</h1><p className="text-[11px] opacity-60 mt-1">Edit prices, add/delete tours & transfers live</p><input type="password" value={pass} onChange={e=>setPass(e.target.value)} placeholder="hero2026" className="mt-6 w-full bg-[#F5F7FA] border rounded-full px-4 py-3 text-[13px] text-center"/><button onClick={()=>{ if(pass===ADMIN_PASSWORD){ localStorage.setItem("hero_admin_auth","1"); setAuth(true)} else alert("Wrong")}} className="mt-3 w-full bg-[#FF8A00] text-black py-3 rounded-full font-black">Login → Cockpit</button></div>
     </main>
   }
 
   const TABS=[
     {id:"overview",label:"📊 Overview"},
+    {id:"transfers",label:`🚕 Transfers ${transfers.length}`},
+    {id:"tours",label:`🏝️ Tours ${tours.length}`},
     {id:"hero",label:`📢 Hero ${announcements.length}`},
-    {id:"transfers",label:`🚕 Airport-Transfers ${transfers.length} 📸3`},
-    {id:"tours",label:`🏝️ Tours ${tours.length} 📸3`},
     {id:"blogs",label:`📝 Blogs ${blogs.length}`},
     {id:"reviews",label:`⭐ Reviews ${reviews.length}`},
     {id:"content",label:"📄 Pages"},
     {id:"settings",label:"⚙️ Settings"},
   ]
 
+  const filteredTransfers = transfers.filter(t=>!search || t.name.toLowerCase().includes(search.toLowerCase()) || t.id.toLowerCase().includes(search.toLowerCase()))
+  const filteredTours = tours.filter(t=>!search || t.name.toLowerCase().includes(search.toLowerCase()) || t.id.toLowerCase().includes(search.toLowerCase()))
+
   return (
     <main className="min-h-screen bg-[#F8FAFF]">
       <Header/>
       <section className="bg-[#0A2342] text-white px-6 md:px-12 py-4 flex justify-between items-center flex-wrap gap-3">
-        <div><h1 className="font-black text-[18px]">COCKPIT 3 PICS • {tours.length} Tours • {transfers.length} Airport-Transfers • {tours.reduce((s,t)=>s+(t.imageDatas?.filter(Boolean).length||0),0)+transfers.reduce((s,t)=>s+(t.imageDatas?.filter(Boolean).length||0),0)} Total Pics</h1><p className="text-[11px] opacity-60">Add up to 3 pics per item - compressed 800px 0.6 - delete anytime - Controls /airport-transfers + /tours</p></div>
-        <div className="flex gap-2"><button onClick={()=>{ localStorage.clear(); location.reload()}} className="bg-white/10 px-4 py-2 rounded-full text-[11px] font-bold">Reset Local</button><button onClick={saveAll} disabled={saving} className="bg-[#FF8A00] text-black px-6 py-2.5 rounded-full font-black text-[12px] disabled:opacity-50">{saving?"Saving...":"💾 SAVE ALL 3 PICS TO DB"}</button></div>
+        <div><h1 className="font-black text-[18px]">FULL POWER COCKPIT V2 • {tours.length} Tours • {transfers.length} Transfers • {tours.reduce((s,t)=>s+(t.imageDatas?.filter(Boolean).length||0),0)+transfers.reduce((s,t)=>s+(t.imageDatas?.filter(Boolean).length||0),0)} Pics • FAST 400px</h1><p className="text-[11px] opacity-60">Edit price inline, toggle active, duplicate, delete, add new - all controls live</p></div>
+        <div className="flex gap-2"><input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search tours/transfers..." className="bg-white/10 border border-white/20 rounded-full px-4 py-2 text-[11px] placeholder:text-white/50 w-[200px]"/><button onClick={()=>{ localStorage.clear(); location.reload()}} className="bg-white/10 px-4 py-2 rounded-full text-[11px] font-bold">Reset</button><button onClick={saveAll} disabled={saving} className="bg-[#FF8A00] text-black px-6 py-2.5 rounded-full font-black text-[12px] disabled:opacity-50">{saving?"Saving...":"💾 SAVE ALL LIVE"}</button></div>
       </section>
       <section className="bg-white border-b sticky top-0 z-30 shadow-sm px-6 md:px-12 py-2.5 flex gap-2 overflow-x-auto">
         {TABS.map(t=><button key={t.id} onClick={()=>setTab(t.id)} className={`px-4 py-2 rounded-full text-[11px] font-black border whitespace-nowrap ${tab===t.id?"bg-[#0A2342] text-white":"bg-[#F5F7FA]"}`}>{t.label}</button>)}
@@ -244,48 +237,44 @@ export default function AdminPage(){
       <section className="px-6 md:px-12 py-8 max-w-[1600px] mx-auto">
         {tab==="overview" && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-white p-5 rounded-[18px] border"><p className="text-[10px] font-black opacity-50">AIRPORT-TRANSFERS</p><p className="font-black text-[26px]">{transfers.length}</p><p className="text-[11px] opacity-60 mt-1">{transfers.reduce((s,t)=>s+(t.imageDatas?.filter(Boolean).length||0),0)} pics / {transfers.length*3} slots</p></div>
-            <div className="bg-white p-5 rounded-[18px] border"><p className="text-[10px] font-black opacity-50">TOURS</p><p className="font-black text-[26px]">{tours.length}</p><p className="text-[11px] opacity-60 mt-1">{tours.reduce((s,t)=>s+(t.imageDatas?.filter(Boolean).length||0),0)} pics / {tours.length*3} slots</p></div>
-            <div className="bg-white p-5 rounded-[18px] border"><p className="text-[10px] font-black opacity-50">BLOGS / GUIDES</p><p className="font-black text-[26px]">{blogs.length}</p></div>
+            <div className="bg-white p-5 rounded-[18px] border"><p className="text-[10px] font-black opacity-50">TRANSFERS LIVE</p><p className="font-black text-[26px]">{transfers.filter(t=>t.active).length}/{transfers.length}</p><p className="text-[11px] opacity-60 mt-1">{transfers.reduce((s,t)=>s+(t.imageDatas?.filter(Boolean).length||0),0)} pics</p></div>
+            <div className="bg-white p-5 rounded-[18px] border"><p className="text-[10px] font-black opacity-50">TOURS LIVE</p><p className="font-black text-[26px]">{tours.filter(t=>t.active).length}/{tours.length}</p><p className="text-[11px] opacity-60 mt-1">{tours.reduce((s,t)=>s+(t.imageDatas?.filter(Boolean).length||0),0)} pics</p></div>
+            <div className="bg-white p-5 rounded-[18px] border"><p className="text-[10px] font-black opacity-50">BLOGS / REVIEWS</p><p className="font-black text-[26px]">{blogs.length}/{reviews.length}</p></div>
             <div className="bg-[#FF8A00] p-5 rounded-[18px] border"><p className="text-[10px] font-black text-black/60">WHATSAPP</p><p className="font-black text-[14px] text-black">+{settings.whatsapp}</p></div>
-            <div className="md:col-span-4 bg-white p-6 rounded-[18px] border mt-2">
-              <p className="font-black text-[14px]">3 PICS SYSTEM - How it works:</p>
-              <div className="grid md:grid-cols-3 gap-3 mt-4 text-[12px]">
-                <div className="bg-[#F8FAFF] p-3 rounded-xl border-2 border-[#FF8A00]"><b>✅ Add 3 Pics</b><br/>Click 📸 on card or in Edit modal → select up to 3 images → auto compressed 800px 0.6 → saves instantly to local + DB on Save All</div>
-                <div className="bg-[#F8FAFF] p-3 rounded-xl"><b>🗑️ Delete Pics</b><br/>Card view: Del 1/2/3 buttons under image. Edit modal: X on top right of each slot. Deletes instantly, then Save All to DB to remove from live site.</div>
-                <div className="bg-[#F8FAFF] p-3 rounded-xl"><b>/airport-transfers + /tours</b><br/>Both pages read local first (so pics show instantly) then DB. Max 3 per item = fast load on mobile. Total {tours.length+transfers.length} items x 3 = {(tours.length+transfers.length)*3} slots.</div>
-              </div>
-            </div>
           </div>
         )}
 
         {tab==="transfers" && (
           <div>
-            <div className="bg-white p-4 rounded-xl border flex justify-between items-center flex-wrap gap-3"><h2 className="font-black">Airport-Transfers - 3 Pics Each - Add/Delete - Controls /airport-transfers</h2><button onClick={()=>setEditingTransfer({id:"",name:"",price:30,market:50,duration:"",area:"",desc:"",cat:["Popular"],active:true,imageDatas:[],images:[]})} className="bg-[#0A2342] text-white px-4 py-2 rounded-full text-[11px] font-bold">+ Add Airport-Transfer 3 pics</button></div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5 mt-5">
-              {transfers.map(t=>{
+            <div className="bg-white p-4 rounded-xl border flex justify-between items-center flex-wrap gap-3"><h2 className="font-black">Transfers - Full Control - Prices, Add, Delete, Active</h2><button onClick={()=>setEditingTransfer({id:"airport-new-"+Date.now(),name:"Airport → New Place",price:30,market:50,duration:"30 min",area:"West",desc:"Private vehicle",cat:["Popular"],active:true,imageDatas:[],images:[]})} className="bg-[#0A2342] text-white px-4 py-2 rounded-full text-[11px] font-bold">+ Add Transfer</button></div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 mt-5">
+              {filteredTransfers.map(t=>{
                 const pics = (t.imageDatas||[]).filter(Boolean)
                 return (
-                <div key={t.id} className="bg-white rounded-[18px] border-2 overflow-hidden">
+                <div key={t.id} className={`bg-white rounded-[18px] border-2 overflow-hidden ${!t.active? "opacity-50 grayscale":""}`}>
                   <div className="h-[160px] bg-[#F5F7FA] relative">
-                    {pics[0]? <img src={pics[0]} className="w-full h-full object-cover"/> : <div className="w-full h-full bg-gradient-to-br from-[#0A2342] to-[#2a5a8a] flex items-center justify-center text-white text-[11px]">No pic - Add 3</div>}
+                    {pics[0]? <img src={pics[0]} className="w-full h-full object-cover"/> : <div className="w-full h-full bg-gradient-to-br from-[#0A2342] to-[#2a5a8a] flex items-center justify-center text-white text-[11px]">No pic</div>}
                     <span className="absolute top-2 left-2 bg-black/70 text-white text-[9px] px-2 py-1 rounded-full font-black">{t.area}</span>
-                    <span className="absolute top-2 right-2 bg-green-600 text-white text-[9px] px-2 py-1 rounded-full font-black">${t.price}</span>
-                    {pics.length>0 && <div className="absolute bottom-2 left-2 flex gap-1">{pics.map((img:string,i:number)=><div key={i} className="w-[32px] h-[24px] rounded-[6px] border-2 border-white overflow-hidden bg-white"><img src={img} className="w-full h-full object-cover"/></div>)}<span className="bg-black/70 text-white text-[9px] px-2 py-1 rounded-full self-center">{pics.length}/3</span></div>}
+                    <span className={`absolute top-2 right-2 text-white text-[9px] px-2 py-1 rounded-full font-black ${t.active? "bg-green-600":"bg-red-600"}`}>{t.active? "LIVE":"HIDDEN"}</span>
+                    {pics.length>0 && <div className="absolute bottom-2 left-2 flex gap-1">{pics.map((img:string,i:number)=><div key={i} className="w-[32px] h-[24px] rounded-[6px] border-2 border-white overflow-hidden bg-white"><img src={img} className="w-full h-full object-cover"/></div>)}</div>}
                   </div>
                   <div className="p-4">
-                    <p className="font-black text-[13px]">{t.name}</p><p className="text-[11px] opacity-60 mt-1 line-clamp-2">{t.desc}</p>
-                    <div className="mt-3 flex gap-2"><p className="text-[11px] font-black text-red-600 line-through">${t.market}</p><p className="font-black text-[20px] text-green-600">${t.price}</p></div>
-                    {/* 3 PICS ADD + DELETE CONTROLS */}
-                    <div className="flex gap-2 mt-3">
-                      <button onClick={()=>setEditingTransfer(t)} className="flex-1 bg-[#0A2342] text-white py-2 rounded-full text-[11px] font-black">✏️ Edit 3 pics</button>
-                      <label className={`px-3 py-2 rounded-full text-[11px] font-bold border cursor-pointer ${pics.length>=3? "bg-gray-100 opacity-50" : "bg-[#FFFBF5]"}`}>📸x3<input type="file" accept="image/*" multiple className="hidden" disabled={pics.length>=3} onChange={e=>{ if(e.target.files) handleTransferFiles(t.id, e.target.files)}}/></label>
+                    <p className="font-black text-[13px]">{t.name}</p><p className="text-[10px] opacity-40">{t.id}</p>
+                    <div className="grid grid-cols-3 gap-2 mt-3">
+                      <div><p className="text-[9px] font-black opacity-50">PRICE $</p><input type="number" value={t.price} onChange={e=>quickUpdatePrice("transfer",t.id,"price",parseInt(e.target.value)||0)} className="w-full bg-[#F0FFF0] border-2 border-green-500 rounded-full px-2 py-1.5 text-[13px] font-black"/></div>
+                      <div><p className="text-[9px] font-black opacity-50">MARKET $</p><input type="number" value={t.market} onChange={e=>quickUpdatePrice("transfer",t.id,"market",parseInt(e.target.value)||0)} className="w-full bg-[#FFF0F0] border border-red-300 rounded-full px-2 py-1.5 text-[11px] font-bold"/></div>
+                      <div><p className="text-[9px] font-black opacity-50">AREA</p><input value={t.area} onChange={e=>quickUpdatePrice("transfer",t.id,"area",e.target.value)} className="w-full bg-[#F5F7FA] border rounded-full px-2 py-1.5 text-[10px]"/></div>
                     </div>
-                    {pics.length>0 && (
-                      <div className="flex gap-1 mt-2 flex-wrap">
-                        {pics.map((_:string, idx:number)=><button key={idx} onClick={()=>removeTransferImage(t.id, idx)} className="text-[9px] bg-red-50 text-red-600 px-2 py-1 rounded-full border border-red-100">Del {idx+1} ✕</button>)}
-                      </div>
-                    )}
+                    <div className="flex gap-2 mt-3">
+                      <button onClick={()=>setEditingTransfer(t)} className="flex-1 bg-[#0A2342] text-white py-2 rounded-full text-[11px] font-black">✏️ Edit All</button>
+                      <button onClick={()=>toggleTransferActive(t.id)} className={`px-3 py-2 rounded-full text-[11px] font-bold border ${t.active? "bg-green-50":"bg-red-50"}`}>{t.active? "👁️":"🚫"}</button>
+                      <label className={`px-3 py-2 rounded-full text-[11px] font-bold border cursor-pointer ${pics.length>=3? "bg-gray-100 opacity-50" : "bg-[#FFFBF5]"}`}>📸<input type="file" accept="image/*" multiple className="hidden" disabled={pics.length>=3} onChange={e=>{ if(e.target.files) handleTransferFiles(t.id, e.target.files)}}/></label>
+                    </div>
+                    <div className="flex gap-1 mt-2">
+                      <button onClick={()=>duplicateTransfer(t)} className="text-[9px] bg-[#F5F7FA] px-2 py-1 rounded-full border">Duplicate</button>
+                      <button onClick={()=>deleteTransfer(t.id)} className="text-[9px] bg-red-50 text-red-600 px-2 py-1 rounded-full border border-red-100">Delete Transfer</button>
+                      {pics.map((_:string, idx:number)=><button key={idx} onClick={()=>removeTransferImage(t.id, idx)} className="text-[9px] bg-red-50 text-red-600 px-2 py-1 rounded-full border border-red-100">DelPic{idx+1}</button>)}
+                    </div>
                   </div>
                 </div>
                 )
@@ -296,29 +285,35 @@ export default function AdminPage(){
 
         {tab==="tours" && (
           <div>
-            <div className="bg-white p-4 rounded-xl border flex justify-between items-center flex-wrap gap-3"><h2 className="font-black">Tours - 3 Pics Each - Add/Delete - Controls /tours + Home</h2><button onClick={()=>setEditingTour({id:"",name:"",cat:["Popular"],price:100,market:150,duration:"3 Hours",pickup:"",desc:"",includes:"",area:"West",active:true,featured:true,imageDatas:[],images:[]})} className="bg-[#0A2342] text-white px-4 py-2 rounded-full text-[11px] font-bold">+ Add Tour 3 pics</button></div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5 mt-5">
-              {tours.map(t=>{
+            <div className="bg-white p-4 rounded-xl border flex justify-between items-center flex-wrap gap-3"><h2 className="font-black">Tours - Full Control - Prices, Add, Delete, Active, Featured</h2><button onClick={()=>setEditingTour({id:"new-tour-"+Date.now(),name:"New Tour",cat:["Popular"],price:100,market:150,duration:"3 Hours",pickup:"Stone Town",desc:"Description",includes:"Guide, Entrance",area:"West",active:true,featured:true,imageDatas:[],images:[]})} className="bg-[#0A2342] text-white px-4 py-2 rounded-full text-[11px] font-bold">+ Add Tour</button></div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 mt-5">
+              {filteredTours.map(t=>{
                 const pics=(t.imageDatas||[]).filter(Boolean)
                 return (
-                <div key={t.id} className="bg-white rounded-[18px] border-2 overflow-hidden">
+                <div key={t.id} className={`bg-white rounded-[18px] border-2 overflow-hidden ${!t.active? "opacity-50 grayscale":""}`}>
                   <div className="h-[180px] bg-[#F5F7FA] relative">
-                    {pics[0]? <img src={pics[0]} className="w-full h-full object-cover"/> : <div className="w-full h-full bg-gradient-to-br from-[#1eb3a5] to-[#0A2342] flex items-center justify-center text-white text-[11px]">No pic - Add 3</div>}
+                    {pics[0]? <img src={pics[0]} className="w-full h-full object-cover"/> : <div className="w-full h-full bg-gradient-to-br from-[#1eb3a5] to-[#0A2342] flex items-center justify-center text-white text-[11px]">No pic</div>}
                     <span className="absolute top-2 left-2 bg-[#0A2342] text-white text-[9px] px-2 py-1 rounded-full font-black">{t.cat?.[0]}</span>
-                    <span className="absolute bottom-2 left-2 bg-white text-black text-[9px] px-2 py-1 rounded-full font-bold">{t.area}</span>
-                    {pics.length>0 && <div className="absolute bottom-2 right-2 flex gap-1">{pics.slice(0,3).map((img:string,i:number)=><div key={i} className="w-[28px] h-[20px] rounded-[4px] border border-white overflow-hidden bg-white"><img src={img} className="w-full h-full object-cover"/></div>)}</div>}
+                    <span className={`absolute top-2 right-2 text-white text-[9px] px-2 py-1 rounded-full font-black ${t.active? "bg-green-600":"bg-red-600"}`}>{t.active? "LIVE":"HIDDEN"}</span>
+                    {t.featured && <span className="absolute top-8 left-2 bg-[#FF8A00] text-black text-[8px] px-2 py-0.5 rounded-full font-black">FEATURED</span>}
                   </div>
-                  <div className="p-4"><p className="font-black text-[13px]">{t.name}</p><p className="text-[11px] opacity-60 mt-1 line-clamp-2">{t.desc}</p><div className="mt-3"><p className="text-[12px] font-black text-[#DC2626] line-through decoration-2">${t.market}</p><p className="font-black text-[22px] text-[#16A34A]">${t.price}</p></div>
-                    <div className="flex gap-2 mt-3">
-                      <button onClick={()=>setEditingTour(t)} className="flex-1 bg-[#0A2342] text-white py-2 rounded-full text-[11px] font-black">✏️ Edit 3 pics</button>
-                      <label className={`px-3 py-2 rounded-full text-[11px] font-bold border cursor-pointer ${pics.length>=3? "bg-gray-100 opacity-50" : "bg-[#FFFBF5]"}`}>📸x3<input type="file" accept="image/*" multiple className="hidden" disabled={pics.length>=3} onChange={e=>{ if(e.target.files) handleTourFiles(t.id, e.target.files)}}/></label>
+                  <div className="p-4">
+                    <p className="font-black text-[13px]">{t.name}</p><p className="text-[10px] opacity-40">{t.id} • {t.duration}</p>
+                    <div className="grid grid-cols-3 gap-2 mt-3">
+                      <div><p className="text-[9px] font-black opacity-50">PRICE $</p><input type="number" value={t.price} onChange={e=>quickUpdatePrice("tour",t.id,"price",parseInt(e.target.value)||0)} className="w-full bg-[#F0FFF0] border-2 border-green-500 rounded-full px-2 py-1.5 text-[13px] font-black"/></div>
+                      <div><p className="text-[9px] font-black opacity-50">MARKET $</p><input type="number" value={t.market} onChange={e=>quickUpdatePrice("tour",t.id,"market",parseInt(e.target.value)||0)} className="w-full bg-[#FFF0F0] border rounded-full px-2 py-1.5 text-[11px]"/></div>
+                      <div><p className="text-[9px] font-black opacity-50">DURATION</p><input value={t.duration} onChange={e=>quickUpdatePrice("tour",t.id,"duration",e.target.value)} className="w-full bg-[#F5F7FA] border rounded-full px-2 py-1.5 text-[10px]"/></div>
                     </div>
-                    {pics.length>0 && (
-                      <div className="flex gap-1 mt-2 flex-wrap">
-                        {pics.map((_:string, idx:number)=><button key={idx} onClick={()=>removeTourImage(t.id, idx)} className="text-[9px] bg-red-50 text-red-600 px-2 py-1 rounded-full border border-red-100">Del {idx+1} ✕</button>)}
-                        <span className="text-[9px] bg-black/5 px-2 py-1 rounded-full">{pics.length}/3</span>
-                      </div>
-                    )}
+                    <div className="flex gap-2 mt-3">
+                      <button onClick={()=>setEditingTour(t)} className="flex-1 bg-[#0A2342] text-white py-2 rounded-full text-[11px] font-black">✏️ Edit All</button>
+                      <button onClick={()=>toggleTourActive(t.id)} className={`px-3 py-2 rounded-full text-[11px] font-bold border ${t.active? "bg-green-50":"bg-red-50"}`}>{t.active? "👁️":"🚫"}</button>
+                      <label className={`px-3 py-2 rounded-full text-[11px] font-bold border cursor-pointer ${pics.length>=3? "bg-gray-100 opacity-50" : "bg-[#FFFBF5]"}`}>📸<input type="file" accept="image/*" multiple className="hidden" disabled={pics.length>=3} onChange={e=>{ if(e.target.files) handleTourFiles(t.id, e.target.files)}}/></label>
+                    </div>
+                    <div className="flex gap-1 mt-2 flex-wrap">
+                      <button onClick={()=>duplicateTour(t)} className="text-[9px] bg-[#F5F7FA] px-2 py-1 rounded-full border">Duplicate</button>
+                      <button onClick={()=>deleteTour(t.id)} className="text-[9px] bg-red-50 text-red-600 px-2 py-1 rounded-full border border-red-100">Delete Tour</button>
+                      {pics.map((_:string, idx:number)=><button key={idx} onClick={()=>removeTourImage(t.id, idx)} className="text-[9px] bg-red-50 text-red-600 px-2 py-1 rounded-full border">Del{idx+1}</button>)}
+                    </div>
                   </div>
                 </div>
                 )
@@ -329,7 +324,7 @@ export default function AdminPage(){
 
         {tab==="hero" && (
           <div className="space-y-4">
-            <div className="flex justify-between bg-white p-4 rounded-xl border"><h2 className="font-black">Hero Slider - Home Top</h2><button onClick={()=>setEditingAnn({id:Date.now().toString(),badge:"🔥 NEW",title:"",subtitle:"",cta:"View Tours",link:"#tours",active:true,imageData:""})} className="bg-[#0A2342] text-white px-4 py-2 rounded-full text-[11px] font-bold">+ Add Slide</button></div>
+            <div className="flex justify-between bg-white p-4 rounded-xl border"><h2 className="font-black">Hero Slider</h2><button onClick={()=>setEditingAnn({id:Date.now().toString(),badge:"🔥 NEW",title:"",subtitle:"",cta:"View Tours",link:"#tours",active:true,imageData:""})} className="bg-[#0A2342] text-white px-4 py-2 rounded-full text-[11px] font-bold">+ Add Slide</button></div>
             <div className="grid md:grid-cols-3 gap-4">
               {announcements.map(a=>(
                 <div key={a.id} className="bg-white rounded-xl border overflow-hidden">
@@ -343,7 +338,7 @@ export default function AdminPage(){
 
         {tab==="blogs" && (
           <div>
-            <div className="bg-white p-4 rounded-xl border flex justify-between"><h2 className="font-black">Blogs / Guides</h2><button onClick={()=>setEditingBlog({id:"",slug:"",title:"",cat:"Guide",excerpt:"",content:"",imageData:"",active:true})} className="bg-[#0A2342] text-white px-4 py-2 rounded-full text-[11px] font-bold">+ Add Blog</button></div>
+            <div className="bg-white p-4 rounded-xl border flex justify-between"><h2 className="font-black">Blogs</h2><button onClick={()=>setEditingBlog({id:"",slug:"",title:"",cat:"Guide",excerpt:"",content:"",imageData:"",active:true})} className="bg-[#0A2342] text-white px-4 py-2 rounded-full text-[11px] font-bold">+ Add Blog</button></div>
             <div className="grid md:grid-cols-3 gap-4 mt-5">
               {blogs.map(b=>(
                 <div key={b.id} className="bg-white p-5 rounded-xl border"><span className="bg-[#0A2342] text-white text-[9px] px-2 py-1 rounded-full font-black">{b.cat}</span><p className="font-black text-[13px] mt-2">{b.title}</p><p className="text-[11px] opacity-60 mt-1 line-clamp-2">{b.excerpt}</p><div className="flex gap-2 mt-3"><button onClick={()=>setEditingBlog(b)} className="flex-1 bg-[#F5F7FA] py-2 rounded-full text-[11px] font-bold">Edit</button><button onClick={()=>setBlogs(prev=>prev.filter(x=>x.id!==b.id))} className="px-3 py-2 bg-red-50 text-red-600 rounded-full text-[11px] font-bold">Del</button></div></div>
@@ -354,7 +349,7 @@ export default function AdminPage(){
 
         {tab==="reviews" && (
           <div>
-            <div className="bg-white p-4 rounded-xl border flex justify-between"><h2 className="font-black">Reviews - Home Section</h2><button onClick={()=>setEditingReview({id:Date.now().toString(),name:"",country:"",text:"",rating:5,tour:"",verified:true,active:true})} className="bg-[#0A2342] text-white px-4 py-2 rounded-full text-[11px] font-bold">+ Add Review</button></div>
+            <div className="bg-white p-4 rounded-xl border flex justify-between"><h2 className="font-black">Reviews</h2><button onClick={()=>setEditingReview({id:Date.now().toString(),name:"",country:"",text:"",rating:5,tour:"",verified:true,active:true})} className="bg-[#0A2342] text-white px-4 py-2 rounded-full text-[11px] font-bold">+ Add Review</button></div>
             <div className="grid md:grid-cols-3 gap-4 mt-5">
               {reviews.map(r=>(
                 <div key={r.id} className="bg-white p-5 rounded-xl border"><div className="flex justify-between"><p className="font-black text-[12px]">{r.name} {r.verified&&<span className="bg-green-600 text-white text-[7px] px-1 py-0.5 rounded-full">VERIFIED</span>}</p><p className="text-[12px]">{"⭐".repeat(r.rating)}</p></div><p className="text-[10px] opacity-50 mt-1">{r.country} • {r.tour}</p><p className="text-[12px] opacity-70 mt-3">"{r.text}"</p><div className="flex gap-2 mt-3"><button onClick={()=>setEditingReview(r)} className="flex-1 bg-[#F5F7FA] py-2 rounded-full text-[11px] font-bold">Edit</button><button onClick={()=>setReviews(prev=>prev.filter(x=>x.id!==r.id))} className="px-3 py-2 bg-red-50 text-red-600 rounded-full text-[11px]">Del</button></div></div>
@@ -366,72 +361,67 @@ export default function AdminPage(){
         {tab==="content" && (
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-white p-6 rounded-xl border"><h3 className="font-black">About Page</h3><input value={settings.aboutTitle} onChange={e=>setSettings({...settings,aboutTitle:e.target.value})} placeholder="About Title" className="mt-3 w-full bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><textarea value={settings.aboutText} onChange={e=>setSettings({...settings,aboutText:e.target.value})} placeholder="About Text" className="mt-3 w-full bg-[#F5F7FA] rounded-2xl px-4 py-3 text-[12px] border h-28"/><input value={settings.footerText} onChange={e=>setSettings({...settings,footerText:e.target.value})} placeholder="Footer Text" className="mt-3 w-full bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/></div>
-            <div className="bg-white p-6 rounded-xl border"><h3 className="font-black">Contact + Footer</h3><input value={settings.email} onChange={e=>setSettings({...settings,email:e.target.value})} placeholder="Email" className="mt-3 w-full bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><input value={settings.address} onChange={e=>setSettings({...settings,address:e.target.value})} placeholder="Address" className="mt-3 w-full bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/></div>
+            <div className="bg-white p-6 rounded-xl border"><h3 className="font-black">Contact</h3><input value={settings.email} onChange={e=>setSettings({...settings,email:e.target.value})} placeholder="Email" className="mt-3 w-full bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><input value={settings.address} onChange={e=>setSettings({...settings,address:e.target.value})} placeholder="Address" className="mt-3 w-full bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/></div>
           </div>
         )}
 
         {tab==="settings" && (
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-white p-6 rounded-xl border"><h3 className="font-black">WhatsApp & Socials</h3><input value={settings.whatsapp} onChange={e=>setSettings({...settings,whatsapp:e.target.value})} placeholder="255773628792" className="mt-3 w-full bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] font-black border-2 border-green-500"/><input value={settings.instagram} onChange={e=>setSettings({...settings,instagram:e.target.value})} placeholder="Instagram URL" className="mt-3 w-full bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><input value={settings.facebook} onChange={e=>setSettings({...settings,facebook:e.target.value})} placeholder="Facebook URL" className="mt-3 w-full bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><input value={settings.tiktok} onChange={e=>setSettings({...settings,tiktok:e.target.value})} placeholder="TikTok URL" className="mt-3 w-full bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/></div>
+            <div className="bg-white p-6 rounded-xl border"><h3 className="font-black">WhatsApp & Socials</h3><input value={settings.whatsapp} onChange={e=>setSettings({...settings,whatsapp:e.target.value})} placeholder="255773628792" className="mt-3 w-full bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] font-black border-2 border-green-500"/><input value={settings.instagram} onChange={e=>setSettings({...settings,instagram:e.target.value})} placeholder="Instagram" className="mt-3 w-full bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><input value={settings.facebook} onChange={e=>setSettings({...settings,facebook:e.target.value})} placeholder="Facebook" className="mt-3 w-full bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><input value={settings.tiktok} onChange={e=>setSettings({...settings,tiktok:e.target.value})} placeholder="TikTok" className="mt-3 w-full bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/></div>
             <div className="bg-white p-6 rounded-xl border"><h3 className="font-black">SEO</h3><input value={settings.seoTitle} onChange={e=>setSettings({...settings,seoTitle:e.target.value})} placeholder="Site Title" className="mt-3 w-full bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><textarea value={settings.seoDesc} onChange={e=>setSettings({...settings,seoDesc:e.target.value})} placeholder="Meta Description" className="mt-3 w-full bg-[#F5F7FA] rounded-2xl px-4 py-3 text-[12px] border h-24"/></div>
           </div>
         )}
       </section>
 
-      {/* TOUR EDIT MODAL - 3 PICS WITH DELETE */}
       {editingTour && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4"><div className="bg-white rounded-[24px] p-6 max-w-2xl w-full max-h-[95vh] overflow-y-auto">
-          <h3 className="font-black text-[16px]">Edit Tour - 3 Pics - Add/Delete - { (editingTour.imageDatas||[]).filter(Boolean).length }/3</h3>
+          <h3 className="font-black text-[16px]">Edit Tour - Full Power - { (editingTour.imageDatas||[]).filter(Boolean).length }/3 {editingTour.active? "🟢 LIVE":"🔴 HIDDEN"}</h3>
           <div className="mt-4 grid grid-cols-3 gap-3">
             {[0,1,2].map(i=>{
               const img = (editingTour.imageDatas||[]).filter(Boolean)[i]
-              return (
-                <div key={i} className="h-[130px] bg-[#F5F7FA] rounded-xl border-2 overflow-hidden flex items-center justify-center relative">
-                  {img? <><img src={img} className="w-full h-full object-cover"/><button onClick={()=>removeTourEditImage(i)} className="absolute top-1 right-1 bg-red-600 text-white w-6 h-6 rounded-full text-[12px] font-black shadow">✕</button><span className="absolute bottom-1 left-1 bg-black/70 text-white text-[9px] px-2 py-0.5 rounded-full">Pic {i+1}</span></> : <div className="text-center"><p className="text-[10px] opacity-40">Slot {i+1}</p><p className="text-[9px] opacity-30 mt-1">Empty</p></div>}
-                </div>
-              )
+              return <div key={i} className="h-[130px] bg-[#F5F7FA] rounded-xl border-2 overflow-hidden flex items-center justify-center relative">{img? <><img src={img} className="w-full h-full object-cover"/><button onClick={()=>removeTourEditImage(i)} className="absolute top-1 right-1 bg-red-600 text-white w-6 h-6 rounded-full text-[12px] font-black shadow">✕</button></> : <div className="text-center"><p className="text-[10px] opacity-40">Slot {i+1}</p></div>}</div>
             })}
           </div>
-          <div className="mt-3 flex gap-2">
-            <label className={`flex-1 text-center py-3 rounded-full font-black text-[12px] border-2 cursor-pointer ${(editingTour.imageDatas||[]).filter(Boolean).length>=3? "bg-gray-100 opacity-40" : "bg-[#FF8A00] text-black border-[#FF8A00]"}`}>📸 Add Pictures ({MAX_IMAGES - (editingTour.imageDatas||[]).filter(Boolean).length} slots left)<input type="file" accept="image/*" multiple className="hidden" disabled={(editingTour.imageDatas||[]).filter(Boolean).length>=3} onChange={e=>{ if(e.target.files) handleTourEditFiles(e.target.files)}}/></label>
+          <label className={`mt-3 block text-center py-3 rounded-full font-black text-[12px] border-2 cursor-pointer ${(editingTour.imageDatas||[]).filter(Boolean).length>=3? "bg-gray-100 opacity-40" : "bg-[#FF8A00] text-black border-[#FF8A00]"}`}>📸 Add Pictures<input type="file" accept="image/*" multiple className="hidden" disabled={(editingTour.imageDatas||[]).filter(Boolean).length>=3} onChange={e=>{ if(e.target.files) handleTourEditFiles(e.target.files)}}/></label>
+          <div className="mt-4 grid md:grid-cols-2 gap-3">
+            <input value={editingTour.id} onChange={e=>setEditingTour({...editingTour,id:e.target.value.toLowerCase().replace(/[^a-z0-9-]/g,'-')})} placeholder="ID (url)" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><input value={editingTour.name} onChange={e=>setEditingTour({...editingTour,name:e.target.value})} placeholder="Name" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] font-bold border"/>
+            <input type="number" value={editingTour.price} onChange={e=>setEditingTour({...editingTour,price:parseInt(e.target.value)||0})} placeholder="Price $" className="bg-[#F0FFF0] rounded-full px-4 py-3 text-[12px] font-black border-2 border-green-500"/><input type="number" value={editingTour.market} onChange={e=>setEditingTour({...editingTour,market:parseInt(e.target.value)||0})} placeholder="Market $" className="bg-[#FFF0F0] rounded-full px-4 py-3 text-[12px] font-black border-2 border-red-300"/>
+            <input value={editingTour.duration} onChange={e=>setEditingTour({...editingTour,duration:e.target.value})} placeholder="Duration e.g. 5 Hours" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><input value={editingTour.pickup} onChange={e=>setEditingTour({...editingTour,pickup:e.target.value})} placeholder="Pickup e.g. Stone Town 8:30 AM" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/>
+            <input value={editingTour.area} onChange={e=>setEditingTour({...editingTour,area:e.target.value})} placeholder="Area e.g. West" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><input value={editingTour.cat?.join(",")} onChange={e=>setEditingTour({...editingTour,cat:e.target.value.split(",").map((s:string)=>s.trim()).filter(Boolean)})} placeholder="Categories comma separated" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/>
+            <input value={editingTour.desc} onChange={e=>setEditingTour({...editingTour,desc:e.target.value})} placeholder="Short Desc" className="md:col-span-2 bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><input value={editingTour.includes} onChange={e=>setEditingTour({...editingTour,includes:e.target.value})} placeholder="Includes e.g. Boat, Guide" className="md:col-span-2 bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/>
+            <label className="flex items-center gap-2 text-[12px] font-bold"><input type="checkbox" checked={editingTour.active} onChange={e=>setEditingTour({...editingTour,active:e.target.checked})}/> Active (Live on site)</label>
+            <label className="flex items-center gap-2 text-[12px] font-bold"><input type="checkbox" checked={editingTour.featured} onChange={e=>setEditingTour({...editingTour,featured:e.target.checked})}/> Featured on Home</label>
           </div>
-          <p className="text-[10px] opacity-50 mt-2">Compressed 800px JPEG 0.6 - Max 3 pics - Click ✕ to delete</p>
-          <div className="mt-4 grid md:grid-cols-2 gap-3"><input value={editingTour.id} onChange={e=>setEditingTour({...editingTour,id:e.target.value.toLowerCase().replace(/[^a-z0-9-]/g,'-')})} placeholder="ID" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><input value={editingTour.name} onChange={e=>setEditingTour({...editingTour,name:e.target.value})} placeholder="Name" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] font-bold border"/><input type="number" value={editingTour.price} onChange={e=>setEditingTour({...editingTour,price:parseInt(e.target.value)||0})} placeholder="Price" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] font-black border-2 border-green-500"/><input type="number" value={editingTour.market} onChange={e=>setEditingTour({...editingTour,market:parseInt(e.target.value)||0})} placeholder="Market" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] font-black border-2 border-red-500"/><input value={editingTour.desc} onChange={e=>setEditingTour({...editingTour,desc:e.target.value})} placeholder="Desc" className="md:col-span-2 bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><input value={editingTour.duration} onChange={e=>setEditingTour({...editingTour,duration:e.target.value})} placeholder="Duration" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><input value={editingTour.area} onChange={e=>setEditingTour({...editingTour,area:e.target.value})} placeholder="Area" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/></div>
-          <div className="flex gap-2 mt-5"><button onClick={()=>{ if(tours.find(t=>t.id===editingTour.id)) setTours(prev=>prev.map(t=>t.id===editingTour.id? editingTour:t)); else setTours(prev=>[...prev,editingTour]); saveOne("tour",editingTour); setEditingTour(null)}} className="flex-1 bg-[#0A2342] text-white py-3 rounded-full font-black text-[12px]">💾 Save { (editingTour.imageDatas||[]).filter(Boolean).length } Pics to DB</button><button onClick={()=>setEditingTour(null)} className="px-6 py-3 bg-[#F5F7FA] rounded-full font-bold text-[12px]">Cancel</button></div>
+          <div className="flex gap-2 mt-5"><button onClick={()=>{ if(tours.find(t=>t.id===editingTour.id)) setTours(prev=>prev.map(t=>t.id===editingTour.id? editingTour:t)); else setTours(prev=>[editingTour,...prev]); saveOne("tour",editingTour); setEditingTour(null)}} className="flex-1 bg-[#0A2342] text-white py-3 rounded-full font-black text-[12px]">💾 Save Tour Live</button><button onClick={()=>setEditingTour(null)} className="px-6 py-3 bg-[#F5F7FA] rounded-full font-bold text-[12px]">Cancel</button></div>
         </div></div>
       )}
 
-      {/* AIRPORT-TRANSFER EDIT MODAL - 3 PICS WITH DELETE */}
       {editingTransfer && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4"><div className="bg-white rounded-[24px] p-6 max-w-xl w-full max-h-[95vh] overflow-y-auto">
-          <h3 className="font-black">Edit Airport-Transfer - 3 Pics - { (editingTransfer.imageDatas||[]).filter(Boolean).length }/3 - Shows on /airport-transfers</h3>
+          <h3 className="font-black">Edit Transfer - { (editingTransfer.imageDatas||[]).filter(Boolean).length }/3 {editingTransfer.active? "🟢 LIVE":"🔴 HIDDEN"}</h3>
           <div className="mt-4 grid grid-cols-3 gap-3">
             {[0,1,2].map(i=>{
               const img=(editingTransfer.imageDatas||[]).filter(Boolean)[i]
-              return <div key={i} className="h-[110px] bg-[#F5F7FA] rounded-xl border-2 overflow-hidden flex items-center justify-center relative">{img? <><img src={img} className="w-full h-full object-cover"/><button onClick={()=>removeTransferEditImage(i)} className="absolute top-1 right-1 bg-red-600 text-white w-6 h-6 rounded-full text-[12px] font-black">✕</button><span className="absolute bottom-1 left-1 bg-black/70 text-white text-[9px] px-2 py-0.5 rounded-full">Pic {i+1}</span></> : <span className="text-[10px] opacity-40">Slot {i+1}</span>}</div>
+              return <div key={i} className="h-[110px] bg-[#F5F7FA] rounded-xl border-2 overflow-hidden flex items-center justify-center relative">{img? <><img src={img} className="w-full h-full object-cover"/><button onClick={()=>removeTransferEditImage(i)} className="absolute top-1 right-1 bg-red-600 text-white w-6 h-6 rounded-full text-[12px] font-black">✕</button></> : <span className="text-[10px] opacity-40">Slot {i+1}</span>}</div>
             })}
           </div>
-          <label className={`mt-3 block text-center py-3 rounded-full font-black text-[12px] border-2 cursor-pointer ${(editingTransfer.imageDatas||[]).filter(Boolean).length>=3? "bg-gray-100 opacity-40" : "bg-[#FF8A00] text-black border-[#FF8A00]"}`}>📸 Add Pictures ({MAX_IMAGES - (editingTransfer.imageDatas||[]).filter(Boolean).length} left)<input type="file" accept="image/*" multiple className="hidden" disabled={(editingTransfer.imageDatas||[]).filter(Boolean).length>=3} onChange={e=>{ if(e.target.files) handleTransferEditFiles(e.target.files)}}/></label>
-          <div className="mt-4 grid gap-3"><input value={editingTransfer.id} onChange={e=>setEditingTransfer({...editingTransfer,id:e.target.value})} placeholder="ID airport-stone" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><input value={editingTransfer.name} onChange={e=>setEditingTransfer({...editingTransfer,name:e.target.value})} placeholder="Name Airport → X" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] font-bold border"/><div className="grid grid-cols-2 gap-3"><input type="number" value={editingTransfer.price} onChange={e=>setEditingTransfer({...editingTransfer,price:parseInt(e.target.value)||0})} placeholder="Price" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] font-black border-2 border-green-500"/><input type="number" value={editingTransfer.market} onChange={e=>setEditingTransfer({...editingTransfer,market:parseInt(e.target.value)||0})} placeholder="Market" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] font-black border-2 border-red-500"/></div><input value={editingTransfer.desc} onChange={e=>setEditingTransfer({...editingTransfer,desc:e.target.value})} placeholder="Desc" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><input value={editingTransfer.area} onChange={e=>setEditingTransfer({...editingTransfer,area:e.target.value})} placeholder="Area" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/></div>
-          <div className="flex gap-2 mt-5"><button onClick={()=>{ if(transfers.find(t=>t.id===editingTransfer.id)) setTransfers(prev=>prev.map(t=>t.id===editingTransfer.id? editingTransfer:t)); else setTransfers(prev=>[...prev,editingTransfer]); saveOne("transfer",editingTransfer); setEditingTransfer(null)}} className="flex-1 bg-[#0A2342] text-white py-3 rounded-full font-black text-[12px]">💾 Save { (editingTransfer.imageDatas||[]).filter(Boolean).length } Pics to /airport-transfers DB</button><button onClick={()=>setEditingTransfer(null)} className="px-6 py-3 bg-[#F5F7FA] rounded-full font-bold text-[12px]">Cancel</button></div>
+          <label className={`mt-3 block text-center py-3 rounded-full font-black text-[12px] border-2 cursor-pointer ${(editingTransfer.imageDatas||[]).filter(Boolean).length>=3? "bg-gray-100 opacity-40" : "bg-[#FF8A00] text-black border-[#FF8A00]"}`}>📸 Add Pictures<input type="file" accept="image/*" multiple className="hidden" disabled={(editingTransfer.imageDatas||[]).filter(Boolean).length>=3} onChange={e=>{ if(e.target.files) handleTransferEditFiles(e.target.files)}}/></label>
+          <div className="mt-4 grid gap-3">
+            <input value={editingTransfer.id} onChange={e=>setEditingTransfer({...editingTransfer,id:e.target.value.toLowerCase().replace(/[^a-z0-9-]/g,'-')})} placeholder="ID airport-stone" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/>
+            <input value={editingTransfer.name} onChange={e=>setEditingTransfer({...editingTransfer,name:e.target.value})} placeholder="Name Airport → X" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] font-bold border"/>
+            <div className="grid grid-cols-2 gap-3"><input type="number" value={editingTransfer.price} onChange={e=>setEditingTransfer({...editingTransfer,price:parseInt(e.target.value)||0})} placeholder="Price" className="bg-[#F0FFF0] rounded-full px-4 py-3 text-[12px] font-black border-2 border-green-500"/><input type="number" value={editingTransfer.market} onChange={e=>setEditingTransfer({...editingTransfer,market:parseInt(e.target.value)||0})} placeholder="Market" className="bg-[#FFF0F0] rounded-full px-4 py-3 text-[12px] font-black border-2 border-red-300"/></div>
+            <div className="grid grid-cols-2 gap-3"><input value={editingTransfer.duration} onChange={e=>setEditingTransfer({...editingTransfer,duration:e.target.value})} placeholder="Duration e.g. 12-15 min" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><input value={editingTransfer.area} onChange={e=>setEditingTransfer({...editingTransfer,area:e.target.value})} placeholder="Area e.g. West" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/></div>
+            <input value={editingTransfer.desc} onChange={e=>setEditingTransfer({...editingTransfer,desc:e.target.value})} placeholder="Description" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/>
+            <input value={editingTransfer.cat?.join(",")} onChange={e=>setEditingTransfer({...editingTransfer,cat:e.target.value.split(",").map((s:string)=>s.trim()).filter(Boolean)})} placeholder="Categories Popular, North" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/>
+            <label className="flex items-center gap-2 text-[12px] font-bold"><input type="checkbox" checked={editingTransfer.active} onChange={e=>setEditingTransfer({...editingTransfer,active:e.target.checked})}/> Active (Live on site)</label>
+          </div>
+          <div className="flex gap-2 mt-5"><button onClick={()=>{ if(transfers.find(t=>t.id===editingTransfer.id)) setTransfers(prev=>prev.map(t=>t.id===editingTransfer.id? editingTransfer:t)); else setTransfers(prev=>[editingTransfer,...prev]); saveOne("transfer",editingTransfer); setEditingTransfer(null)}} className="flex-1 bg-[#0A2342] text-white py-3 rounded-full font-black text-[12px]">💾 Save Transfer Live</button><button onClick={()=>setEditingTransfer(null)} className="px-6 py-3 bg-[#F5F7FA] rounded-full font-bold text-[12px]">Cancel</button></div>
         </div></div>
       )}
 
-      {editingAnn && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4"><div className="bg-white rounded-[24px] p-6 max-w-lg w-full">
-          <h3 className="font-black">Edit Hero Slide</h3><div className="mt-4 grid gap-3"><input value={editingAnn.badge} onChange={e=>setEditingAnn({...editingAnn,badge:e.target.value})} placeholder="Badge" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><input value={editingAnn.title} onChange={e=>setEditingAnn({...editingAnn,title:e.target.value})} placeholder="Title" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] font-bold border"/><input value={editingAnn.subtitle} onChange={e=>setEditingAnn({...editingAnn,subtitle:e.target.value})} placeholder="Subtitle" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><div className="grid grid-cols-2 gap-3"><input value={editingAnn.cta} onChange={e=>setEditingAnn({...editingAnn,cta:e.target.value})} placeholder="CTA" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><input value={editingAnn.link} onChange={e=>setEditingAnn({...editingAnn,link:e.target.value})} placeholder="Link" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/></div><input type="file" accept="image/*" className="text-[11px]" onChange={e=>{ const f=e.target.files?.[0]; if(!f) return; toBase64(f,b64=>setEditingAnn({...editingAnn,imageData:b64}))}}/><div className="h-[120px] bg-[#F5F7FA] rounded-xl overflow-hidden">{editingAnn.imageData&&<img src={editingAnn.imageData} className="w-full h-full object-cover"/>}</div></div><div className="flex gap-2 mt-5"><button onClick={()=>{ if(announcements.find(a=>a.id===editingAnn.id)) setAnnouncements(prev=>prev.map(a=>a.id===editingAnn.id? editingAnn:a)); else setAnnouncements(prev=>[...prev,editingAnn]); setEditingAnn(null)}} className="flex-1 bg-[#0A2342] text-white py-3 rounded-full font-black text-[12px]">Save Slide</button><button onClick={()=>setEditingAnn(null)} className="px-6 py-3 bg-[#F5F7FA] rounded-full font-bold">Cancel</button></div>
-        </div></div>
-      )}
-      {editingBlog && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4"><div className="bg-white rounded-[24px] p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto">
-          <h3 className="font-black">Edit Blog</h3><div className="mt-4 grid gap-3"><input value={editingBlog.slug} onChange={e=>setEditingBlog({...editingBlog,slug:e.target.value.toLowerCase().replace(/[^a-z0-9-]/g,'-'),id:e.target.value})} placeholder="slug" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><input value={editingBlog.title} onChange={e=>setEditingBlog({...editingBlog,title:e.target.value})} placeholder="Title" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] font-bold border"/><input value={editingBlog.cat} onChange={e=>setEditingBlog({...editingBlog,cat:e.target.value})} placeholder="Category" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><input value={editingBlog.excerpt} onChange={e=>setEditingBlog({...editingBlog,excerpt:e.target.value})} placeholder="Excerpt" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><textarea value={editingBlog.content} onChange={e=>setEditingBlog({...editingBlog,content:e.target.value})} placeholder="Full content" className="bg-[#F5F7FA] rounded-2xl px-4 py-3 text-[12px] border h-32"/><input type="file" accept="image/*" className="text-[11px]" onChange={e=>{ const f=e.target.files?.[0]; if(!f) return; toBase64(f,b64=>setEditingBlog({...editingBlog,imageData:b64}))}}/></div><div className="flex gap-2 mt-5"><button onClick={()=>{ if(blogs.find(b=>b.id===editingBlog.id)) setBlogs(prev=>prev.map(b=>b.id===editingBlog.id? editingBlog:b)); else setBlogs(prev=>[...prev,editingBlog]); setEditingBlog(null)}} className="flex-1 bg-[#0A2342] text-white py-3 rounded-full font-black">Save Blog</button><button onClick={()=>setEditingBlog(null)} className="px-6 py-3 bg-[#F5F7FA] rounded-full font-bold">Cancel</button></div>
-        </div></div>
-      )}
-      {editingReview && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4"><div className="bg-white rounded-[24px] p-6 max-w-lg w-full">
-          <h3 className="font-black">Edit Review</h3><div className="mt-4 grid gap-3"><input value={editingReview.name} onChange={e=>setEditingReview({...editingReview,name:e.target.value})} placeholder="Name" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><input value={editingReview.country} onChange={e=>setEditingReview({...editingReview,country:e.target.value})} placeholder="Country" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><input value={editingReview.tour} onChange={e=>setEditingReview({...editingReview,tour:e.target.value})} placeholder="Tour" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><textarea value={editingReview.text} onChange={e=>setEditingReview({...editingReview,text:e.target.value})} placeholder="Review" className="bg-[#F5F7FA] rounded-2xl px-4 py-3 text-[12px] border h-24"/><input type="number" min={1} max={5} value={editingReview.rating} onChange={e=>setEditingReview({...editingReview,rating:parseInt(e.target.value)||5})} className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/></div><div className="flex gap-2 mt-5"><button onClick={()=>{ if(reviews.find(r=>r.id===editingReview.id)) setReviews(prev=>prev.map(r=>r.id===editingReview.id? editingReview:r)); else setReviews(prev=>[...prev,editingReview]); setEditingReview(null)}} className="flex-1 bg-[#0A2342] text-white py-3 rounded-full font-black">Save Review</button><button onClick={()=>setEditingReview(null)} className="px-6 py-3 bg-[#F5F7FA] rounded-full font-bold">Cancel</button></div>
-        </div></div>
-      )}
+      {editingAnn && (<div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4"><div className="bg-white rounded-[24px] p-6 max-w-lg w-full"><h3 className="font-black">Edit Hero Slide</h3><div className="mt-4 grid gap-3"><input value={editingAnn.badge} onChange={e=>setEditingAnn({...editingAnn,badge:e.target.value})} placeholder="Badge" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><input value={editingAnn.title} onChange={e=>setEditingAnn({...editingAnn,title:e.target.value})} placeholder="Title" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] font-bold border"/><input value={editingAnn.subtitle} onChange={e=>setEditingAnn({...editingAnn,subtitle:e.target.value})} placeholder="Subtitle" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><div className="grid grid-cols-2 gap-3"><input value={editingAnn.cta} onChange={e=>setEditingAnn({...editingAnn,cta:e.target.value})} placeholder="CTA" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><input value={editingAnn.link} onChange={e=>setEditingAnn({...editingAnn,link:e.target.value})} placeholder="Link" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/></div><input type="file" accept="image/*" className="text-[11px]" onChange={e=>{ const f=e.target.files?.[0]; if(!f) return; toBase64(f,b64=>setEditingAnn({...editingAnn,imageData:b64}))}}/><div className="h-[120px] bg-[#F5F7FA] rounded-xl overflow-hidden">{editingAnn.imageData&&<img src={editingAnn.imageData} className="w-full h-full object-cover"/>}</div></div><div className="flex gap-2 mt-5"><button onClick={()=>{ if(announcements.find(a=>a.id===editingAnn.id)) setAnnouncements(prev=>prev.map(a=>a.id===editingAnn.id? editingAnn:a)); else setAnnouncements(prev=>[...prev,editingAnn]); setEditingAnn(null)}} className="flex-1 bg-[#0A2342] text-white py-3 rounded-full font-black text-[12px]">Save Slide</button><button onClick={()=>setEditingAnn(null)} className="px-6 py-3 bg-[#F5F7FA] rounded-full font-bold">Cancel</button></div></div></div>)}
+      {editingBlog && (<div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4"><div className="bg-white rounded-[24px] p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto"><h3 className="font-black">Edit Blog</h3><div className="mt-4 grid gap-3"><input value={editingBlog.slug} onChange={e=>setEditingBlog({...editingBlog,slug:e.target.value.toLowerCase().replace(/[^a-z0-9-]/g,'-'),id:e.target.value})} placeholder="slug" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><input value={editingBlog.title} onChange={e=>setEditingBlog({...editingBlog,title:e.target.value})} placeholder="Title" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] font-bold border"/><input value={editingBlog.cat} onChange={e=>setEditingBlog({...editingBlog,cat:e.target.value})} placeholder="Category" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><input value={editingBlog.excerpt} onChange={e=>setEditingBlog({...editingBlog,excerpt:e.target.value})} placeholder="Excerpt" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><textarea value={editingBlog.content} onChange={e=>setEditingBlog({...editingBlog,content:e.target.value})} placeholder="Full content" className="bg-[#F5F7FA] rounded-2xl px-4 py-3 text-[12px] border h-32"/><input type="file" accept="image/*" className="text-[11px]" onChange={e=>{ const f=e.target.files?.[0]; if(!f) return; toBase64(f,b64=>setEditingBlog({...editingBlog,imageData:b64}))}}/></div><div className="flex gap-2 mt-5"><button onClick={()=>{ if(blogs.find(b=>b.id===editingBlog.id)) setBlogs(prev=>prev.map(b=>b.id===editingBlog.id? editingBlog:b)); else setBlogs(prev=>[...prev,editingBlog]); setEditingBlog(null)}} className="flex-1 bg-[#0A2342] text-white py-3 rounded-full font-black">Save Blog</button><button onClick={()=>setEditingBlog(null)} className="px-6 py-3 bg-[#F5F7FA] rounded-full font-bold">Cancel</button></div></div></div>)}
+      {editingReview && (<div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4"><div className="bg-white rounded-[24px] p-6 max-w-lg w-full"><h3 className="font-black">Edit Review</h3><div className="mt-4 grid gap-3"><input value={editingReview.name} onChange={e=>setEditingReview({...editingReview,name:e.target.value})} placeholder="Name" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><input value={editingReview.country} onChange={e=>setEditingReview({...editingReview,country:e.target.value})} placeholder="Country" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><input value={editingReview.tour} onChange={e=>setEditingReview({...editingReview,tour:e.target.value})} placeholder="Tour" className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/><textarea value={editingReview.text} onChange={e=>setEditingReview({...editingReview,text:e.target.value})} placeholder="Review" className="bg-[#F5F7FA] rounded-2xl px-4 py-3 text-[12px] border h-24"/><input type="number" min={1} max={5} value={editingReview.rating} onChange={e=>setEditingReview({...editingReview,rating:parseInt(e.target.value)||5})} className="bg-[#F5F7FA] rounded-full px-4 py-3 text-[12px] border"/></div><div className="flex gap-2 mt-5"><button onClick={()=>{ if(reviews.find(r=>r.id===editingReview.id)) setReviews(prev=>prev.map(r=>r.id===editingReview.id? editingReview:r)); else setReviews(prev=>[...prev,editingReview]); setEditingReview(null)}} className="flex-1 bg-[#0A2342] text-white py-3 rounded-full font-black">Save Review</button><button onClick={()=>setEditingReview(null)} className="px-6 py-3 bg-[#F5F7FA] rounded-full font-bold">Cancel</button></div></div></div>)}
     </main>
   )
 }
