@@ -10,7 +10,6 @@ const DEFAULT_ANNOUNCEMENTS = [
   { id:3, badge:"🏝️ FULL DAY • BEST SNORKELING", title:"Safari Blue & Mnemba Atoll - Private Dhow & Boat", subtitle:"Safari Blue sandbank + snorkeling + seafood BBQ & Mnemba best reef - Private dhow/boat", cta:"Build Itinerary", link:"#tours", imageData:"https://images.unsplash.com/photo-1583212292454-1fe6229603b7?w=800&q=80&auto=format&fit=crop", active:true },
 ]
 
-// EXACT SAME AS airport-transfers page - READ FROM E:\Projects\hero-shuttle\public\transfers
 const TRANSFER_IMAGE_MAP: Record<string, string> = {
   "airport-stone": "/transfers/airport-stone.jpg",
   "airport-nungwi": "/transfers/nungwi.jpg",
@@ -55,7 +54,6 @@ function getTransferPricing(id:string, name:string, apiPrice:number, apiMarket:n
   return {price: apiPrice||35, market: apiMarket|| (apiPrice+20)}
 }
 
-// EXACT SAME AS tours page - READ FROM E:\Projects\hero-shuttle\public\tours
 const PUBLIC_IMAGE_MAP: Record<string, string[]> = {
   "prison-nakupenda": ["/tours/prison-nakupenda.jpg"],
   "salaam": ["/tours/salaam-cave.jpg"],
@@ -127,6 +125,9 @@ export default function HomePage(){
   const [waNumber, setWaNumber] = useState("255773628792")
   const [blogs, setBlogs] = useState(HOME_BLOGS)
   const [showCart, setShowCart] = useState(false)
+  // --- ADDED REVIEWS FETCH ONLY ---
+  const [reviews, setReviews] = useState<any[]>([])
+  const [reviewsLoading, setReviewsLoading] = useState(true)
 
   const announcementsRef = useRef(announcements)
   useEffect(()=>{ announcementsRef.current = announcements }, [announcements])
@@ -153,7 +154,6 @@ export default function HomePage(){
       const data = await r.json()
       if(Array.isArray(data) && data.length>0){
         const mapped = data.filter((d:any)=>d.active!==false).filter((d:any)=>!HIDDEN_TOUR_IDS.includes(d.id)).map((d:any)=>{
-          // SAME LOGIC AS tours PAGE - force from public/tours
           const publicUrls = getPublicImages(d.id, d.name||d.title||"")
           const urls = publicUrls && publicUrls.length>0 ? publicUrls : []
           const apiPrice = Number(d.price?? 0)
@@ -169,7 +169,6 @@ export default function HomePage(){
       const data = await r.json()
       if(Array.isArray(data) && data.length>0){
         const mapped = data.filter((d:any)=>d.active!==false).map((d:any)=>{
-          // SAME LOGIC AS airport-transfers PAGE - force from public/transfers
           const apiPrice = Number(d.price?? 0)
           const apiMarket = Number(d.market_price?? d.market?? 0)
           const pricing = getTransferPricing(d.id, d.name||d.title, apiPrice, apiMarket)
@@ -182,6 +181,22 @@ export default function HomePage(){
     }catch{}
     try{ const r = await fetch('/api/blogs',{cache:'no-store'}); const data = await r.json(); if(Array.isArray(data)&&data.length>0) setBlogs(data.slice(0,6).map((b:any)=>({ slug:b.slug||b.id, cat:b.cat||b.category, title:b.title, excerpt:b.excerpt||b.desc||"" }))) }catch{}
     try{ const r = await fetch('/api/settings',{cache:'no-store'}); const data = await r.json(); if(data?.whatsapp) setWaNumber(data.whatsapp) }catch{}
+
+    // --- REVIEWS API FETCH (ADDED) ---
+    try{
+      setReviewsLoading(true)
+      const r = await fetch('/api/reviews',{cache:'no-store'})
+      const data = await r.json()
+      if(Array.isArray(data)) setReviews(data)
+      else if(Array.isArray(data?.data)) setReviews(data.data)
+      else if(Array.isArray(data?.reviews)) setReviews(data.reviews)
+      else if(Array.isArray(data?.data?.data)) setReviews(data.data.data)
+      else setReviews([])
+    }catch{
+      setReviews([])
+    }finally{
+      setReviewsLoading(false)
+    }
   }
 
   useEffect(()=>{ syncAll(); const ivSync = setInterval(syncAll, 15000); const onFocus = ()=> syncAll(); window.addEventListener('focus', onFocus); return ()=>{ clearInterval(ivSync); window.removeEventListener('focus', onFocus) } },[])
@@ -204,8 +219,8 @@ export default function HomePage(){
   const toggleTransfer = (tr:any)=> setSelectedTransfers(prev=> prev.find(p=>p.id===tr.id)? prev.filter(p=>p.id!==tr.id) : [...prev, {...tr, guests:1, type:'transfer'}])
   const allSelected = [...selectedTransfers, ...selectedTours]
 
-  const TA_WRITE_URL = "https://www.tripadvisor.com/UserReviewEdit-g608438-d34749047-Hero_Shuttles-Zanzibar_City_Zanzibar_Archipelago.html"
-  const TA_VIEW_URL = "https://www.tripadvisor.com/Attraction_Review-g608438-d34749047-Reviews-Hero_Shuttles-Zanzibar_City_Zanzibar_Archipelago.html"
+  const TA_WRITE_URL = "https://www.tripadvisor.com/UserReviewEdit-g8055401-d34749047-Hero_Shuttles-Zanzibar_City_Zanzibar_Island_Zanzibar_Archipelago.html"
+  const TA_VIEW_URL = "https://www.tripadvisor.com/Attraction_Review-g8055401-d34749047-Reviews-Hero_Shuttles-Zanzibar_City_Zanzibar_Island_Zanzibar_Archipelago.html"
 
   return (
     <main className="min-h-screen bg-[#F8FAFF]">
@@ -392,7 +407,7 @@ export default function HomePage(){
         <div className="max-w-[1400px] mx-auto">
           <div className="text-center max-w-3xl mx-auto">
             <h2 className="font-black text-[28px] md:text-[38px] text-[#0a2342] leading-[1.1]">What guests say on TripAdvisor after their<br/>private tours with HERO</h2>
-            <p className="text-[13px] text-[#0A2342]/60 mt-3">Verified reviews from TripAdvisor • #112 of 1198 in Zanzibar City</p>
+            <p className="text-[13px] text-[#0A2342]/60 mt-3">Verified reviews from TripAdvisor • #112 of 1198 in Zanzibar City • Location ID: 34749047</p>
           </div>
 
           <div className="mt-10 grid md:grid-cols-3 gap-6">
@@ -400,6 +415,7 @@ export default function HomePage(){
               <div className="flex items-center gap-3">
                 <span className="font-black text-[18px] text-[#0a2342]">TripAdvisor</span>
                 <span className="bg-[#00aa6c] text-white text-[10px] px-3 py-1 rounded-full font-black">VERIFIED</span>
+                <span className="text-[11px] text-gray-500">{reviewsLoading? "Loading..." : `${reviews.length} reviews loaded`}</span>
               </div>
               <h3 className="font-black text-[22px] md:text-[26px] text-[#0a2342] mt-6 leading-tight">Enjoyed your private tour with HERO?</h3>
               <p className="text-[14px] text-[#0a2342]/70 mt-3 leading-relaxed">Tap below to leave a review on TripAdvisor. Takes 30 seconds and helps other travelers find us. Asante sana!</p>
@@ -442,20 +458,40 @@ export default function HomePage(){
 
           <div className="mt-12">
             <div className="flex justify-between items-center">
-              <h3 className="font-black text-[18px] text-[#0a2342]">All Guest Reviews from TripAdvisor</h3>
+              <h3 className="font-black text-[18px] text-[#0a2342]">All Guest Reviews from TripAdvisor API</h3>
               <a href={TA_VIEW_URL} target="_blank" className="text-[12px] font-black text-[#00aa6c] underline">View on TripAdvisor →</a>
             </div>
-            <div className="mt-6 bg-[#F8FAFF] rounded-[24px] border-2 border-[#0a2342]/5 p-8 text-center">
-              <div className="max-w-xl mx-auto">
-                <div className="w-16 h-16 bg-[#00aa6c]/10 rounded-full flex items-center justify-center mx-auto"><span className="text-[28px]">💬</span></div>
-                <h4 className="font-black text-[16px] text-[#0a2342] mt-4">No reviews yet - Be the first!</h4>
-                <p className="text-[13px] text-[#0a2342]/60 mt-2 leading-relaxed">Scan the green QR above. Once guests review on TripAdvisor, reviews appear here automatically within 24h.</p>
-                <div className="mt-6 flex flex-col md:flex-row justify-center gap-3">
-                  <a href={TA_WRITE_URL} target="_blank" className="bg-[#0a2342] text-white px-8 py-3 rounded-full font-black text-[13px]">Write First Review →</a>
-                  <a href={TA_VIEW_URL} target="_blank" className="bg-white border-2 border-[#0a2342]/10 text-[#0a2342] px-8 py-3 rounded-full font-black text-[13px]">View Listing →</a>
+
+            {reviewsLoading ? (
+              <div className="mt-6 grid md:grid-cols-3 gap-4">
+                {[1,2,3].map(i=><div key={i} className="bg-[#F8FAFF] rounded-[18px] p-6 animate-pulse h-[160px] border-2 border-[#0a2342]/5"></div>)}
+              </div>
+            ) : reviews.length > 0 ? (
+              <div className="mt-6 grid md:grid-cols-3 gap-4">
+                {reviews.map((rv:any, idx:number)=>(
+                  <div key={rv.id||idx} className="bg-white rounded-[18px] border-2 border-[#0a2342]/5 p-5 shadow-sm">
+                    <div className="flex justify-between items-start gap-2">
+                      <p className="font-black text-[13px] text-[#0a2342]">{rv.user?.username || rv.author || "Guest"}</p>
+                      <span className="bg-[#00aa6c]/10 text-[#00aa6c] text-[11px] font-black px-2 py-0.5 rounded-full">⭐ {rv.rating || 5}/5</span>
+                    </div>
+                    <p className="text-[12px] text-gray-500 mt-1">{rv.published_date || rv.date || ""} • {rv.title || ""}</p>
+                    <p className="text-[13px] text-[#0a2342]/80 mt-3 leading-relaxed line-clamp-4">{rv.text || rv.review_text || rv.comment || JSON.stringify(rv).slice(0,200)}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="mt-6 bg-[#F8FAFF] rounded-[24px] border-2 border-[#0a2342]/5 p-8 text-center">
+                <div className="max-w-xl mx-auto">
+                  <div className="w-16 h-16 bg-[#00aa6c]/10 rounded-full flex items-center justify-center mx-auto"><span className="text-[28px]">💬</span></div>
+                  <h4 className="font-black text-[16px] text-[#0a2342] mt-4">No reviews from API yet - Terra not migrated</h4>
+                  <p className="text-[13px] text-[#0a2342]/60 mt-2 leading-relaxed">Your listing ID 34749047 exists on TripAdvisor but not yet in Terra API. API returns empty. Guests can still review via QR above - once migrated, reviews auto-appear here. Use Widget fallback for now.</p>
+                  <div className="mt-6 flex flex-col md:flex-row justify-center gap-3">
+                    <a href={TA_WRITE_URL} target="_blank" className="bg-[#0a2342] text-white px-8 py-3 rounded-full font-black text-[13px]">Write First Review →</a>
+                    <a href={TA_VIEW_URL} target="_blank" className="bg-white border-2 border-[#0a2342]/10 text-[#0a2342] px-8 py-3 rounded-full font-black text-[13px]">View Listing →</a>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </section>
