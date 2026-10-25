@@ -56,52 +56,30 @@ function getTransferPricing(id:string, name:string, apiPrice:number, apiMarket:n
 
 const PUBLIC_IMAGE_MAP: Record<string, string[]> = {
   "prison-nakupenda": ["/tours/prison-nakupenda.jpg"],
-  "salaam": ["/tours/salaam-cave.jpg"],
   "salaam-cave": ["/tours/salaam-cave.jpg"],
-  "kuza": ["/tours/kuza-cave.jpg"],
   "kuza-cave": ["/tours/kuza-cave.jpg"],
   "mnemba": ["/tours/mnemba.jpg", "/tours/mnemba2.jpg"],
   "safari-sharing": ["/tours/safari-sharing.jpg"],
-  "sharing": ["/tours/safari-sharing.jpg"],
   "prison-island": ["/tours/prison-island.jpg", "/tours/prison-island2.jpg"],
-  "prison-only": ["/tours/prison-island.jpg", "/tours/prison-island2.jpg"],
   "nakupenda-only": ["/tours/nakupenda-only.jpg", "/tours/nakupenda-only2.jpg"],
-  "nakupenda": ["/tours/nakupenda-only.jpg", "/tours/nakupenda-only2.jpg"],
   "quad-bike": ["/tours/quad-bike.jpg", "/tours/quad-bike2.jpg"],
-  "quad": ["/tours/quad-bike.jpg", "/tours/quad-bike2.jpg"],
   "safari-blue-private": ["/tours/safari-blue-private.jpg"],
-  "private": ["/tours/safari-blue-private.jpg"],
   "stone-town": ["/tours/stone-town.jpg", "/tours/stone-town2.jpg"],
   "spice-farm": ["/tours/spice-farm.jpg", "/tours/spice-farm2.jpg"],
-  "spice": ["/tours/spice-farm.jpg", "/tours/spice-farm2.jpg"],
   "jozani": ["/tours/jozani-monkeys1.jpg", "/tours/jozani-monkeys2.jpg", "/tours/jozani-monkeys3.jpg"],
   "sunset-dhow": ["/tours/sunset-dhow.jpg"],
-  "sunset": ["/tours/sunset-dhow.jpg"],
   "kizimkazi-dolphin": ["/tours/kizimkazi-dolphin.jpg"],
-  "kizimkazi": ["/tours/kizimkazi-dolphin.jpg"],
-  "dolphin": ["/tours/kizimkazi-dolphin.jpg"],
 }
 function getPublicImages(id: string, name: string): string[] | null {
+  const lowerId = id?.toLowerCase() || ""
+  if (PUBLIC_IMAGE_MAP[lowerId]) return PUBLIC_IMAGE_MAP[lowerId]
+  const sortedKeys = Object.keys(PUBLIC_IMAGE_MAP).sort((a,b)=>b.length-a.length)
   const raw = (id + " " + name).toLowerCase()
-  const key = raw.replace(/-/g, " ")
-  if (PUBLIC_IMAGE_MAP[id?.toLowerCase()]) return PUBLIC_IMAGE_MAP[id.toLowerCase()]
-  for (const mapKey in PUBLIC_IMAGE_MAP) {
-    const mapKeyNorm = mapKey.replace(/-/g, " ")
-    if (key.includes(mapKey) || key.includes(mapKeyNorm) || raw.includes(mapKey)) {
-      return PUBLIC_IMAGE_MAP[mapKey]
-    }
+  for (const mapKey of sortedKeys) {
+    if (raw.includes(mapKey)) return PUBLIC_IMAGE_MAP[mapKey]
   }
   return null
 }
-
-const REAL_10_TRANSFERS = [
-  { id:"airport-stone", name:"Airport → Stone Town", area:"West", duration:"15 min", distance:"6 km", price:15, market:25, desc:"Per CAR up to 6 pax - Pay after trip", active:true, cat:["Popular"] },
-  { id:"airport-nungwi", name:"Airport → Nungwi / Kendwa", area:"North", duration:"1h 15m", distance:"58 km", price:40, market:60, desc:"Per CAR up to 6 pax - North beach", active:true, cat:["Popular","North"] },
-  { id:"airport-matemwe", name:"Airport → Matemwe / Mnemba", area:"North-East", duration:"1h 20m", distance:"52 km", price:40, market:60, desc:"Per CAR up to 6 pax - Mnemba area", active:true, cat:["Popular","North"] },
-  { id:"airport-kiwengwa", name:"Airport → Kiwengwa / Pongwe", area:"East", duration:"1h", distance:"36 km", price:35, market:55, desc:"Per CAR - East coast", active:true, cat:["East"] },
-  { id:"airport-paje", name:"Airport → Paje / Jambiani", area:"South-East", duration:"1h", distance:"48 km", price:40, market:60, desc:"Per CAR up to 6 pax - Kitesurf area", active:true, cat:["Popular","South"] },
-  { id:"paje-nungwi", name:"Paje → Nungwi", area:"North", duration:"1h 30m", distance:"75 km", price:70, market:110, desc:"Per CAR - East to North crossing", active:true, cat:["Popular"] },
-]
 
 const HOME_BLOGS = [
   { slug:"prison-island-nakupenda-guide", cat:"Guide", title:"Prison Island & Nakupenda: Complete Guide 2026", excerpt:"Giant tortoises 100+ years + white sandbank - best time, itinerary and private boat inclusions." },
@@ -117,15 +95,14 @@ const HIDDEN_TOUR_IDS = ["kite-lesson","chumbe","rock","nungwi-sunset","paje-kit
 export default function HomePage(){
   const [announcements, setAnnouncements] = useState(DEFAULT_ANNOUNCEMENTS)
   const [activeSlide, setActiveSlide] = useState(0)
-  const [tours, setTours] = useState<any[]>([])
-  const [transfers, setTransfers] = useState<any[]>(REAL_10_TRANSFERS.map(t=>({...t, imageData:getTransferImage(t.id,t.name,""), imageDatas:[getTransferImage(t.id,t.name,"")]})))
+  const [tours, setTours] = useState<any[]>([]) // ONLY from /api/tours
+  const [transfers, setTransfers] = useState<any[]>([]) // ONLY from /api/transfers
   const [filter, setFilter] = useState("Popular")
   const [selectedTours, setSelectedTours] = useState<any[]>([])
   const [selectedTransfers, setSelectedTransfers] = useState<any[]>([])
   const [waNumber, setWaNumber] = useState("255773628792")
   const [blogs, setBlogs] = useState(HOME_BLOGS)
   const [showCart, setShowCart] = useState(false)
-  // --- ADDED REVIEWS FETCH ONLY ---
   const [reviews, setReviews] = useState<any[]>([])
   const [reviewsLoading, setReviewsLoading] = useState(true)
 
@@ -149,21 +126,23 @@ export default function HomePage(){
         }
       }
     }catch{}
+    // TOURS - ONLY from tours page API
     try{
       const r = await fetch('/api/tours',{cache:'no-store'})
       const data = await r.json()
       if(Array.isArray(data) && data.length>0){
         const mapped = data.filter((d:any)=>d.active!==false).filter((d:any)=>!HIDDEN_TOUR_IDS.includes(d.id)).map((d:any)=>{
           const publicUrls = getPublicImages(d.id, d.name||d.title||"")
-          const urls = publicUrls && publicUrls.length>0 ? publicUrls : []
+          const urls = publicUrls && publicUrls.length>0 ? publicUrls : (d.image_urls||d.images||[])
           const apiPrice = Number(d.price?? 0)
           const apiMarket = Number(d.market_price?? d.market?? 0)
           const market = apiMarket>apiPrice ? apiMarket : apiPrice+20
           return { id:d.id, name:d.name||d.title, cat: Array.isArray(d.cat)? d.cat : d.category? [d.category] : ["Popular"], price: apiPrice, market, duration: d.duration || "3 Hours", pickup: d.pickup || "Stone Town", desc: d.description || d.desc || "", area: d.area || "West", active: d.active!==false, featured:!!d.featured, imageData: urls[0]||"", imageDatas: urls, image: urls[0]||"", }
         })
-        if(mapped.length>0) setTours(mapped)
+        setTours(mapped)
       }
     }catch{}
+    // TRANSFERS - ONLY from airport-transfers API
     try{
       const r = await fetch('/api/transfers',{cache:'no-store'})
       const data = await r.json()
@@ -176,13 +155,12 @@ export default function HomePage(){
           const finalImg = getTransferImage(d.id, d.name, apiImg)
           return { id:d.id, name:d.name||d.title, area: d.area || "West", duration: d.duration || "", distance: d.distance || "", price: pricing.price, market: pricing.market, desc: d.description || d.desc || "", imageData: finalImg, imageDatas: finalImg ? [finalImg] : [], image: finalImg, active: d.active!==false, cat: Array.isArray(d.cat)? d.cat : d.category? [d.category] : ["Popular"] }
         })
-        if(mapped.length>0) setTransfers(mapped)
+        setTransfers(mapped)
       }
     }catch{}
     try{ const r = await fetch('/api/blogs',{cache:'no-store'}); const data = await r.json(); if(Array.isArray(data)&&data.length>0) setBlogs(data.slice(0,6).map((b:any)=>({ slug:b.slug||b.id, cat:b.cat||b.category, title:b.title, excerpt:b.excerpt||b.desc||"" }))) }catch{}
     try{ const r = await fetch('/api/settings',{cache:'no-store'}); const data = await r.json(); if(data?.whatsapp) setWaNumber(data.whatsapp) }catch{}
 
-    // --- REVIEWS API FETCH (ADDED) ---
     try{
       setReviewsLoading(true)
       const r = await fetch('/api/reviews',{cache:'no-store'})
@@ -190,7 +168,6 @@ export default function HomePage(){
       if(Array.isArray(data)) setReviews(data)
       else if(Array.isArray(data?.data)) setReviews(data.data)
       else if(Array.isArray(data?.reviews)) setReviews(data.reviews)
-      else if(Array.isArray(data?.data?.data)) setReviews(data.data.data)
       else setReviews([])
     }catch{
       setReviews([])
@@ -311,7 +288,9 @@ export default function HomePage(){
             <p className="text-[13.5px] md:text-[14px] text-[#0A2342]/65 mt-2 leading-relaxed font-medium">Same pricing & images as transfers page - fast local images, pay after trip.</p>
           </div>
           <div className="mt-9 grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {transfers.slice(0,8).map((tr:any)=>{
+            {transfers.length===0 ? (
+              <div className="col-span-4 text-center py-10 text-gray-400 text-[13px]">Loading transfers</div>
+            ) : transfers.slice(0,8).map((tr:any)=>{
               const isSel = selectedTransfers.find(s=>s.id===tr.id)
               const save = (tr.market||0)-(tr.price||0)
               return (
@@ -353,7 +332,9 @@ export default function HomePage(){
             </div>
           </div>
           <div className="mt-10 grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {toursToShow.map((t:any)=>{
+            {tours.length===0 ? (
+              <div className="col-span-4 text-center py-10 text-gray-400 text-[13px]">Loading tours </div>
+            ) : toursToShow.map((t:any)=>{
               const isSel = selectedTours.find(s=>s.id===t.id)
               const save = (t.market||0)-(t.price||0)
               return (
@@ -406,92 +387,108 @@ export default function HomePage(){
       <section id="reviews" className="px-6 md:px-12 py-16 bg-white border-t border-[#0A2342]/10">
         <div className="max-w-[1400px] mx-auto">
           <div className="text-center max-w-3xl mx-auto">
-            <h2 className="font-black text-[28px] md:text-[38px] text-[#0a2342] leading-[1.1]">What guests say on TripAdvisor after their<br/>private tours with HERO</h2>
-            <p className="text-[13px] text-[#0A2342]/60 mt-3">Verified reviews from TripAdvisor • #112 of 1198 in Zanzibar City • Location ID: 34749047</p>
+            <h2 className="font-black text-[28px] md:text-[36px] text-[#0a2342] leading-[1.1]">What guests say on TripAdvisor after their<br/>private tours with HERO</h2>
+            <p className="text-[12px] text-[#0A2342]/60 mt-3">Verified reviews from TripAdvisor • Location ID: 34749047 • Hero Shuttles • Zanzibar City</p>
           </div>
 
-          <div className="mt-10 grid md:grid-cols-3 gap-6">
-            <div className="md:col-span-2 bg-[#F8FAFF] rounded-[24px] border-2 border-[#0a2342]/5 p-8">
-              <div className="flex items-center gap-3">
-                <span className="font-black text-[18px] text-[#0a2342]">TripAdvisor</span>
-                <span className="bg-[#00aa6c] text-white text-[10px] px-3 py-1 rounded-full font-black">VERIFIED</span>
-                <span className="text-[11px] text-gray-500">{reviewsLoading? "Loading..." : `${reviews.length} reviews loaded`}</span>
+          <div className="mt-10 grid md:grid-cols-3 gap-6 items-start">
+            <div className="md:col-span-2 space-y-6">
+              <div className="bg-[#F8FAFF] rounded-[20px] border border-[#0a2342]/5 p-6">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-black text-[15px] text-[#0a2342]">TripAdvisor</span>
+                  <span className="bg-[#00aa6c] text-white text-[9px] px-2.5 py-0.5 rounded-full font-black">VERIFIED</span>
+                  <span className="text-[11px] text-gray-500">{reviewsLoading? "Loading..." : `${reviews.length} reviews loaded`}</span>
+                </div>
+                <h3 className="font-black text-[18px] md:text-[20px] text-[#0a2342] mt-3 leading-tight">Enjoyed your private tour with HERO?</h3>
+                <p className="text-[12px] text-[#0a2342]/60 mt-2">Tap below to leave a review on TripAdvisor. Takes 30 seconds and helps other travelers find us. Asante sana!</p>
+                <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <a href={TA_WRITE_URL} target="_blank" className="bg-[#00aa6c] text-white px-5 py-3 rounded-full font-black text-[13px] text-center hover:bg-[#009a62] transition">👍 Tap to Write a Review</a>
+                  <a href={TA_VIEW_URL} target="_blank" className="bg-white border-2 border-[#0a2342]/15 text-[#0a2342] px-5 py-3 rounded-full font-black text-[13px] text-center hover:bg-[#0a2342] hover:text-white transition">👁️ View All Reviews on TA</a>
+                </div>
+                <div className="mt-3 text-[10px] text-gray-400">⭐⭐⭐⭐⭐ Location ID: 34749047 • Hero Shuttles • Zanzibar City</div>
               </div>
-              <h3 className="font-black text-[22px] md:text-[26px] text-[#0a2342] mt-6 leading-tight">Enjoyed your private tour with HERO?</h3>
-              <p className="text-[14px] text-[#0a2342]/70 mt-3 leading-relaxed">Tap below to leave a review on TripAdvisor. Takes 30 seconds and helps other travelers find us. Asante sana!</p>
-              <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-3">
-                <a href={TA_WRITE_URL} target="_blank" className="bg-[#00aa6c] text-white px-6 py-4 rounded-full font-black text-[14px] text-center hover:bg-[#009a62] transition">✍️ Tap to Write a Review</a>
-                <a href={TA_VIEW_URL} target="_blank" className="bg-white border-2 border-[#0a2342] text-[#0a2342] px-6 py-4 rounded-full font-black text-[14px] text-center hover:bg-[#0a2342] hover:text-white transition">👁️ View All Reviews on TA</a>
-              </div>
-              <div className="mt-6 flex items-center gap-2 text-[11px] text-gray-500">
-                <span>⭐⭐⭐⭐⭐</span>
-                <span>Location ID: 34749047 • Hero Shuttles • Zanzibar City</span>
-              </div>
+
+              {reviewsLoading ? (
+                <div className="grid md:grid-cols-2 gap-4">
+                  {[1,2,3].map(i=><div key={i} className="bg-[#F8FAFF] rounded-[18px] p-5 animate-pulse h-[180px] border"></div>)}
+                </div>
+              ) : reviews.length > 0 ? (
+                <>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {reviews.slice(0,2).map((rv:any, idx:number)=>(
+                      <a key={rv.id||idx} href={rv.url || TA_VIEW_URL} target="_blank" rel="noopener noreferrer" className="bg-white rounded-[18px] border-2 border-[#0a2342]/5 p-5 shadow-sm hover:shadow-lg hover:border-[#00aa6c]/30 transition cursor-pointer group block text-left">
+                        <div className="flex items-start gap-3">
+                          <div className="w-9 h-9 rounded-full bg-[#0a2342] text-white flex items-center justify-center font-black text-[12px] shrink-0">{(rv.author||rv.user?.username||rv.username||"G")[0]}</div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex justify-between gap-2 items-center">
+                              <p className="font-black text-[13px] text-[#0a2342] truncate group-hover:text-[#00aa6c] transition">{rv.author || rv.user?.username || rv.username || "Guest"}</p>
+                              <div className="flex items-center gap-1 shrink-0">
+                                <span className="text-[10px] font-black bg-[#00aa6c]/10 text-[#00aa6c] px-2 py-0.5 rounded-full">⭐ {rv.rating||5}/5</span>
+                                <span className="text-[12px]">↗️</span>
+                              </div>
+                            </div>
+                            <p className="text-[11px] text-gray-400 mt-0.5 truncate">{rv.published_date || rv.date || ""} • {rv.title || "Verified"} • <span className="text-[#00aa6c] font-bold">VERIFIED</span></p>
+                          </div>
+                        </div>
+                        <p className="text-[13px] text-[#0a2342]/75 mt-3 leading-relaxed line-clamp-4">"{rv.text || rv.review_text || ""}"</p>
+                        <p className="text-[11px] font-black text-[#00aa6c] mt-3 underline">View this review on TripAdvisor →</p>
+                      </a>
+                    ))}
+                  </div>
+                  <div className="grid md:grid-cols-1 gap-4">
+                    {reviews.slice(2).map((rv:any, idx:number)=>(
+                      <a key={rv.id||idx+2} href={rv.url || TA_VIEW_URL} target="_blank" rel="noopener noreferrer" className="bg-white rounded-[18px] border-2 border-[#0a2342]/5 p-5 shadow-sm hover:shadow-lg hover:border-[#00aa6c]/30 transition cursor-pointer group block text-left">
+                        <div className="flex items-start gap-3">
+                          <div className="w-9 h-9 rounded-full bg-[#00aa6c] text-white flex items-center justify-center font-black text-[12px] shrink-0">{(rv.author||rv.user?.username||rv.username||"G")[0]}</div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex justify-between gap-2 items-center">
+                              <p className="font-black text-[13px] text-[#0a2342] truncate group-hover:text-[#00aa6c] transition">{rv.author || rv.user?.username || rv.username || "Guest"}</p>
+                              <div className="flex items-center gap-1 shrink-0">
+                                <span className="text-[10px] font-black bg-[#00aa6c]/10 text-[#00aa6c] px-2 py-0.5 rounded-full">⭐ {rv.rating||5}/5</span>
+                                <span className="text-[12px]">↗️</span>
+                              </div>
+                            </div>
+                            <p className="text-[11px] text-gray-400 mt-0.5 truncate">{rv.published_date || rv.date || ""} • {rv.title || ""} • <span className="text-[#00aa6c] font-bold">VERIFIED</span></p>
+                          </div>
+                        </div>
+                        <p className="text-[13px] text-[#0a2342]/75 mt-3 leading-relaxed">"{rv.text || rv.review_text || ""}"</p>
+                        <p className="text-[11px] font-black text-[#00aa6c] mt-3 underline">View this review on TripAdvisor →</p>
+                      </a>
+                    ))}
+                  </div>
+                  <div className="flex justify-between items-center pt-2">
+                    <h4 className="font-black text-[14px] text-[#0a2342]">All Guest Reviews from TripAdvisor</h4>
+                    <a href={TA_VIEW_URL} target="_blank" className="text-[11px] font-black text-[#00aa6c] underline">View on TripAdvisor →</a>
+                  </div>
+                </>
+              ) : (
+                <div className="bg-[#F8FAFF] rounded-[20px] border p-6 text-center">
+                  <p className="text-[13px] text-gray-500">No reviews yet - API returns empty, waiting for Terra migration</p>
+                </div>
+              )}
             </div>
 
-            <div className="bg-white rounded-[24px] border-2 border-[#0a2342]/10 p-3 text-center shadow-sm flex flex-col items-center">
-              <div className="bg-[#00E078] rounded-[28px] p-5 w-full flex flex-col items-center">
-                <div className="bg-white rounded-[18px] p-3 w-full">
-                  <img src="/tripadvisor-qr.png" alt="TripAdvisor QR" className="w-full h-auto rounded-[8px]" />
-                </div>
-                <div className="mt-5 text-center">
-                  <p className="font-black text-[26px] leading-none text-black">Review us</p>
-                  <p className="font-black text-[26px] leading-none text-black mt-1">on</p>
-                  <p className="font-black text-[26px] leading-none text-black mt-1">Tripadvisor</p>
-                  <div className="mt-4 flex justify-center">
-                    <svg width="80" height="32" viewBox="0 0 100 40" fill="none">
-                      <ellipse cx="25" cy="18" rx="20" ry="12" fill="black"/>
-                      <ellipse cx="75" cy="18" rx="20" ry="12" fill="black"/>
-                      <ellipse cx="25" cy="18" rx="13" ry="8" fill="white"/>
-                      <ellipse cx="75" cy="18" rx="13" ry="8" fill="white"/>
-                      <circle cx="25" cy="18" r="5" fill="black"/>
-                      <circle cx="75" cy="18" r="5" fill="black"/>
-                      <path d="M50 28 L45 36 L55 36 Z" fill="black"/>
-                    </svg>
+            <div className="md:col-span-1">
+              <div className="bg-white rounded-[20px] border-2 border-[#0a2342]/10 p-3 shadow-sm sticky top-6">
+                <div className="bg-[#00E078] rounded-[20px] p-4">
+                  <div className="bg-white rounded-[16px] p-3">
+                    <img src="/tripadvisor-qr.png" alt="TripAdvisor QR" className="w-full h-auto rounded-[8px]" />
+                  </div>
+                  <div className="mt-4 text-center">
+                    <p className="font-black text-[22px] leading-[0.9] text-black">Review us</p>
+                    <p className="font-black text-[22px] leading-[0.9] text-black mt-1">on</p>
+                    <p className="font-black text-[22px] leading-[0.9] text-black mt-1">Tripadvisor</p>
+                    <div className="mt-3 flex justify-center text-[18px]">👀</div>
                   </div>
                 </div>
+                <a href={TA_WRITE_URL} target="_blank" className="block mt-3 w-full bg-[#0a2342] text-white px-5 py-3.5 rounded-full font-black text-[12px] text-center hover:bg-black transition">Open Review Page →</a>
+                <p className="text-[10px] text-gray-400 mt-2 text-center">Scan with phone camera • Goes to TripAdvisor</p>
+                <div className="mt-6 pt-4 border-t border-gray-100">
+                  <a href={TA_VIEW_URL} target="_blank" className="block text-center text-[12px] font-black text-[#00aa6c] underline">View on TripAdvisor →</a>
+                  <p className="text-[10px] text-gray-400 mt-2 text-center">Verified listing • 34749047</p>
+                </div>
               </div>
-              <a href={TA_WRITE_URL} target="_blank" className="block mt-4 w-full bg-[#0a2342] text-white px-5 py-3 rounded-full font-black text-[12px] text-center">Open Review Page →</a>
-              <p className="text-[10px] text-gray-400 mt-2">Scan with phone camera • Goes to TripAdvisor</p>
             </div>
-          </div>
-
-          <div className="mt-12">
-            <div className="flex justify-between items-center">
-              <h3 className="font-black text-[18px] text-[#0a2342]">All Guest Reviews from TripAdvisor API</h3>
-              <a href={TA_VIEW_URL} target="_blank" className="text-[12px] font-black text-[#00aa6c] underline">View on TripAdvisor →</a>
-            </div>
-
-            {reviewsLoading ? (
-              <div className="mt-6 grid md:grid-cols-3 gap-4">
-                {[1,2,3].map(i=><div key={i} className="bg-[#F8FAFF] rounded-[18px] p-6 animate-pulse h-[160px] border-2 border-[#0a2342]/5"></div>)}
-              </div>
-            ) : reviews.length > 0 ? (
-              <div className="mt-6 grid md:grid-cols-3 gap-4">
-                {reviews.map((rv:any, idx:number)=>(
-                  <div key={rv.id||idx} className="bg-white rounded-[18px] border-2 border-[#0a2342]/5 p-5 shadow-sm">
-                    <div className="flex justify-between items-start gap-2">
-                      <p className="font-black text-[13px] text-[#0a2342]">{rv.user?.username || rv.author || "Guest"}</p>
-                      <span className="bg-[#00aa6c]/10 text-[#00aa6c] text-[11px] font-black px-2 py-0.5 rounded-full">⭐ {rv.rating || 5}/5</span>
-                    </div>
-                    <p className="text-[12px] text-gray-500 mt-1">{rv.published_date || rv.date || ""} • {rv.title || ""}</p>
-                    <p className="text-[13px] text-[#0a2342]/80 mt-3 leading-relaxed line-clamp-4">{rv.text || rv.review_text || rv.comment || JSON.stringify(rv).slice(0,200)}</p>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="mt-6 bg-[#F8FAFF] rounded-[24px] border-2 border-[#0a2342]/5 p-8 text-center">
-                <div className="max-w-xl mx-auto">
-                  <div className="w-16 h-16 bg-[#00aa6c]/10 rounded-full flex items-center justify-center mx-auto"><span className="text-[28px]">💬</span></div>
-                  <h4 className="font-black text-[16px] text-[#0a2342] mt-4">No reviews from API yet - Terra not migrated</h4>
-                  <p className="text-[13px] text-[#0a2342]/60 mt-2 leading-relaxed">Your listing ID 34749047 exists on TripAdvisor but not yet in Terra API. API returns empty. Guests can still review via QR above - once migrated, reviews auto-appear here. Use Widget fallback for now.</p>
-                  <div className="mt-6 flex flex-col md:flex-row justify-center gap-3">
-                    <a href={TA_WRITE_URL} target="_blank" className="bg-[#0a2342] text-white px-8 py-3 rounded-full font-black text-[13px]">Write First Review →</a>
-                    <a href={TA_VIEW_URL} target="_blank" className="bg-white border-2 border-[#0a2342]/10 text-[#0a2342] px-8 py-3 rounded-full font-black text-[13px]">View Listing →</a>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </section>
