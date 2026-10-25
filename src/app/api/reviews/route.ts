@@ -1,13 +1,13 @@
 export async function GET() {
   const key = process.env.TRIPADVISOR_API_KEY?.trim()
+  const LOCATION_ID = "34749047" // your old ID - let's test if Terra accepts it
   
   const res = await fetch(
-    `https://terra.tripadvisor.com/api/locations/search?query=Hero%20Shuttle%20Tours&locale=en-US`,
+    `https://terra.tripadvisor.com/api/locations/${LOCATION_ID}?locale=en-US`,
     { headers: { "x-api-key": key! } }
   )
   
   const text = await res.text()
-  // Return raw to see result
   try {
     return Response.json(JSON.parse(text))
   } catch {
