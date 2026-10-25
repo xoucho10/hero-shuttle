@@ -1,15 +1,17 @@
 export async function GET() {
   const key = process.env.TRIPADVISOR_API_KEY?.trim()
-  const LOCATION_ID = "34749047" // your old ID - let's test if Terra accepts it
   
+  // Search ALL attractions near Zanzibar City - no query filter
   const res = await fetch(
-    `https://terra.tripadvisor.com/api/locations/${LOCATION_ID}?locale=en-US`,
+    `https://terra.tripadvisor.com/api/locations/nearby-search?latLong=-6.1659,39.2026&radius=20&radiusUnit=km&category=attractions&locale=en-US`,
     { headers: { "x-api-key": key! } }
   )
   
   const text = await res.text()
   try {
-    return Response.json(JSON.parse(text))
+    const json = JSON.parse(text)
+    // Return only first 10 with names to find Hero
+    return Response.json(json)
   } catch {
     return new Response(text, { headers: { "Content-Type": "text/plain" } })
   }
