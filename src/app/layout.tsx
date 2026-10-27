@@ -2,6 +2,7 @@
 import "./globals.css";
 import { GlobalEffects } from "@/components/effects/GlobalEffects";
 import FloatingWhatsApp from "@/components/FloatingWhatsApp";
+import Script from "next/script";
 
 export const viewport = {
   width: "device-width",
@@ -32,6 +33,17 @@ export default function RootLayout({
   return (
     <html lang="en" className="overflow-x-hidden">
       <body className="bg-white text-[#0A2342] overflow-x-hidden min-w-0 antialiased">
+        {/* Google Analytics - Hero Shuttle G-4EQ4SW354T */}
+        <Script async src="https://www.googletagmanager.com/gtag/js?id=G-4EQ4SW354T" strategy="afterInteractive" />
+        <Script id="ga-hero-shuttle" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-4EQ4SW354T');
+          `}
+        </Script>
+
         <GlobalEffects />
         {children}
         <FloatingWhatsApp />
